@@ -8,21 +8,35 @@
 .chunk{padding:10px 12px;border-radius:10px;margin:6px 0;font-size:13px;line-height:1.5;border:1px solid #E9EEF3;cursor:pointer;transition:.15s}
 .chunk:hover{transform:translateY(-1px);box-shadow:0 2px 10px rgba(10,25,49,.08)}
 .chunk.best{border-color:#12549E;background:#EFF6FF;box-shadow:0 4px 14px rgba(37,99,235,.12)}
-.baguette{height:36px;border-radius:999px;overflow:hidden;display:flex;border:1px solid #D4DDE8;background:#F4F7FA}
-.slice{flex:1;display:grid;place-items:center;font-size:11px;font-weight:700;color:#0A1931;border-right:1px solid #fff;position:relative}
-.slice.overlap::after{content:"";position:absolute;right:-10px;top:0;bottom:0;width:20px;background:repeating-linear-gradient(45deg, rgba(18,84,158,.18), rgba(18,84,158,.18) 6px, transparent 6px, transparent 10px);pointer-events:none}
-.preset{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
-.preset button{padding:8px 12px;border-radius:999px;border:1px solid #D4DDE8;background:#fff;font-size:13px;font-weight:700;cursor:pointer}
+.baguette{border-radius:14px;overflow:hidden;display:flex;align-items:stretch;border:1px solid #D4DDE8;background:#F4F7FA;min-height:52px}
+.slice{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 2px;border-right:1px solid #fff}
+.slice .sn{font-size:11px;font-weight:800;color:#0A1931;line-height:1}
+.slice .sr{font-size:9px;font-weight:700;color:#5A6C80;line-height:1;white-space:nowrap}
+.baguette.dense .sr{display:none}
+.bnd{width:26px;flex:0 0 26px;display:grid;place-items:center;font-size:9px;font-weight:800;color:#12549E;background:repeating-linear-gradient(45deg, rgba(18,84,158,.16), rgba(18,84,158,.16) 5px, rgba(18,84,158,.05) 5px, rgba(18,84,158,.05) 9px)}
+.bag-summary{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.bag-summary span{background:#fff;border:1px solid #E9EEF3;border-radius:999px;padding:4px 9px;font-size:11px;font-weight:700;color:#0A1931}
+.bag-summary span.hl{border-color:#12549E;color:#12549E;background:#EFF6FF}
+.preset{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+@media(max-width:640px){.preset{grid-template-columns:1fr}}
+.preset button{padding:9px 10px;border-radius:12px;border:1px solid #D4DDE8;background:#fff;font-size:13px;font-weight:800;color:#0A1931;cursor:pointer;text-align:left;line-height:1.25}
+.preset button small{display:block;font-size:11px;font-weight:600;color:#5A6C80;margin-top:2px}
 .preset button.active{background:#0A1931;color:#fff;border-color:#0A1931}
+.preset button.active small{color:#C7D2FE}
 .range-card{padding:12px;border:1px solid #E9EEF3;border-radius:12px;background:#F9FAFB}
 .range-row{margin:8px 0}
 .range-row label{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;color:#0A1931}
 .range-row input{flex:1}
-.range-row .val{min-width:64px;text-align:right;font-weight:800;color:#12549E}
+.range-row .val{min-width:70px;text-align:right;font-weight:800;color:#12549E}
 .help{font-size:12px;color:#5A6C80;margin:2px 0 8px 0}
+.status{margin-top:10px;padding:10px 12px;border-radius:10px;background:#0A1931;color:#fff;font-size:12px;font-family:ui-monospace,Menlo,monospace}
+.status .verdict{display:block;margin-top:6px;font-family:Inter,sans-serif;font-weight:700}
+.status .verdict.good{color:#6EE7B7}
+.status .verdict.warn{color:#FDE68A}
 .scorebar{height:6px;background:#E9EEF3;border-radius:999px;margin-top:6px;overflow:hidden}
 .scorefill{height:100%;background:#12549E;border-radius:999px}
 .scorefill.bestfill{background:#EF413D}
+.slicerange{font-size:11px;color:#5A6C80;font-weight:600}
 </style>
 </head>
 <body>
@@ -31,52 +45,48 @@
   <div id="pipeline" style="margin-bottom:12px"></div>
   <div class="kicker">Chunking — Baguette Slicer</div>
   <h1 style="color:#0A1931;margin:8px 0 6px">Cut the baguette — find the garlic slice</h1>
-  <p style="color:#5A6C80;margin:0">A 50-page policy is too long for AI. We cut it into slices (chunks). <strong>Use the sliders</strong> — watch how the best slice for your question changes.</p>
+  <p style="color:#5A6C80;margin:0">A 50-page policy is too long for AI. We cut it into slices (chunks). Drag the sliders — every number on this page updates instantly.</p>
 
-  <!-- Question -->
   <div class="card" style="margin-top:12px;background:#EFF6FF;border-color:#BFDBFE">
     <div style="font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:#12549E">Your question (fixed for this demo)</div>
     <div style="font-size:15px;font-weight:700;color:#0A1931;margin-top:4px">“Which hospitals are covered in this policy?”</div>
     <div style="font-size:12px;color:#5A6C80;margin-top:4px">We rank every slice by <strong>cosine similarity</strong> — simply a 0–100% similarity score between meanings — to this question. Highest score = slice that would be sent to the AI.</div>
   </div>
 
-  <!-- Baguette visual + controls -->
   <div class="card">
     <h3 style="margin:0;color:#0A1931">1 — Slice the document</h3>
-    <p class="help">Move <strong>Chunk size</strong> (how big each slice) and <strong>Overlap</strong> (how much slices share to keep context). The baguette below updates live.</p>
+    <p class="help">Drag the sliders below. The baguette shows <strong>each slice’s character range</strong> and the <strong>↩shared overlap</strong> at every cut.</p>
+
     <div class="baguette" id="baguette"></div>
-    <div style="display:flex;justify-content:space-between;font-size:11px;color:#5A6C80;margin-top:6px"><span>Start</span><span id="sliceCount">0 slices</span><span>End</span></div>
+    <div class="bag-summary" id="bagSummary"></div>
 
     <div class="preset">
-      <button data-size="180" data-over="20">Too small (180)</button>
-      <button class="active" data-size="450" data-over="50">Just right (500)</button>
-      <button data-size="800" data-over="50">Too big (800)</button>
+      <button data-size="180" data-over="20">Too small (180)<small>words get cut mid-sentence</small></button>
+      <button class="active" data-size="450" data-over="50">Just right (450)<small>whole thoughts stay together</small></button>
+      <button data-size="800" data-over="50">Too big (800)<small>hospitals + fluff mushed together</small></button>
     </div>
 
     <div class="range-card">
-      <div class="range-row"><label>Chunk size — move this first <input type="range" id="size" min="150" max="900" value="450"> <span class="val" id="sizeV">450</span></label></div>
-      <div class="help">How big each slice is. Watch the baguette above and the blue <strong>Best slice</strong> in section 3. Try preset <strong>180</strong> → “St. Jude’s” cut in half; <strong>800</strong> → legal fluff + hospitals together (diluted).</div>
-      <div class="range-row"><label>Overlap — move second <input type="range" id="over" min="0" max="200" value="50"> <span class="val" id="overV">50</span></label></div>
-      <div class="help">How much slices share at the boundary. Striped overlap on the baguette = shared characters. Try <strong>0</strong> → sentence breaks at the cut; <strong>50</strong> keeps it intact. <span style="color:#5A6C80">Note: this short excerpt has only 2–4 slices — overlap adds more slices only when text is longer than chunk size. For a 50-page doc, more overlap = noticeably more slices — that’s normal.</span></div>
+      <div class="range-row"><label>Chunk size — move this first <input type="range" id="size" min="150" max="900" value="450"> <span class="val" id="sizeV">450 chars</span></label></div>
+      <div class="help">How long every slice is. Watch the ranges printed on the baguette and the blue <strong>Best slice</strong> below. Try <strong>180</strong> → “St. Jude’s” gets cut in half; <strong>800</strong> → legal fluff lands in the same slice.</div>
+      <div class="range-row"><label>Overlap — move second <input type="range" id="over" min="0" max="400" value="50"> <span class="val" id="overV">50 chars</span></label></div>
+      <div class="help">Overlap does <strong>not</strong> change slice length — slices stay as long as Chunk size. It starts each next slice a bit earlier, so the text at a cut is read twice (the ↩ badge) and nothing is lost. <strong>Step = size − overlap.</strong></div>
+      <div class="status" id="statusLive"></div>
     </div>
-
-    <details class="details" style="margin-top:8px"><summary>How to use — 10 seconds</summary><p class="help">1) Move <strong>Chunk size</strong> → slice count changes. 2) Move <strong>Overlap</strong> → striped shared area appears on baguette. 3) Look at section 3 — the blue slice is the winner for “Which hospitals are covered?”. Tap any slice to see its score.</p></details>
   </div>
 
-  <!-- Source text (collapsible to save space) -->
   <details class="card">
     <summary>Source text — 50-page excerpt (tap to edit)</summary>
     <textarea id="txt" style="width:100%;height:110px;margin-top:10px;padding:10px;border:1px solid #D4DDE8;border-radius:10px;font-size:13px">HEALTH INSURANCE POLICY — Schedule of Network Providers (excerpt). Section 4.2.1 List of Network Service Liability and Covered Institutions: The policy covers City General Hospital Alliance, St. Jude’s Medical Center, and Westside Health Center under the Preferred Provider Tier. Section 4.2.2 Emergency Care: Out-of-network emergency care is reimbursed only if pre-authorized within 48 hours. Section 5 Legal Disclaimer: This policy does not guarantee availability of Physicians on weekends. For other benefits, see Appendix B. The Preferred Provider Tier includes comprehensive care at listed centers. Any service outside the network is subject to co-pay of 30% unless classified as emergency under Section 4.2.2.</textarea>
     <p class="help">You can edit this — try pasting a clause and see how slicing changes.</p>
   </details>
 
-  <!-- Chunks + best -->
   <div class="grid grid-2" style="margin-top:12px">
     <div class="card">
       <h3 style="margin:0;color:#0A1931">2 — Your slices — tap any</h3>
       <p class="help">Blue = <strong>best for your question</strong> (would be sent to AI). Gray = others. Score = cosine similarity.</p>
       <div id="chunks"></div>
-      <div style="font-size:11px;color:#5A6C80;margin-top:8px"><span id="count">0 chunks</span> • <span id="time">~0 ms</span> • Tip: too small &lt;200 loses context, too big &gt;700 dilutes match.</div>
+      <div style="font-size:11px;color:#5A6C80;margin-top:8px"><span id="count">0 chunks</span> • <span id="time">~0 ms</span></div>
     </div>
     <div class="card" style="position:sticky;top:72px;align-self:start">
       <h3 style="margin:0;color:#0A1931">3 — Which slice would the AI see?</h3>
@@ -84,78 +94,130 @@
       <div id="bestExplain" style="font-size:12px;color:#5A6C80;margin-top:8px"></div>
       <div style="margin-top:10px;padding:10px;background:#F9FAFB;border:1px solid #E9EEF3;border-radius:10px">
         <div style="font-size:12px;font-weight:700;color:#0A1931">Why this one is highlighted</div>
-        <p class="help" style="margin:4px 0 0">We compute <code>cosine(slice, “Which hospitals are covered?”)</code> for every slice — highest wins. <strong>Move the Chunk size slider above</strong> and watch the winner change. Move <strong>Overlap</strong> to see how sharing prevents a sentence from being cut.</p>
+        <p class="help" style="margin:4px 0 0">We compute <code>cosine(slice, question)</code> for every slice — highest wins. Move <strong>Chunk size</strong> and watch the winner change; move <strong>Overlap</strong> to see a cut sentence survive in the next slice.</p>
       </div>
-      <details class="details"><summary>For builders</summary><p class="help">Real pipeline: 500 chars + 50 overlap, 768-D embeddings. Overlap prevents sentence cut. Try 0 vs 50 to see the boundary sentence stay intact.</p></details>
+      <details class="details"><summary>For builders</summary><p class="help">Real pipeline: 500 chars + 50 overlap, 768-D embeddings. Overlap prevents boundary loss; step = size − overlap.</p></details>
     </div>
   </div>
 </main>
 <script src="../assets/pipeline.js?v=11"></script>
 <script src="../assets/common.js"></script>
 <script>
-const txt=document.getElementById('txt'), size=document.getElementById('size'), over=document.getElementById('over'), sizeV=document.getElementById('sizeV'), overV=document.getElementById('overV'), chunksDiv=document.getElementById('chunks'), best=document.getElementById('best'), bestExplain=document.getElementById('bestExplain'), count=document.getElementById('count'), timeEl=document.getElementById('time'), baguette=document.getElementById('baguette');
+const txt=document.getElementById('txt'), size=document.getElementById('size'), over=document.getElementById('over'), sizeV=document.getElementById('sizeV'), overV=document.getElementById('overV'), chunksDiv=document.getElementById('chunks'), best=document.getElementById('best'), bestExplain=document.getElementById('bestExplain'), count=document.getElementById('count'), timeEl=document.getElementById('time'), baguette=document.getElementById('baguette'), bagSummary=document.getElementById('bagSummary'), statusLive=document.getElementById('statusLive');
 const query="Which hospitals are covered in this policy?";
-function renderBaguette(n, overlap){
-  // visual slices: max 8 visual for readability
-  const vis = Math.min(n, 8);
+let lesson=null; // set by preset chips
+
+// slice with positions: each slice = size long, next starts (size-overlap) later
+function chunkPieces(text, size, overlap){
+  const step=Math.max(1, size-overlap);
+  const pieces=[]; let i=0;
+  while(i<text.length){
+    const end=Math.min(i+size, text.length);
+    pieces.push({start:i, end:end, text:text.slice(i,end)});
+    if(end>=text.length) break;
+    i+=step;
+  }
+  return pieces;
+}
+
+function renderBaguette(pieces, overlap, size){
+  const n=pieces.length, vis=Math.min(n,8);
+  baguette.classList.toggle('dense', vis>6);
   baguette.innerHTML="";
   for(let i=0;i<vis;i++){
+    const p=pieces[i];
     const d=document.createElement('div');
-    d.className="slice"+(overlap>0 && i<vis-1 ? " overlap" : "");
+    d.className="slice";
     d.style.background=["#FFFFFF","#F4F7FA","#EFF6FF","#FEF3C7","#ECFDF5","#FDF2F8"][i%6];
-    d.textContent=i===0?"Slice 1":i===vis-1 && n>vis?`+${n-vis+1}`:`${i+1}`;
+    const last = i===vis-1 && n>vis;
+    d.innerHTML=`<span class="sn">${last?("+"+(n-vis+1)):("S"+(i+1))}</span>`+
+                `<span class="sr">${p.start}–${p.end}</span>`;
     baguette.appendChild(d);
+    if(overlap>0 && i<vis-1){
+      const b=document.createElement('div');
+      b.className="bnd"; b.textContent="↩"+overlap;
+      baguette.appendChild(b);
+    }
   }
+  // summary chips under the baguette
+  const step=Math.max(1,size-overlap);
+  bagSummary.innerHTML=
+    `<span class="hl">slice length = ${size} chars</span>`+
+    `<span>step = ${step}</span>`+
+    `<span>overlap = ${overlap} shared</span>`+
+    `<span>${n} slices</span>`+
+    `<span>text = ${txt.value.length} chars</span>`;
 }
+
 function render(){
-  const s=parseInt(size.value,10), o=parseInt(over.value,10);
+  const s=parseInt(size.value,10);
+  // keep overlap sane: step must stay >= 50
+  over.max=Math.max(0, s-50);
+  if(+over.value > +over.max) over.value=over.max;
+  const o=parseInt(over.value,10);
   sizeV.textContent=s+" chars"; overV.textContent=o+" chars";
+
   const t0=performance.now();
-  const cs=chunkText(txt.value, s, o);
+  const pieces=chunkPieces(txt.value, s, o);
   const t1=performance.now();
-  count.textContent=cs.length+" slices"; timeEl.textContent="~"+Math.round(t1-t0)+" ms";
-  renderBaguette(cs.length, o);
-  const scored=cs.map((c,i)=>({text:c, idx:i, score:cosine(mockEmbed(c), mockEmbed(query))})).sort((a,b)=>b.score-a.score);
+  count.textContent=pieces.length+" slices"; timeEl.textContent="~"+Math.round(t1-t0)+" ms";
+
+  renderBaguette(pieces, o, s);
+
+  const scored=pieces.map((p,i)=>({p, idx:i, score:cosine(mockEmbed(p.text), mockEmbed(query))})).sort((a,b)=>b.score-a.score);
   const bestScore=scored[0];
-  // chunks in original order, but highlight best
-  chunksDiv.innerHTML=cs.map((c,i)=>{
-    const sc = scored.find(x=>x.idx===i).score;
-    const isBest = c===bestScore.text;
-    const pct = Math.round(sc*100);
-    const border = isBest ? "#12549E" : "#E9EEF3";
-    const bg = isBest ? "" : "";
-    const badge = isBest ? '<span style="background:#12549E;color:#fff;font-size:11px;font-weight:800;padding:3px 7px;border-radius:999px;margin-left:6px">★ Best — would be retrieved</span>' : `<span style="font-size:11px;color:#5A6C80;float:right">${sc.toFixed(2)} • ${pct}%</span>`;
-    const hit = c.toLowerCase().includes("st. jude")||c.toLowerCase().includes("city general") ? "🏥 " : "";
-    return `<div class="chunk ${isBest?'best':''}" style="border-color:${border}" data-idx="${i}"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span style="font-size:11px;font-weight:700;color:#5A6C80">#${i+1} • ${c.length} chars</span>${badge}</div><div style="margin-top:4px">${hit}${c.slice(0,180).replace(/</g,"&lt;")}${c.length>180?"…":""}</div><div class="scorebar"><div class="scorefill ${isBest?'bestfill':''}" style="width:${Math.max(6, pct)}%"></div></div><div style="font-size:11px;color:#5A6C80;margin-top:4px">Tap to focus → score ${sc.toFixed(2)}</div></div>`;
+
+  chunksDiv.innerHTML=pieces.map((p,i)=>{
+    const sc=scored.find(x=>x.idx===i).score;
+    const isBest=p.text===bestScore.p.text;
+    const pct=Math.round(sc*100);
+    const badge=isBest?'<span style="background:#12549E;color:#fff;font-size:11px;font-weight:800;padding:3px 7px;border-radius:999px;margin-left:6px">★ Best — would be retrieved</span>'
+      :`<span style="font-size:11px;color:#5A6C80;float:right">${sc.toFixed(2)} • ${pct}%</span>`;
+    const hit=p.text.toLowerCase().includes("st. jude")||p.text.toLowerCase().includes("city general")?"🏥 ":"";
+    const share=(i>0&&o>0)?`<span class="slicerange">↩ shares ${o} with slice #${i}</span>`:"";
+    return `<div class="chunk ${isBest?'best':''}" data-idx="${i}"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:11px;font-weight:700;color:#5A6C80">S${i+1} • chars ${p.start}–${p.end} • ${p.text.length} chars ${share}</span>${badge}</div><div style="margin-top:4px">${hit}${p.text.slice(0,180).replace(/</g,"&lt;")}${p.text.length>180?"…":""}</div><div class="scorebar"><div class="scorefill ${isBest?'bestfill':''}" style="width:${Math.max(6,pct)}%"></div></div></div>`;
   }).join("");
-  // tap to focus
+
   chunksDiv.querySelectorAll('.chunk').forEach(el=>{
     el.addEventListener('click', ()=>{
       const idx=parseInt(el.dataset.idx,10);
       const item=scored.find(x=>x.idx===idx);
-      best.innerHTML = `<div style="font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#12549E">Selected slice #${idx+1} — score ${item.score.toFixed(2)}</div><div style="margin-top:6px;font-size:14px;line-height:1.5">${item.text.slice(0,320).replace(/</g,"&lt;")}</div>`;
-      bestExplain.textContent = item.text===bestScore.text ? "This is the highest match — the AI would see this slice." : `Score ${item.score.toFixed(2)} — lower than best (${bestScore.score.toFixed(2)}), so it would be ranked lower and likely not sent.`;
-      // scroll to best card on mobile
-      if(window.innerWidth<700) document.getElementById('best').scrollIntoView({behavior:'smooth', block:'center'});
+      best.innerHTML=`<div style="font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#12549E">Selected slice S${idx+1} (chars ${item.p.start}–${item.p.end}) — score ${item.score.toFixed(2)}</div><div style="margin-top:6px;font-size:14px;line-height:1.5">${item.p.text.slice(0,320).replace(/</g,"&lt;")}</div>`;
+      bestExplain.textContent=item.p.text===bestScore.p.text?"This is the highest match — the AI would see this slice.":`Score ${item.score.toFixed(2)} — lower than best (${bestScore.score.toFixed(2)}), so it would be ranked lower and likely not sent.`;
+      if(window.innerWidth<700) best.scrollIntoView({behavior:'smooth', block:'center'});
     });
   });
-  best.innerHTML = `<div style="font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#12549E">Best for “${query}” — score ${bestScore.score.toFixed(2)}</div><div style="margin-top:6px;font-size:14px;line-height:1.5;font-weight:600">${bestScore.text.slice(0,320).replace(/</g,"&lt;")}</div>`;
-  let reason="";
-  if(s<200) reason = "Tiny slices → “St. Jude’s Medical Center” is cut in half, so similarity drops. Increase to ~450.";
-  else if(s>700) reason = "Huge slice → hospitals + legal fluff together, so signal dilutes. Decrease to ~500.";
-  else if(o===0) reason = "No overlap → a sentence is cut at the boundary. Add 30-70 overlap to keep context.";
-  else reason = "Just right: hospitals stay together and context is preserved. This slice has the cleanest hospital list, so it scores highest.";
-  bestExplain.innerHTML = reason + ` <span style="color:#5A6C80">(Tap any gray slice to compare)</span>`;
+
+  best.innerHTML=`<div style="font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#12549E">Best for “${query}” — score ${bestScore.score.toFixed(2)}</div><div style="margin-top:6px;font-size:14px;line-height:1.5;font-weight:600">${bestScore.p.text.slice(0,320).replace(/</g,"&lt;")}</div>`;
+
+  // live status: numbers + verdict/lesson
+  const step=Math.max(1,s-o);
+  let verdict;
+  if(lesson){ verdict=lesson; }
+  else if(s<200) verdict={cls:"warn", txt:`Slices are fragments — “St. Jude’s Medical Center” is likely split across two slices, so no slice holds the full answer. Try a bigger size.`};
+  else if(s>700) verdict={cls:"warn", txt:`Slices are huge — hospitals sit next to weekend disclaimers, so the meaning blurs. Try a smaller size.`};
+  else if(o===0) verdict={cls:"warn", txt:`No overlap — whatever sentence sits at a cut is lost from one side. Add 30–70 overlap to protect boundaries.`};
+  else verdict={cls:"good", txt:`Healthy: whole thoughts stay together, boundaries are protected. This slice carries the full hospital list.`};
+  statusLive.innerHTML=`${s} chars × ${o} overlap → step ${step} → ${pieces.length} slices → best score ${bestScore.score.toFixed(2)}`+
+    `<span class="verdict ${verdict.cls}">${verdict.txt}</span>`;
 }
-size.addEventListener('input', render); over.addEventListener('input', render); txt.addEventListener('input', render);
+
+size.addEventListener('input', ()=>{lesson=null; render();});
+over.addEventListener('input', ()=>{lesson=null; render();});
+txt.addEventListener('input', render);
 document.querySelectorAll('.preset button').forEach(b=>{
   b.addEventListener('click', ()=>{
     document.querySelectorAll('.preset button').forEach(x=>x.classList.remove('active'));
     b.classList.add('active');
     size.value=b.dataset.size; over.value=b.dataset.over;
+    lesson=b.dataset.lesson||null;
     render();
   });
 });
+// chip lessons
+document.querySelector('.preset button:nth-child(1)').dataset.lesson="Too small: each slice is a fragment — “St. Jude’s” is split across slices, so no single slice holds the full answer. Watch the best score drop.";
+document.querySelector('.preset button:nth-child(2)').dataset.lesson="Just right: the hospital list sits together in one slice — highest score. Real pipelines use sizes like this.";
+document.querySelector('.preset button:nth-child(3)').dataset.lesson="Too big: hospitals and weekend disclaimers share one slice — the meaning blurs and the score drops.";
 render();
 </script>
 <script>renderPipeline('chunking');</script>
