@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-RAG Explainer — TCS France PPT Generator (pure stdlib, no python-pptx)
-Generates slides/rag_explainer.pptx with 17 slides, TCS theme, mobile-ready narrative.
+RAG Explainer — RAG Explainer PPT Generator (pure stdlib, no python-pptx)
+Generates slides/rag_explainer.pptx with 18 slides, professional theme, mobile-ready narrative.
 Stdlib only: zipfile + xml escaping. Based on images_to_pptx ZipFile pattern.
 """
 from pathlib import Path
@@ -54,7 +54,7 @@ def app_xml(n):
   <Slides>{n}</Slides><Notes>0</Notes><HiddenSlides>0</HiddenSlides><MMClips>0</MMClips><ScaleCrop>false</ScaleCrop>
   <HeadingPairs><vt:vector size="2" baseType="variant"><vt:variant><vt:lpstr>Slides</vt:lpstr></vt:variant><vt:variant><vt:i4>{n}</vt:i4></vt:variant></vt:vector></HeadingPairs>
   <TitlesOfParts><vt:vector size="{n}" baseType="lpstr">{''.join(f'<vt:lpstr>Slide {i}</vt:lpstr>' for i in range(1,n+1))}</vt:vector></TitlesOfParts>
-  <Company>TCS France</Company><LinksUpToDate>false</LinksUpToDate><SharedDoc>false</SharedDoc><HyperlinksChanged>false</HyperlinksChanged><AppVersion>16.0000</AppVersion>
+  <Company/><LinksUpToDate>false</LinksUpToDate><SharedDoc>false</SharedDoc><HyperlinksChanged>false</HyperlinksChanged><AppVersion>16.0000</AppVersion>
 </Properties>
 '''
 
@@ -62,7 +62,7 @@ def core_xml(title):
     now = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00","Z")
     return f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <dc:title>{xml_escape(title)}</dc:title><dc:creator>TCS France – RAG Explainer</dc:creator><cp:lastModifiedBy>TCS France</cp:lastModifiedBy>
+  <dc:title>{xml_escape(title)}</dc:title><dc:creator>RAG Explainer</dc:creator><cp:lastModifiedBy>RAG Explainer</cp:lastModifiedBy>
   <dcterms:created xsi:type="dcterms:W3CDTF">{now}</dcterms:created><dcterms:modified xsi:type="dcterms:W3CDTF">{now}</dcterms:modified>
 </cp:coreProperties>
 '''
@@ -216,7 +216,7 @@ def shape_tx(id_, name, x,y,cx,cy, paragraphs, fill=None, line=None):
         <p:txBody><a:bodyPr wrap="square" lIns="72000" rIns="72000" tIns="36000" bIns="36000"/><a:lstStyle/>{body}</p:txBody>
       </p:sp>'''
 
-# Specialized shape helpers for TCS deck
+# Specialized shape helpers for the deck
 def title_shape(text, subtitle=None):
     paras=[{"text": text, "size":2400, "bold": True, "color":"0A1931"}]
     if subtitle:
@@ -244,7 +244,7 @@ def footer_shape():
 def full_shape(paras, y=1500000, h=4600000):
     return shape_tx(3,"Full", 360000, y, 11472000, h, paras)
 
-# Slide definitions — 17 slides, TCS professional English
+# Slide definitions — 18 slides, professional English
 SLIDES = [
   # 1 Title
   {"type":"title", "title":"Build Your Personal\nDocument Assistant", "subtitle":"How AI answers from data it was never trained on — the RAG technique behind private PDFs", "notes":"Welcome. Today we demystify how AI reads your private documents. One example, full pipeline, zero magic."},

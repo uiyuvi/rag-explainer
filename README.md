@@ -2,7 +2,7 @@
 
 How AI answers from data it was never trained on. The technique behind private PDF assistants — Vector Search, explained step-by-step.
 
-**Audience:** Mixed non-technical + technical, TCS France • 25 minutes • Mobile-friendly • Professional English
+**Audience:** Mixed non-technical + technical • 25 minutes • Mobile-friendly • Professional English
 
 ## Quick Start — No Download
 
@@ -12,7 +12,7 @@ How AI answers from data it was never trained on. The technique behind private P
 
 ## What’s Inside
 
-- **18-slide deck:** `slides/rag_explainer.pptx` — TCS France theme (Navy #0A1931 / Blue #12549E / Red #EF413D), 16:9
+- **18-slide deck:** `slides/rag_explainer.pptx` — theme (Navy #0A1931 / Blue #12549E / Red #EF413D), 16:9
   - Problem → Flow (9 steps) → Value (benefits/limits, generic use cases, Basic vs Graph vs Agentic RAG) → Go Further
 - **7 micro-demos:** `demos/` — tap to play
   1. Keyword vs Vector — live “Hospitals” miss vs hit
@@ -26,7 +26,7 @@ How AI answers from data it was never trained on. The technique behind private P
 
 ## Standards
 
-- TCS France theme, simple professional English (B1)
+- Theme, simple professional English (B1)
 - Mobile-first: 360px–414px, touch targets 44px, no hover-only, `< 120KB` per demo, pure HTML/CSS/vanilla JS
 - No build, no npm, no backend — static site, GitHub Pages (`main` / `root`)
 
