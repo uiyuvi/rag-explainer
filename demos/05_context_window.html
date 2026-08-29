@@ -23,7 +23,7 @@
     <div class="card">
       <h3>LLM Token Window <span id="count" style="float:right;color:#12549E;font-weight:700">0 / 4096</span></h3>
       <div id="window" class="window"></div>
-      <div id="status" style="margin-top:8px;font-size:13px;color:#5A6C80">Drop chunks here. When full, LLM answers.</div>
+      <div id="status" style="margin-top:8px;font-size:13px;color:#5A6C80">Tap a chunk to add it (or drag it in). When the window has context, the LLM answers.</div>
       <div id="answer" style="margin-top:10px;padding:10px;background:#fff;border:1px solid #E9EEF3;border-radius:10px;display:none"></div>
     </div>
   </div>
@@ -58,7 +58,7 @@ function renderWindow(){
   }).join("")||'<span style="color:#5A6C80;font-size:12px">Empty — drag here or click Auto-fill.</span>';
   win.querySelectorAll('.chunk-pill').forEach(el=> el.addEventListener('click', ()=>{ used=used.filter(x=>x!==+el.dataset.id); renderAll(); }));
   if(total>4096){ status.textContent="⚠ Window overflow — remove a chunk. LLM would truncate."; answer.style.display="none"; }
-  else if(total===0){ status.textContent="Drop chunks here. When full, LLM answers."; answer.style.display="none"; }
+  else if(total===0){ status.textContent="Tap a chunk to add it (or drag it in). When the window has context, the LLM answers."; answer.style.display="none"; }
   else {
     status.textContent=`Using ${used.length} chunk(s) • ${total} tokens. LLM can answer.`;
     const hasHosp = used.some(id=>[1,2,3].includes(id));

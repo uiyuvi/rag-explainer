@@ -19,13 +19,19 @@
   <div class="grid grid-2">
     <div>
       <div class="grid" style="gap:8px">
-        <div class="card step" id="s1"><strong>1 Ingest</strong> <span style="color:#5A6C80">— extract text/tables</span></div>
-        <div class="card step" id="s2"><strong>2 Chunk</strong> <span style="color:#5A6C80">— 500 + 50 overlap</span></div>
-        <div class="card step" id="s3"><strong>3 Embed</strong> <span style="color:#5A6C80">— 8-D mock vectors</span></div>
-        <div class="card step" id="s4"><strong>4 Search</strong> <span style="color:#5A6C80">— cosine Top-K=3</span></div>
-        <div class="card step" id="s5"><strong>5 Answer</strong> <span style="color:#5A6C80">— LLM with citations</span></div>
+        <div class="card step" id="s1"><strong>Ingest</strong> <span style="color:#5A6C80">— extract text/tables</span></div>
+        <div class="card step" id="s2"><strong>Chunking</strong> <span style="color:#5A6C80">— 500 + 50 overlap</span></div>
+        <div class="card step" id="s3"><strong>Embeddings</strong> <span style="color:#5A6C80">— 8-D mock vectors</span></div>
+        <div class="card step" id="s4"><strong>Search</strong> <span style="color:#5A6C80">— cosine Top-K=3</span></div>
+        <div class="card step" id="s5"><strong>Answer</strong> <span style="color:#5A6C80">— grounded, with citations</span></div>
       </div>
       <div class="card" id="answer" style="margin-top:12px;display:none"></div>
+      <div class="card" id="nextsteps" style="margin-top:12px;display:none;background:#F9FAFB">
+        <h3 style="margin:0;color:#0A1931">Where to go next</h3>
+        <p style="font-size:13px;color:#5A6C80;margin:6px 0">Trust matters: see <a href="07_limits.html" style="font-weight:700">how this can fail — and how to fix it →</a><br>
+        Curious about the real tools? <a href="../resources.html" style="font-weight:700">Explore further →</a><br>
+        Replays: <a href="00_ingest.html" style="font-weight:700">Ingest</a> · <a href="02_chunk_lab.html" style="font-weight:700">Chunking</a> · <a href="03_vector_map.html" style="font-weight:700">Embeddings</a> · <a href="04b_vectordb.html" style="font-weight:700">Vector DB</a> · <a href="04a_query.html" style="font-weight:700">Query</a> · <a href="04_similarity_rank.html" style="font-weight:700">Search</a> · <a href="05_context_window.html" style="font-weight:700">Context</a></p>
+      </div>
     </div>
     <div class="card"><h3>Console</h3><div id="log" class="log">Press Run…</div></div>
   </div>
@@ -53,14 +59,14 @@ async function run(){
   renderPipeline('embeddings'); document.getElementById('s3').classList.add('active'); const vecs=chunks.map(c=>mockEmbed(c)); add("→ Embed: "+vecs.length+" vectors (8-D normalized)"); add("   query fingerprint: ["+mockEmbed(query).slice(0,3).map(v=>v.toFixed(2)).join(", ")+"…]"); await delay(500);
   renderPipeline('search'); document.getElementById('s4').classList.add('active'); const ranked=chunks.map((c,i)=>({text:c, score:cosine(mockEmbed(c), mockEmbed(query)), page: i<2?1: i<4?8:12})).sort((a,b)=>b.score-a.score); const top=ranked.slice(0,3); add("→ Search: Top-3 cosine"); top.forEach(t=> add(`   ${t.score.toFixed(2)} — ${t.text.slice(0,60)}…`)); await delay(500);
   renderPipeline('answer'); document.getElementById('s5').classList.add('active'); add("→ LLM context: 3 chunks (~1,400 tokens)"); add("→ Generate…"); await delay(600);
-  answer.style.display="block";
+  answer.style.display="block"; document.getElementById('nextsteps').style.display="block";
   const has = top.some(t=> t.text.toLowerCase().includes("city general")||t.text.toLowerCase().includes("st. jude"));
   if(has){ answer.innerHTML='<strong style="color:#065F46">✓ Answer (grounded):</strong> “According to your policy (p.12, p.8), you are covered at <strong>City General, St. Jude’s Medical Center, and Westside Health</strong>.”<br><span style="color:#5A6C80;font-size:12px">Citations: p.12, p.8 — verify in PDF. Query “'+query+'” matched 3 chunks (0.93, 0.91, 0.84).</span>'; add("✓ Answer ready with citations."); }
   else { answer.innerHTML='<strong style="color:#991B1B">No answer found in provided chunks.</strong> <span style="color:#5A6C80">Provide more pages or adjust chunking.</span>'; add("✘ No relevant chunk in Top-K."); }
 }
 document.getElementById('run').addEventListener('click', run);
 document.getElementById('reset').addEventListener('click', ()=>{
-  log.textContent="Press Run…"; answer.style.display="none"; steps.forEach(id=>document.getElementById(id).classList.remove('active'));
+  log.textContent="Press Run…"; answer.style.display="none"; document.getElementById('nextsteps').style.display="none"; steps.forEach(id=>document.getElementById(id).classList.remove('active'));
   renderPipelineOverview('pipeline');
 });
 </script>
