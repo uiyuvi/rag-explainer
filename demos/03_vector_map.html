@@ -34,12 +34,13 @@
   <nav class="nav"><a href="../index.html">Home</a><a href="../index.html#visualise">Visualise Concepts</a><a href="../resources.html">Resources</a></nav>
 </div></header>
 <main class="wrap">
+  <div id="pipeline" style="margin-bottom:12px"></div>
   <div class="kicker">Embeddings — Closest-Match Map</div>
   <h1 style="margin:8px 0 6px;color:#0A1931">Which word is closest in meaning?</h1>
   <p style="color:#5A6C80;margin:0 0 10px">Everyone can explore. Tap a supported word below → see its Meaning Fingerprint and nearest neighbors. <strong>Hospital ≈ Medical Center (0.99) ≠ Car (0.00)</strong>.</p>
   <div style="display:flex;gap:8px;margin:10px 0">
-    <button class="btn btn-primary" id="tabVisual" style="padding:8px 14px;font-size:13px">Visual Map</button>
-    <button class="btn btn-secondary" id="tabHow" style="padding:8px 14px;font-size:13px">How it scores</button>
+    <button class="btn btn-primary" id="tabHow" style="padding:8px 14px;font-size:13px">How it scores</button>
+    <button class="btn btn-secondary" id="tabVisual" style="padding:8px 14px;font-size:13px">Visual Map</button>
   </div>
 
   <div id="visualControls">
@@ -79,9 +80,11 @@
       <li><strong>Visual Map tab:</strong> see coordinates, clusters and distance lines.</li>
       <li><strong>How it scores tab:</strong> see the numeric cosine and the ranking it produces.</li>
       <li>Real TF Projector uses 300-D Word2Vec; we use 8-D so it loads instantly on your phone. Swap to <code>Transformers.js all-MiniLM-L6-v2</code> later if you want real model scores.</li>
+      <li><strong>Then tap “Visual Map”</strong> to see the same scores drawn as a map — clusters, distance lines, everything above made visual.</li>
     </ul>
   </div>
 </main>
+<script src="../assets/pipeline.js?v=13"></script>
 <script src="../assets/common.js?v=12"></script>
 <script>
 const WORDS=["hospital","medical center","medical care center","clinic","doctor","physician","insurance","policy","apple","pear","fruit","car","vehicle"];
@@ -210,14 +213,14 @@ function showTab(which){
   const isVisual = which==='visual';
   rankCard.style.display = isVisual ? 'block' : 'none';
   canvasWrap.style.display = isVisual ? 'block' : 'none';
-  visualControls.style.display = isVisual ? 'block' : 'none';
+  visualControls.style.display = 'block';
   howCard.style.display = isVisual ? 'none' : 'block';
   tabVisual.className = isVisual ? 'btn btn-primary' : 'btn btn-secondary';
   tabHow.className = isVisual ? 'btn btn-secondary' : 'btn btn-primary';
-  if(!isVisual) howCard.scrollIntoView({behavior:'smooth'});
 }
 tabVisual.addEventListener('click', ()=> showTab('visual'));
 tabHow.addEventListener('click', ()=> showTab('how'));
+showTab('how');
 renderChips();
 draw();
 function resize(){
@@ -273,5 +276,6 @@ canvas.addEventListener('touchend', e=>{
 });
 if(window.innerWidth<640){ zoom=95; spread=95; document.getElementById('zoom').value=zoom; document.getElementById('spread').value=spread; draw(); }
 </script>
+<script>renderPipeline('embeddings');</script>
 </body>
 </html>
