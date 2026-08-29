@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Vector DB — RAG Explainer</title><link rel="stylesheet" href="../assets/style.css">
+<style>.shelf{padding:10px 12px;border-radius:10px;border:1px solid #E9EEF3;background:#fff;margin:6px 0;display:flex;justify-content:space-between;align-items:center}.shelf.hl{border-color:#12549E;background:#EFF6FF;box-shadow:0 4px 12px rgba(37,99,235,.12)}.tag{font-size:11px;font-weight:800;padding:4px 8px;border-radius:999px;background:#F4F7FA;color:#0A1931}</style>
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner"><div class="brand"><div class="brand-mark">RE</div><div>RAG Explainer <small>Vector DB</small></div></div><nav class="nav"><a href="../index.html">Home</a><a href="../index.html#visualise">Visualise</a><a href="../resources.html">Resources</a></nav></div></header>
+<main class="wrap">
+  <div id="pipeline" style="margin-bottom:12px"></div>
+  <div class="kicker">Step 5 — Vector DB • Explain, not search</div>
+  <h1 style="color:#0A1931;margin:8px 0 6px">The smart library</h1>
+  <p style="color:#5A6C80;margin:0">Not a search — it’s storage. Fingerprints are filed so related meanings sit together. When you ask, the DB just hands the right shelf.</p>
+
+  <div class="card" style="margin-top:12px">
+    <h3 style="margin:0;color:#0A1931">How it files — tap a shelf</h3>
+    <p class="help" style="margin:4px 0 8px">Tap any word below — watch where it would be filed. “Hospital” and “Medical Center” share a shelf, “Apple” is far away.</p>
+    <div id="shelves"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px" id="words"></div>
+    <p id="explain" style="font-size:13px;color:#12549E;margin-top:10px;font-weight:600"></p>
+  </div>
+
+  <div class="grid grid-2" style="margin-top:12px">
+    <div class="card"><h3>What it does</h3><ul style="font-size:13px;color:#5A6C80;padding-left:18px;margin:6px 0"><li>Stores every fingerprint (no computing)</li><li>Groups by meaning — “Fruit” shelf vs “Hospital” shelf</li><li>Finds matches in milliseconds even for 10k pages</li></ul></div>
+    <div class="card"><h3>What it does NOT do</h3><ul style="font-size:13px;color:#5A6C80;padding-left:18px;margin:6px 0"><li>No ranking (that’s Search)</li><li>No answer writing (that’s Context → Answer)</li><li>Needs re-index only when that file changes</li></ul></div>
+  </div>
+
+  <div class="card" style="margin-top:12px;background:#F9FAFB">
+    <h3>Try next</h3>
+    <p style="font-size:13px;color:#5A6C80;margin:4px 0">Next is <a href="04_similarity_rank.html" style="font-weight:700">Search — the closest-match game</a>. The DB just hands the shelves; Search ranks them.</p>
+  </div>
+</main>
+<script src="../assets/pipeline.js"></script>
+<script src="../assets/common.js"></script>
+<script>
+const SHELVES=[
+  {id:'medical', title:'🏥 Medical shelf', items:['hospital','medical center','clinic','doctor','physician']},
+  {id:'fruit', title:'🍎 Fruit shelf', items:['apple','pear','fruit']},
+  {id:'transport', title:'🚗 Transport shelf', items:['car','vehicle']},
+  {id:'policy', title:'📄 Policy shelf', items:['insurance','policy','hospital covered','medical care center']},
+];
+const ALL=["hospital","medical center","clinic","doctor","apple","pear","fruit","car","vehicle","insurance","policy"];
+const shelvesDiv=document.getElementById('shelves'), wordsDiv=document.getElementById('words'), explain=document.getElementById('explain');
+function findShelf(w){ return SHELVES.find(s=>s.items.includes(w)); }
+function renderShelves(activeWord){
+  shelvesDiv.innerHTML=SHELVES.map(s=>{
+    const active = s.items.includes(activeWord);
+    return `<div class="shelf ${active?'hl':''}"><span><strong>${s.title}</strong> <span style="color:#5A6C80">— ${s.items.join(', ')}</span></span><span class="tag">${active?'★ here':''}</span></div>`;
+  }).join("");
+  explain.textContent = activeWord ? `"${activeWord}" would be filed on the ${findShelf(activeWord)?.title} — near ${findShelf(activeWord)?.items.filter(x=>x!==activeWord).slice(0,2).join(' & ')}.` : 'Tap a word below.';
+}
+wordsDiv.innerHTML=ALL.map(w=>`<button class="chip" data-w="${w}" style="padding:8px 12px;border-radius:999px;border:1px solid #D4DDE8;background:#fff;font-size:13px;font-weight:700;cursor:pointer">${w}</button>`).join("");
+wordsDiv.querySelectorAll('button').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    wordsDiv.querySelectorAll('button').forEach(x=>x.style.background='#fff')
+    b.style.background='#0A1931'; b.style.color='#fff';
+    renderShelves(b.dataset.w);
+  });
+});
+renderShelves('hospital');
+renderPipeline('vectordb');
+</script>
+</body>
+</html>

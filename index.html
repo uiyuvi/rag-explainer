@@ -39,15 +39,9 @@
   </section>
 
   <section class="section">
-    <div class="section-head"><h2>One Flow — The Big Picture</h2><p>Static diagram — follow the story below; interactive part is in Visualise Concepts</p></div>
-    <div class="pipeline">
-      <span class="pipe-step">PDF Policy</span><span class="pipe-arrow">→</span>
-      <span class="pipe-step">Chunking</span><span class="pipe-arrow">→</span>
-      <span class="pipe-step">Encoder</span><span class="pipe-arrow">→</span>
-      <span class="pipe-step">Vector DB</span><span class="pipe-arrow">→</span>
-      <span class="pipe-step">LLM Answer + Citations</span>
-    </div>
-    <p class="note" style="margin-top:12px">We turn text into <strong>Meaning Fingerprints (Vectors)</strong>, store them, find the closest match to your question, and let the AI write the answer. Visualise each step below — no clicks on this diagram.</p>
+    <div class="section-head"><h2>One Flow — The Big Picture</h2><p>Same 8 steps everywhere — tap to jump</p></div>
+    <div id="pipeline-overview"></div>
+    <p class="note" style="margin-top:10px">We turn text into <strong>Meaning Fingerprints (Vectors)</strong>, store them, find the closest match to your question, and let the AI write the answer. Tap any step above — same as in every demo.</p>
   </section>
 
   <section class="section" id="visualise">
@@ -100,6 +94,6 @@
   RAG Explainer • Private data stays private • 18 slides + 7 demos • <a href="resources.html">Resources</a> • <a href="slides/rag_explainer.pptx">Slides</a>
 </footer>
 <script src="assets/pipeline.js"></script>
-<script>renderPipeline('chunking');</script>
+<script>renderPipeline('chunking','pipeline'); renderPipelineOverview('pipeline-overview');</script>
 </body>
 </html>

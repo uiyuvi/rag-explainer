@@ -48,11 +48,11 @@ async function run(){
   steps.forEach(id=> document.getElementById(id).classList.remove('active'));
   const query=q.value.trim()||"Which hospitals are covered?";
   function add(s){ log.textContent+=s+"\n"; log.scrollTop=log.scrollHeight; }
-  document.getElementById('s1').classList.add('active'); add("→ Ingest: 5 pages extracted ("+PAGES.join(" ").length+" chars)"); await delay(400);
-  document.getElementById('s2').classList.add('active'); const chunks=chunkText(PAGES.join(" "), 500, 50); add("→ Chunk: "+chunks.length+" chunks (500 + 50 overlap)"); add("   e.g., “"+chunks[2].slice(0,70)+"…”"); await delay(500);
-  document.getElementById('s3').classList.add('active'); const vecs=chunks.map(c=>mockEmbed(c)); add("→ Embed: "+vecs.length+" vectors (8-D normalized)"); add("   query fingerprint: ["+mockEmbed(query).slice(0,3).map(v=>v.toFixed(2)).join(", ")+"…]"); await delay(500);
-  document.getElementById('s4').classList.add('active'); const ranked=chunks.map((c,i)=>({text:c, score:cosine(mockEmbed(c), mockEmbed(query)), page: i<2?1: i<4?8:12})).sort((a,b)=>b.score-a.score); const top=ranked.slice(0,3); add("→ Search: Top-3 cosine"); top.forEach(t=> add(`   ${t.score.toFixed(2)} — ${t.text.slice(0,60)}…`)); await delay(500);
-  document.getElementById('s5').classList.add('active'); add("→ LLM context: 3 chunks (~1,400 tokens)"); add("→ Generate…"); await delay(600);
+  renderPipeline('ingest'); document.getElementById('s1').classList.add('active'); add("→ Ingest: 5 pages extracted ("+PAGES.join(" ").length+" chars)"); await delay(400);
+  renderPipeline('chunking'); document.getElementById('s2').classList.add('active'); const chunks=chunkText(PAGES.join(" "), 500, 50); add("→ Chunk: "+chunks.length+" chunks (500 + 50 overlap)"); add("   e.g., “"+chunks[2].slice(0,70)+"…”"); await delay(500);
+  renderPipeline('embeddings'); document.getElementById('s3').classList.add('active'); const vecs=chunks.map(c=>mockEmbed(c)); add("→ Embed: "+vecs.length+" vectors (8-D normalized)"); add("   query fingerprint: ["+mockEmbed(query).slice(0,3).map(v=>v.toFixed(2)).join(", ")+"…]"); await delay(500);
+  renderPipeline('search'); document.getElementById('s4').classList.add('active'); const ranked=chunks.map((c,i)=>({text:c, score:cosine(mockEmbed(c), mockEmbed(query)), page: i<2?1: i<4?8:12})).sort((a,b)=>b.score-a.score); const top=ranked.slice(0,3); add("→ Search: Top-3 cosine"); top.forEach(t=> add(`   ${t.score.toFixed(2)} — ${t.text.slice(0,60)}…`)); await delay(500);
+  renderPipeline('answer'); document.getElementById('s5').classList.add('active'); add("→ LLM context: 3 chunks (~1,400 tokens)"); add("→ Generate…"); await delay(600);
   answer.style.display="block";
   const has = top.some(t=> t.text.toLowerCase().includes("city general")||t.text.toLowerCase().includes("st. jude"));
   if(has){ answer.innerHTML='<strong style="color:#065F46">✓ Answer (grounded):</strong> “According to your policy (p.12, p.8), you are covered at <strong>City General, St. Jude’s Medical Center, and Westside Health</strong>.”<br><span style="color:#5A6C80;font-size:12px">Citations: p.12, p.8 — verify in PDF. Query “'+query+'” matched 3 chunks (0.93, 0.91, 0.84).</span>'; add("✓ Answer ready with citations."); }
