@@ -112,10 +112,12 @@ def slide_layout_xml(): return f'''<?xml version="1.0" encoding="UTF-8" standalo
 </p:sldLayout>'''
 
 def theme_xml():
+    # ECMA-376 strict: fillStyleLst/lnStyleLst/effectStyleLst/bgFillStyleLst need EXACTLY 3 entries;
+    # fontScheme requires a:ea and a:cs. Missing these triggers PowerPoint's repair dialog.
     return '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="TCS France">
+<a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="RAG Explainer">
   <a:themeElements>
-    <a:clrScheme name="TCS">
+    <a:clrScheme name="RAGExplainer">
       <a:dk1><a:srgbClr val="0A1931"/></a:dk1>
       <a:lt1><a:srgbClr val="FFFFFF"/></a:lt1>
       <a:dk2><a:srgbClr val="1F2A44"/></a:dk2>
@@ -129,42 +131,57 @@ def theme_xml():
       <a:hlink><a:srgbClr val="12549E"/></a:hlink>
       <a:folHlink><a:srgbClr val="0A1931"/></a:folHlink>
     </a:clrScheme>
-    <a:fontScheme name="TCS"><a:majorFont><a:latin typeface="Calibri"/></a:majorFont><a:minorFont><a:latin typeface="Calibri"/></a:minorFont></a:fontScheme>
-    <a:fmtScheme name="TCS"><a:fillStyleLst><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:fillStyleLst><a:lnStyleLst><a:ln w="6350"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:prstDash val="solid"/></a:ln></a:lnStyleLst><a:effectStyleLst><a:effectStyle><a:effectLst/></a:effectStyle></a:effectStyleLst><a:bgFillStyleLst><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:bgFillStyleLst></a:fmtScheme>
-  </a:themeElements><a:objectDefaults/><a:extraClrSchemeLst/>
+    <a:fontScheme name="RAGExplainer">
+      <a:majorFont><a:latin typeface="Calibri Light"/><a:ea typeface=""/><a:cs typeface=""/></a:majorFont>
+      <a:minorFont><a:latin typeface="Calibri"/><a:ea typeface=""/><a:cs typeface=""/></a:minorFont>
+    </a:fontScheme>
+    <a:fmtScheme name="RAGExplainer">
+      <a:fillStyleLst>
+        <a:solidFill><a:schemeClr val="phClr"/></a:solidFill>
+        <a:gradFill rotWithShape="1">
+          <a:gsLst>
+            <a:gs pos="0"><a:schemeClr val="phClr"><a:lumMod val="110000"/><a:satMod val="105000"/><a:tint val="67000"/></a:schemeClr></a:gs>
+            <a:gs pos="50000"><a:schemeClr val="phClr"><a:lumMod val="105000"/><a:satMod val="103000"/><a:tint val="73000"/></a:schemeClr></a:gs>
+            <a:gs pos="100000"><a:schemeClr val="phClr"><a:lumMod val="105000"/><a:satMod val="109000"/><a:tint val="81000"/></a:schemeClr></a:gs>
+          </a:gsLst>
+          <a:lin ang="5400000" scaled="0"/>
+        </a:gradFill>
+        <a:gradFill rotWithShape="1">
+          <a:gsLst>
+            <a:gs pos="0"><a:schemeClr val="phClr"><a:satMod val="103000"/><a:lumMod val="102000"/><a:tint val="94000"/></a:schemeClr></a:gs>
+            <a:gs pos="50000"><a:schemeClr val="phClr"><a:satMod val="110000"/><a:lumMod val="100000"/><a:shade val="100000"/></a:schemeClr></a:gs>
+            <a:gs pos="100000"><a:schemeClr val="phClr"><a:lumMod val="99000"/><a:satMod val="120000"/><a:shade val="78000"/></a:schemeClr></a:gs>
+          </a:gsLst>
+          <a:lin ang="5400000" scaled="0"/>
+        </a:gradFill>
+      </a:fillStyleLst>
+      <a:lnStyleLst>
+        <a:ln w="6350" cap="flat" cmpd="sng" algn="ctr"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:prstDash val="solid"/><a:miter lim="800000"/></a:ln>
+        <a:ln w="12700" cap="flat" cmpd="sng" algn="ctr"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:prstDash val="solid"/><a:miter lim="800000"/></a:ln>
+        <a:ln w="19050" cap="flat" cmpd="sng" algn="ctr"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:prstDash val="solid"/><a:miter lim="800000"/></a:ln>
+      </a:lnStyleLst>
+      <a:effectStyleLst>
+        <a:effectStyle><a:effectLst/></a:effectStyle>
+        <a:effectStyle><a:effectLst/></a:effectStyle>
+        <a:effectStyle><a:effectLst><a:outerShdw blurRad="57150" dist="19050" dir="5400000" algn="ctr" rotWithShape="0"><a:srgbClr val="000000"><a:alpha val="63000"/></a:srgbClr></a:outerShdw></a:effectLst></a:effectStyle>
+      </a:effectStyleLst>
+      <a:bgFillStyleLst>
+        <a:solidFill><a:schemeClr val="phClr"/></a:solidFill>
+        <a:solidFill><a:schemeClr val="phClr"><a:tint val="95000"/><a:satMod val="170000"/></a:schemeClr></a:solidFill>
+        <a:gradFill rotWithShape="1">
+          <a:gsLst>
+            <a:gs pos="0"><a:schemeClr val="phClr"><a:tint val="93000"/><a:satMod val="150000"/><a:shade val="98000"/><a:lumMod val="102000"/></a:schemeClr></a:gs>
+            <a:gs pos="50000"><a:schemeClr val="phClr"><a:tint val="98000"/><a:satMod val="130000"/><a:shade val="90000"/><a:lumMod val="103000"/></a:schemeClr></a:gs>
+            <a:gs pos="100000"><a:schemeClr val="phClr"><a:shade val="63000"/><a:satMod val="120000"/></a:schemeClr></a:gs>
+          </a:gsLst>
+          <a:lin ang="5400000" scaled="0"/>
+        </a:gradFill>
+      </a:bgFillStyleLst>
+    </a:fmtScheme>
+  </a:themeElements>
+  <a:objectDefaults/>
+  <a:extraClrSchemeLst/>
 </a:theme>'''
-
-# Helper to create text shape XML
-def tx_shape(id_, name, x, y, cx, cy, paragraphs, font_size=1200, bold=False, color=None, align=None):
-    # paragraphs: list of dict {text, bold, size, color, bullet}
-    # color: hex RRGGBB
-    # size in hundredths pt (1200 = 12pt)
-    p_xml=""
-    for para in paragraphs:
-        # para may be single run or multiple runs
-        if isinstance(para, str):
-            para = {"text": para}
-        txt = xml_escape(para.get("text",""))
-        sz = para.get("size", font_size)
-        b = " b=\"1\"" if para.get("bold", bold) else ""
-        c = para.get("color", color)
-        col_xml = f'<a:solidFill><a:srgbClr val="{c}"/></a:solidFill>' if c else '<a:solidFill><a:schemeClr val="tx1"/></a:solidFill>'
-        # bullet?
-        # align
-        aln = f' algn="{align}"' if align else ""
-        # handle empty?
-        if txt=="":
-            p_xml += f'<a:p{aln}><a:pPr/><a:endParaRPr sz="{sz}"{b}/></a:p>'
-        else:
-            # split bullet handling: if bullet true, add buChar
-            bu = '<a:buChar char="•"/>' if para.get("bullet") else '<a:buNone/>'
-            p_xml += f'<a:p{aln}><a:pPr {bu[3:-2] if "buChar" not in bu else "><a:buChar char=\"•\"/"}></a:pPr>' if False else f'<a:p{aln}><a:pPr>{bu}</a:pPr><a:r><a:rPr sz="{sz}"{b}>{col_xml}</a:rPr><a:t>{txt}</a:t></a:r></a:p>'
-            # Actually need proper bu handling; simplify:
-            # We'll redo to avoid complexity: use buNone vs buChar
-    # Better construct correctly without escaping confusion:
-    # Rebuild properly
-    # Instead of above broken, reconstruct clean
-    return "" # placeholder to be replaced
 
 # Improved tx builder
 def build_paragraphs_xml(paragraphs, default_size=1000, default_color=None, default_bold=False, align=None):
@@ -222,7 +239,7 @@ def side_shape(paras):
     return shape_tx(4,"Side", 6500000, 1500000, 5000000, 4600000, paras)
 
 def footer_shape():
-    return shape_tx(5,"Footer", 360000, 6400000, 11472000, 300000, [{"text":"TCS France  •  RAG Explainer  •  Private data stays private  •  rag-explainer.github.io","size":700,"color":"5A6C80"}])
+    return shape_tx(5,"Footer", 360000, 6400000, 11472000, 300000, [{"text":"RAG Explainer  •  Private data stays private  •  uiyuvi.github.io/rag-explainer","size":700,"color":"5A6C80"}])
 
 def full_shape(paras, y=1500000, h=4600000):
     return shape_tx(3,"Full", 360000, y, 11472000, h, paras)
