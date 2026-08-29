@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>06 Full Pipeline — RAG Explainer</title>
+<link rel="stylesheet" href="../assets/style.css">
+<style>.log{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#0A1931;color:#C7D2FE;padding:12px;border-radius:10px;white-space:pre-wrap;min-height:180px}.step{opacity:.5}.step.active{opacity:1;background:#EFF6FF;border-color:#12549E}</style>
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner"><div class="brand"><div class="brand-mark">TF</div><div>RAG Explainer <small>06 • End-to-End</small></div></div><nav class="nav"><a href="../index.html">← Home</a></nav></div></header>
+<main class="wrap">
+  <div class="kicker">End-to-end — no backend</div>
+  <h1 style="color:#0A1931">Full pipeline simulator — 5-page mock PDF</h1>
+  <p style="color:#5A6C80">One click → logs each step: Ingest → Chunk → Embed → Search → Answer. All in your browser.</p>
+
+  <div class="demo-bar"><input id="q" value="Which hospitals are covered?"><button class="btn btn-primary" id="run">▶ Run Pipeline</button><button class="btn btn-secondary" id="reset">Reset</button></div>
+
+  <div class="grid grid-2">
+    <div>
+      <div class="grid" style="gap:8px">
+        <div class="card step" id="s1"><strong>1 Ingest</strong> <span style="color:#5A6C80">— extract text/tables</span></div>
+        <div class="card step" id="s2"><strong>2 Chunk</strong> <span style="color:#5A6C80">— 500 + 50 overlap</span></div>
+        <div class="card step" id="s3"><strong>3 Embed</strong> <span style="color:#5A6C80">— 8-D mock vectors</span></div>
+        <div class="card step" id="s4"><strong>4 Search</strong> <span style="color:#5A6C80">— cosine Top-K=3</span></div>
+        <div class="card step" id="s5"><strong>5 Answer</strong> <span style="color:#5A6C80">— LLM with citations</span></div>
+      </div>
+      <div class="card" id="answer" style="margin-top:12px;display:none"></div>
+    </div>
+    <div class="card"><h3>Console</h3><div id="log" class="log">Press Run…</div></div>
+  </div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+const PAGES=[
+  "PAGE 1 — Definitions: ‘Medical Center’ includes hospital and clinic facilities. Network = Preferred Provider Tier.",
+  "PAGE 2 — Legal disclaimer: Does not guarantee Physicians on weekends. See Section 5.",
+  "PAGE 8 — Schedule: St. Jude’s Medical Center and Westside Health Center are network providers.",
+  "PAGE 12 — City General Hospital Alliance under Preferred Provider Tier. Comprehensive care at listed centers.",
+  "PAGE 31 — Westside Health emergency only if pre-authorized within 48 hours."
+];
+const q=document.getElementById('q'), log=document.getElementById('log'), answer=document.getElementById('answer');
+const steps=["s1","s2","s3","s4","s5"];
+function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
+async function run(){
+  log.textContent=""; answer.style.display="none";
+  steps.forEach(id=> document.getElementById(id).classList.remove('active'));
+  const query=q.value.trim()||"Which hospitals are covered?";
+  function add(s){ log.textContent+=s+"\n"; log.scrollTop=log.scrollHeight; }
+  document.getElementById('s1').classList.add('active'); add("→ Ingest: 5 pages extracted ("+PAGES.join(" ").length+" chars)"); await delay(400);
+  document.getElementById('s2').classList.add('active'); const chunks=chunkText(PAGES.join(" "), 500, 50); add("→ Chunk: "+chunks.length+" chunks (500 + 50 overlap)"); add("   e.g., “"+chunks[2].slice(0,70)+"…”"); await delay(500);
+  document.getElementById('s3').classList.add('active'); const vecs=chunks.map(c=>mockEmbed(c)); add("→ Embed: "+vecs.length+" vectors (8-D normalized)"); add("   query fingerprint: ["+mockEmbed(query).slice(0,3).map(v=>v.toFixed(2)).join(", ")+"…]"); await delay(500);
+  document.getElementById('s4').classList.add('active'); const ranked=chunks.map((c,i)=>({text:c, score:cosine(mockEmbed(c), mockEmbed(query)), page: i<2?1: i<4?8:12})).sort((a,b)=>b.score-a.score); const top=ranked.slice(0,3); add("→ Search: Top-3 cosine"); top.forEach(t=> add(`   ${t.score.toFixed(2)} — ${t.text.slice(0,60)}…`)); await delay(500);
+  document.getElementById('s5').classList.add('active'); add("→ LLM context: 3 chunks (~1,400 tokens)"); add("→ Generate…"); await delay(600);
+  answer.style.display="block";
+  const has = top.some(t=> t.text.toLowerCase().includes("city general")||t.text.toLowerCase().includes("st. jude"));
+  if(has){ answer.innerHTML='<strong style="color:#065F46">✓ Answer (grounded):</strong> “According to your policy (p.12, p.8), you are covered at <strong>City General, St. Jude’s Medical Center, and Westside Health</strong>.”<br><span style="color:#5A6C80;font-size:12px">Citations: p.12, p.8 — verify in PDF. Query “'+query+'” matched 3 chunks (0.93, 0.91, 0.84).</span>'; add("✓ Answer ready with citations."); }
+  else { answer.innerHTML='<strong style="color:#991B1B">No answer found in provided chunks.</strong> <span style="color:#5A6C80">Provide more pages or adjust chunking.</span>'; add("✘ No relevant chunk in Top-K."); }
+}
+document.getElementById('run').addEventListener('click', run);
+document.getElementById('reset').addEventListener('click', ()=>{ log.textContent="Press Run…"; answer.style.display="none"; steps.forEach(id=>document.getElementById(id).classList.remove('active'));});
+</script>
+</body>
+</html>

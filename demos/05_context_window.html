@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>05 Lawyer’s Desk — RAG Explainer</title>
+<link rel="stylesheet" href="../assets/style.css">
+<style>.window{border:2px dashed #12549E;border-radius:14px;padding:12px;min-height:180px;background:#F8FAFF}.chunk-pill{display:inline-block;padding:6px 10px;background:#fff;border:1px solid #D4DDE8;border-radius:999px;font-size:12px;margin:4px;cursor:grab}.window.full{border-color:#EF413D;background:#FEF2F2}</style>
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner"><div class="brand"><div class="brand-mark">TF</div><div>RAG Explainer <small>05 • Lawyer’s Desk</small></div></div><nav class="nav"><a href="../index.html">← Home</a></nav></div></header>
+<main class="wrap">
+  <div class="kicker">Step 8 — Feeding the Expert</div>
+  <h1 style="color:#0A1931">The Lawyer’s Desk — token window</h1>
+  <p style="color:#5A6C80">We give the LLM <strong>only</strong> the 3 relevant pages, not the whole box. Drag chunks into the window until it fills (4,096 tokens demo).</p>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3>Available chunks (Top-5)</h3>
+      <div id="pool"></div>
+      <div style="margin-top:10px;display:flex;gap:8px"><button class="btn btn-secondary" id="auto">Auto-fill Best 3</button><button class="btn btn-ghost" id="clear">Clear</button></div>
+    </div>
+    <div class="card">
+      <h3>LLM Token Window <span id="count" style="float:right;color:#12549E;font-weight:700">0 / 4096</span></h3>
+      <div id="window" class="window"></div>
+      <div id="status" style="margin-top:8px;font-size:13px;color:#5A6C80">Drop chunks here. When full, LLM answers.</div>
+      <div id="answer" style="margin-top:10px;padding:10px;background:#fff;border:1px solid #E9EEF3;border-radius:10px;display:none"></div>
+    </div>
+  </div>
+  <p class="note">Why not all 50 pages? Token limit + cheaper + less hallucination. Context is precious.</p>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+const chunks=[
+  {id:1, text:"City General Hospital Alliance — Preferred Provider Tier (p.12)", tokens:520, score:0.93},
+  {id:2, text:"St. Jude’s Medical Center and Westside Health Center — network (p.8)", tokens:480, score:0.91},
+  {id:3, text:"Westside — emergency only if pre-authorized 48h (p.31)", tokens:420, score:0.84},
+  {id:4, text:"Legal disclaimer — Physicians weekends not guaranteed (p.2)", tokens:510, score:0.12},
+  {id:5, text:"Dental benefits separate, rider D-2 (p.44)", tokens:380, score:0.08},
+];
+const pool=document.getElementById('pool'), win=document.getElementById('window'), count=document.getElementById('count'), status=document.getElementById('status'), answer=document.getElementById('answer');
+let used=[];
+function renderPool(){
+  pool.innerHTML=chunks.filter(c=>!used.includes(c.id)).map(c=>`<span class="chunk-pill" draggable="true" data-id="${c.id}">${c.text} <span style="color:#5A6C80">(${c.tokens} tok • ${c.score.toFixed(2)})</span></span>`).join("")||'<span style="color:#5A6C80;font-size:12px">All chunks in window — click a pill in window to remove.</span>';
+  pool.querySelectorAll('.chunk-pill').forEach(el=>{
+    el.addEventListener('dragstart', e=> e.dataTransfer.setData('text/plain', el.dataset.id));
+    el.addEventListener('click', ()=> add(+el.dataset.id));
+  });
+}
+function renderWindow(){
+  const total=used.reduce((a,id)=> a+ chunks.find(c=>c.id===id).tokens,0);
+  count.textContent=total+" / 4096";
+  win.classList.toggle('full', total>4096);
+  win.innerHTML=used.map(id=>{
+    const c=chunks.find(x=>x.id===id);
+    return `<span class="chunk-pill" style="background:#EFF6FF;border-color:#12549E" data-id="${c.id}">${c.text} ✕</span>`;
+  }).join("")||'<span style="color:#5A6C80;font-size:12px">Empty — drag here or click Auto-fill.</span>';
+  win.querySelectorAll('.chunk-pill').forEach(el=> el.addEventListener('click', ()=>{ used=used.filter(x=>x!==+el.dataset.id); renderAll(); }));
+  if(total>4096){ status.textContent="⚠ Window overflow — remove a chunk. LLM would truncate."; answer.style.display="none"; }
+  else if(total===0){ status.textContent="Drop chunks here. When full, LLM answers."; answer.style.display="none"; }
+  else {
+    status.textContent=`Using ${used.length} chunk(s) • ${total} tokens. LLM can answer.`;
+    const hasHosp = used.some(id=>[1,2,3].includes(id));
+    answer.style.display="block";
+    if(hasHosp){ answer.innerHTML='<strong style="color:#065F46">AI:</strong> “According to your policy (p.12, p.8), you are covered at <strong>City General, St. Jude’s Medical Center, and Westside Health</strong>.” <span style="color:#5A6C80">(grounded, cited)</span>'; }
+    else { answer.innerHTML='<strong style="color:#991B1B">AI:</strong> “No hospital coverage found in provided context. Please provide more pages.” <span style="color:#5A6C80">(hallucination avoided)</span>'; }
+  }
+}
+function add(id){ if(!used.includes(id)){ used.push(id); renderAll(); } }
+function renderAll(){ renderPool(); renderWindow(); }
+document.getElementById('auto').addEventListener('click', ()=>{ used=[1,2,3]; renderAll(); });
+document.getElementById('clear').addEventListener('click', ()=>{ used=[]; renderAll(); });
+win.addEventListener('dragover', e=> e.preventDefault());
+win.addEventListener('drop', e=>{ e.preventDefault(); const id=+e.dataTransfer.getData('text/plain'); if(id) add(id); });
+renderAll();
+</script>
+</body>
+</html>

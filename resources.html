@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Resources — RAG Explainer</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand"><div class="brand-mark">TF</div><div>RAG Explainer <small>Resources • Scan after session</small></div></div>
+    <nav class="nav"><a href="index.html">← Back</a><a class="primary" href="slides/rag_explainer.pptx">Download PPT</a></nav>
+  </div>
+</header>
+<main class="wrap">
+  <section class="hero">
+    <div class="kicker">Separate file • One QR</div>
+    <h1>Explore Further — <span>5 + 3 Links</span></h1>
+    <p class="lead">Curated for after the session. Tap to open — all work on mobile. The TensorFlow Projector link is your <code>enwiki skipgram</code> config from the prompt.</p>
+    <div class="qr-card">
+      <div class="qr"><img alt="QR resources" src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=https://uiyuvi.github.io/rag-explainer/resources.html"></div>
+      <div class="qr-meta"><strong>This page’s QR</strong>https://uiyuvi.github.io/rag-explainer/resources.html<br>Show this slide at the end — one scan covers everything.</div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 style="color:#0A1931;margin:0 0 12px">Visualize Real Embeddings</h2>
+    <div class="grid grid-2">
+      <div class="card">
+        <span class="badge badge-builders">Desktop • Heavy</span>
+        <h3>TensorFlow Projector — your link</h3>
+        <p>Real 300-D Word2Vec (enwiki skipgram). Search “Physician” vs “Doctor” → see cluster. Not mobile-friendly, but reference standard.</p>
+        <p><a href="https://projector.tensorflow.org/?config=https://gist.githubusercontent.com/akutuzov/65b70e033fc6ade81340973554090c11/raw/76c9e679910c86f5796c9de1a83dc6670bff7da4/MOD_enwiki_upos_skipgram_300_2_2021_ddc4a8727e3aaf28595ac3e8656b2f69_tsne_config.json" target="_blank" rel="noopener">Open Projector →</a></p>
+        <p class="flow-note">Try: load config → search “hospital” → neighbors show “clinic, medical”.</p>
+      </div>
+      <div class="card">
+        <span class="badge badge-everyone">Mobile lighter</span>
+        <h3>Embedding Atlas (Apple)</h3>
+        <p>Modern 2-D/3-D browser atlas, lighter than TF, touch-friendly. Good for “fruit vs vehicle” intuition.</p>
+        <p><a href="https://apple.github.io/embedding-atlas/" target="_blank" rel="noopener">Open Embedding Atlas →</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 style="color:#0A1931;margin:0 0 12px">Why It Works / Store at Scale</h2>
+    <div class="grid grid-2">
+      <div class="card">
+        <h3>Sentence-Transformers — all-MiniLM</h3>
+        <p>Open embedding model docs. What “768-D vector” means, cosine similarity explained.</p>
+        <p><a href="https://www.sbert.net/" target="_blank" rel="noopener">sbert.net →</a> • <a href="https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2" target="_blank" rel="noopener">Model card →</a></p>
+      </div>
+      <div class="card">
+        <h3>Vector DB Intro (vendor-neutral)</h3>
+        <p>One-pager on why we need a vector DB vs Postgres. Choose one to read:</p>
+        <p><a href="https://www.pinecone.io/learn/vector-database/" target="_blank" rel="noopener">Pinecone Learn →</a> • <a href="https://docs.trychroma.com/" target="_blank" rel="noopener">Chroma Docs →</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 style="color:#0A1931;margin:0 0 12px">Pattern & Next Levels</h2>
+    <div class="grid grid-2">
+      <div class="card">
+        <h3>RAG from Scratch</h3>
+        <p>LangChain / OpenAI cookbook: the 5-line RAG loop you saw live.</p>
+        <p><a href="https://python.langchain.com/docs/concepts/rag/" target="_blank" rel="noopener">LangChain RAG →</a> • <a href="https://cookbook.openai.com/examples/retrieval_augmented_generation" target="_blank" rel="noopener">OpenAI Cookbook →</a></p>
+      </div>
+      <div class="card">
+        <h3>GraphRAG + Agentic RAG</h3>
+        <p>When Basic RAG is not enough. 2 lines each on slide 14c, docs here:</p>
+        <p><a href="https://microsoft.github.io/graphrag/" target="_blank" rel="noopener">Microsoft GraphRAG →</a> • <a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">Agents (Anthropic) →</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="card" style="background:#EAF0F8;border-color:#12549E">
+      <h3 style="color:#0A1931">Use Cases — Generic</h3>
+      <p>Customer Support • Healthcare • Finance/Insurance • Legal • Education • Enterprise Search — same pattern: <strong>private docs + question → grounded answer + citations</strong>. All need re-processing on update (Basic cheapest).</p>
+    </div>
+  </section>
+</main>
+<footer class="footer">RAG Explainer • Resources separate for QR longevity • <a href="index.html">Home</a> • <a href="slides/rag_explainer.pptx">PPT</a></footer>
+</body>
+</html>

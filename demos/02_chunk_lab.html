@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>02 Chunk Lab — RAG Explainer</title>
+<link rel="stylesheet" href="../assets/style.css">
+<style>.chunk{padding:8px 10px;border-radius:10px;margin:6px 0;font-size:13px;line-height:1.5;border:1px solid #E9EEF3}</style>
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner"><div class="brand"><div class="brand-mark">TF</div><div>RAG Explainer <small>02 • Baguette Slicer</small></div></div><nav class="nav"><a href="../index.html">← Home</a></nav></div></header>
+<main class="wrap">
+  <div class="kicker">Step 2 — Chunking</div>
+  <h1 style="color:#0A1931">Cut the Baguette — find the garlic slice</h1>
+  <p style="color:#5A6C80">50-page policy → slices (chunks). Move the sliders. Overlap keeps context from breaking at the cut.</p>
+
+  <div class="card">
+    <div class="range-row"><label>Chunk size <input type="range" id="size" min="150" max="900" value="450"> <span id="sizeV">450</span> chars</label><label>Overlap <input type="range" id="over" min="0" max="200" value="50"> <span id="overV">50</span></label><span class="kpi"><span id="count">0 chunks</span><span id="time">~0 ms</span></span></div>
+    <textarea id="txt" style="width:100%;height:140px;margin-top:10px;padding:10px;border:1px solid #D4DDE8;border-radius:10px;font-size:13px">HEALTH INSURANCE POLICY — Schedule of Network Providers (excerpt). Section 4.2.1 List of Network Service Liability and Covered Institutions: The policy covers City General Hospital Alliance, St. Jude’s Medical Center, and Westside Health Center under the Preferred Provider Tier. Section 4.2.2 Emergency Care: Out-of-network emergency care is reimbursed only if pre-authorized within 48 hours. Section 5 Legal Disclaimer: This policy does not guarantee availability of Physicians on weekends. For other benefits, see Appendix B. The Preferred Provider Tier includes comprehensive care at listed centers. Any service outside the network is subject to co-pay of 30% unless classified as emergency under Section 4.2.2.</textarea>
+  </div>
+
+  <div class="grid grid-2" style="margin-top:12px">
+    <div class="canvas-wrap"><h3 style="margin:0;color:#0A1931">Chunks — tap to highlight “hospitals”</h3><div id="chunks"></div></div>
+    <div class="card">
+      <h3>Which slice has the answer?</h3>
+      <div id="best" style="padding:12px;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px;color:#1E40AF">Move sliders to see the best chunk.</div>
+      <p class="flow-note">Rule: too small (&lt;200) → “St. Jude’s” cut off. Too big (&gt;800) → legal fluff dilutes match. Overlap 30-70 keeps context.</p>
+      <details class="details"><summary>For Builders</summary><p class="flow-note">We use <code>chunkText(text,size,overlap)</code> + <code>cosine(mockEmbed(chunk), mockEmbed("Which hospitals are covered?"))</code> to rank. Real pipelines use 500 + 50 overlap, 768-D.</p></details>
+    </div>
+  </div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+const txt=document.getElementById('txt'), size=document.getElementById('size'), over=document.getElementById('over'), sizeV=document.getElementById('sizeV'), overV=document.getElementById('overV'), chunksDiv=document.getElementById('chunks'), best=document.getElementById('best'), count=document.getElementById('count'), timeEl=document.getElementById('time');
+const query="Which hospitals are covered in this policy?";
+function render(){
+  const s=parseInt(size.value,10), o=parseInt(over.value,10);
+  sizeV.textContent=s; overV.textContent=o;
+  const t0=performance.now();
+  const cs=chunkText(txt.value, s, o);
+  const t1=performance.now();
+  count.textContent=cs.length+" chunks"; timeEl.textContent="~"+Math.round(t1-t0)+" ms + embed";
+  const scored=cs.map(c=>({text:c, score:cosine(mockEmbed(c), mockEmbed(query))})).sort((a,b)=>b.score-a.score);
+  const bestScore=scored[0];
+  chunksDiv.innerHTML=cs.map((c,i)=>{
+    const isBest = c===bestScore.text;
+    const sc = scored.find(x=>x.text===c).score;
+    const bg = isBest ? "#EFF6FF" : ["#FFF","#F9FAFB","#EFF6FF","#FEF3C7","#ECFDF5"][i%5];
+    const border = isBest ? "#12549E" : "#E9EEF3";
+    const hit = c.toLowerCase().includes("st. jude")||c.toLowerCase().includes("city general") ? "🏥" : " ";
+    return `<div class="chunk" style="background:${bg};border-color:${border};${isBest?'font-weight:700':''}">${hit} <span style="color:#5A6C80;font-size:11px;float:right">${sc.toFixed(2)}</span> ${c.slice(0,160).replace(/</g,"&lt;")}${c.length>160?"…":""}</div>`;
+  }).join("");
+  best.innerHTML = `Best chunk (score ${bestScore.score.toFixed(2)}):<br><strong>${bestScore.text.slice(0,280).replace(/</g,"&lt;")}</strong><br><span style="font-size:11px;color:#5A6C80">Query “${query}” closest here. Try size 250 vs 700 to see context break.</span>`;
+}
+size.addEventListener('input', render); over.addEventListener('input', render); txt.addEventListener('input', render); render();
+</script>
+</body>
+</html>

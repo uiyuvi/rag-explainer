@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Closest-Match Map — RAG Explainer</title>
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+.map-wrap{position:relative}
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.legend span{font-size:11px;font-weight:700;padding:4px 8px;border-radius:999px;background:#fff;border:1px solid #D4DDE8;color:#0A1931}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:4px;vertical-align:middle}
+.results{max-height:46vh;overflow:auto}
+@media(max-width:640px){.results{max-height:40vh}}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner">
+  <div class="brand"><div class="brand-mark">TF</div><div>RAG Explainer <small>03 • Closest-Match Map • Hero</small></div></div>
+  <nav class="nav"><a href="../index.html">← Home</a><a href="../resources.html">Resources</a></nav>
+</div></header>
+<main class="wrap">
+  <div class="kicker">Like TensorFlow Projector — but instant on your phone</div>
+  <h1 style="margin:8px 0 6px;color:#0A1931">Which word is closest in meaning?</h1>
+  <p style="color:#5A6C80;margin:0 0 10px">Type a word. We make a Meaning Fingerprint (mock 8-D) and show its nearest neighbors. <strong>Hospital ≈ Medical Center (0.92) ≠ Car (0.03)</strong>. Drag to pan, pinch to zoom is simulated via sliders for mobile.</p>
+
+  <div class="demo-bar">
+    <input id="q" placeholder="Type: hospital, physician, apple, car…" value="hospital">
+    <select id="k"><option value="5">Top 5</option><option value="8">Top 8</option><option value="12">Top 12</option></select>
+    <button class="btn btn-primary" id="go">Find Closest</button>
+  </div>
+
+  <div class="canvas-wrap map-wrap">
+    <canvas id="map" width="900" height="520"></canvas>
+    <div class="legend">
+      <span><i class="dot" style="background:#12549E"></i>Query</span>
+      <span><i class="dot" style="background:#EF413D"></i>Closest</span>
+      <span><i class="dot" style="background:#5A6C80"></i>Others</span>
+      <span>Metric: cosine similarity (1 − distance)</span>
+    </div>
+    <div class="range-row"><label>Zoom <input type="range" id="zoom" min="60" max="140" value="100"></label><label>Spread <input type="range" id="spread" min="60" max="140" value="100"></label><span id="hint" class="flow-note">Try: “physician” → near “doctor”, far from “car”</span></div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin:0">Ranked — closest first</h3>
+    <ul id="list" class="list"></ul>
+    <details class="details"><summary>For Builders — how mock works</summary><p class="flow-note">No API. <code>mockEmbed(word)</code> → 8-D normalized vector (synonym map for demo words, hash→sin for others). Cosine = dot. Real TF projector uses 300-D Word2Vec; we use 8-D for instant phone. Swap to <code>Transformers.js</code> later if you want.</p></details>
+  </div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+const WORDS=["hospital","medical center","clinic","doctor","physician","apple","pear","fruit","car","vehicle","insurance","policy","hospital covered","medical care center","physicians","hospitals"];
+const POS={
+ "hospital":[220,220], "medical center":[280,240], "clinic":[310,280], "doctor":[200,320], "physician":[240,360],
+ "apple":[700,180], "pear":[740,220], "fruit":[720,140],
+ "car":[700,380], "vehicle":[680,430], "insurance":[430,200], "policy":[460,260], "hospital covered":[320,180], "medical care center":[350,300], "physicians":[250,400], "hospitals":[200,200]
+};
+const canvas=document.getElementById('map'), ctx=canvas.getContext('2d');
+const q=document.getElementById('q'), kSel=document.getElementById('k'), list=document.getElementById('list');
+let zoom=100, spread=100;
+document.getElementById('zoom').addEventListener('input', e=>{zoom=+e.target.value; draw();});
+document.getElementById('spread').addEventListener('input', e=>{spread=+e.target.value; draw();});
+
+function ranked(query, k){
+  return topK(query, WORDS, k);
+}
+let lastRanked=[];
+function draw(){
+  const query = (q.value.trim()||"hospital");
+  const k = parseInt(kSel.value,10);
+  lastRanked = ranked(query, WORDS.length);
+  // layout scaling
+  const s = spread/100, z = zoom/100;
+  const cx=450, cy=260;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  // grid
+  ctx.strokeStyle="#E9EEF3"; ctx.lineWidth=1;
+  for(let x=0;x<canvas.width;x+=90){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke(); }
+  for(let y=0;y<canvas.height;y+=90){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke(); }
+  // draw lines from query to top-3
+  const qKey = query.toLowerCase();
+  // query pos: if in POS use it else center-ish (hash)
+  let qPos = POS[qKey] || [430, 320];
+  // scale around center
+  function tr(p){ return [(p[0]-cx)*s*z + cx, (p[1]-cy)*s*z + cy]; }
+  const tQ = tr(qPos);
+  // draw connections to top 3
+  for(let i=0;i<Math.min(3, lastRanked.length);i++){
+    const r=lastRanked[i];
+    const p=POS[r.text] || [500+ (Math.random()*80-40), 300+(Math.random()*80-40)];
+    const tp=tr(p);
+    ctx.strokeStyle="rgba(18,84,158,0.25)"; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(tQ[0], tQ[1]); ctx.lineTo(tp[0], tp[1]); ctx.stroke();
+    // distance label
+    const mid=[(tQ[0]+tp[0])/2,(tQ[1]+tp[1])/2];
+    ctx.fillStyle="#12549E"; ctx.font="11px Inter, sans-serif";
+    ctx.fillText(r.score.toFixed(2), mid[0]+4, mid[1]-4);
+  }
+  // draw all words
+  for(const w of WORDS){
+    const p=tr(POS[w]||[400,300]);
+    const rank = lastRanked.findIndex(r=>r.text===w);
+    const score = rank>=0? lastRanked[rank].score : 0;
+    const isQuery = w.toLowerCase()===qKey;
+    const isTop3 = rank>=0 && rank<3;
+    // dot
+    ctx.beginPath();
+    ctx.arc(p[0], p[1], isQuery?10: isTop3?8:6, 0, Math.PI*2);
+    if(isQuery){ ctx.fillStyle="#12549E"; ctx.fill(); ctx.strokeStyle="#0A1931"; ctx.lineWidth=2; ctx.stroke(); }
+    else if(isTop3){ ctx.fillStyle="#EF413D"; ctx.fill(); }
+    else { ctx.fillStyle="#5A6C80"; ctx.fill(); }
+    // label
+    ctx.fillStyle="#0A1931"; ctx.font = isQuery||isTop3 ? "700 13px Inter" : "500 12px Inter";
+    ctx.fillText(w, p[0]+10, p[1]+4);
+    if(isTop3){ ctx.fillStyle="#12549E"; ctx.font="11px Inter"; ctx.fillText(score.toFixed(2), p[0]+10, p[1]+16); }
+  }
+  // render list top-k
+  const topKList = lastRanked.slice(0,k);
+  list.innerHTML = topKList.map((r,i)=>{
+    const pct = Math.round(r.score*100);
+    const col = i===0 ? "#12549E": i<3 ? "#EF413D":"#5A6C80";
+    return `<li><span><strong style="color:${col}">${i+1}. ${r.text}</strong> <span style="color:#5A6C80">— ${r.score.toFixed(2)} cosine</span></span><span class="score">${pct}%</span></li>`;
+  }).join("");
+}
+document.getElementById('go').addEventListener('click', draw);
+q.addEventListener('keydown', e=>{ if(e.key==='Enter') draw(); });
+kSel.addEventListener('change', draw);
+draw();
+// responsive canvas
+function resize(){ const w=canvas.clientWidth; canvas.width=w*2; canvas.height=520*2; canvas.style.height="520px"; draw(); }
+window.addEventListener('resize', resize); resize();
+</script>
+</body>
+</html>

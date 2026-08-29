@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>07 Limits — RAG Explainer</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner"><div class="brand"><div class="brand-mark">TF</div><div>RAG Explainer <small>07 • Limits Explorer • Builders</small></div></div><nav class="nav"><a href="../index.html">← Home</a></nav></div></header>
+<main class="wrap">
+  <div class="kicker">Trust — make it fail, then fix it</div>
+  <h1 style="color:#0A1931">Limits Explorer</h1>
+  <p style="color:#5A6C80">Three knobs that break RAG. Move them → see the answer degrade → learn the mitigation.</p>
+
+  <div class="grid grid-3">
+    <div class="card">
+      <h3>1. Blurry PDF (OCR)</h3>
+      <p style="font-size:13px;color:#5A6C80">Simulate OCR errors: “Medical Center” → “MediCal C3nter”</p>
+      <label style="font-size:13px"><input type="checkbox" id="blur"> Enable blur corruption</label>
+      <p id="blurOut" style="font-size:12px;color:#991B1B;margin-top:8px"></p>
+    </div>
+    <div class="card">
+      <h3>2. Chunk Size</h3>
+      <div class="range-row"><input type="range" id="cs" min="80" max="900" value="500"><span id="csV">500</span></div>
+      <p style="font-size:12px;color:#5A6C80">Too small → “St. Jude’s” cut. Too big → legal fluff dilutes.</p>
+    </div>
+    <div class="card">
+      <h3>3. Top-K</h3>
+      <div class="range-row"><input type="range" id="tk" min="1" max="6" value="2"><span id="tkV">2</span></div>
+      <p style="font-size:12px;color:#5A6C80">Too low → misses Westside. Too high → token overflow.</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><input id="q" value="Which hospitals are covered?" style="flex:1;padding:10px;border:1px solid #D4DDE8;border-radius:10px"><button class="btn btn-primary" id="test">Test Answer</button></div>
+    <div id="res" style="margin-top:12px;padding:12px;border-radius:10px;border:1px solid #E9EEF3;background:#F9FAFB">Press Test…</div>
+    <div id="mit" style="margin-top:8px;font-size:13px;color:#12549E"></div>
+  </div>
+
+  <div class="grid grid-2" style="margin-top:12px">
+    <div class="card"><h3>Mitigations</h3><ul style="font-size:13px;color:#5A6C80;margin:0;padding-left:18px"><li>Blur → OCR + human review</li><li>Small chunks → 50 overlap, 450-550 size</li><li>Top-K → 3-4 + “No answer” fallback</li><li>Update → re-chunk + re-embed only that file (Basic cheapest)</li></ul></div>
+    <div class="card"><h3>For Builders — cost</h3><p style="font-size:13px;color:#5A6C80">Embedding 50 pages ≈ cents. Re-embedding on update = same. GraphRAG rebuild = heavier. Agentic = higher token loops.</p></div>
+  </div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+const q=document.getElementById('q'), res=document.getElementById('res'), mit=document.getElementById('mit'), blur=document.getElementById('blur'), cs=document.getElementById('cs'), csV=document.getElementById('csV'), tk=document.getElementById('tk'), tkV=document.getElementById('tkV'), blurOut=document.getElementById('blurOut');
+cs.addEventListener('input', ()=> csV.textContent=cs.value); tk.addEventListener('input', ()=> tkV.textContent=tk.value);
+function corrupt(s){ return s.replace("Medical Center","MediCal C3nter").replace("City General","C1ty Gen3ral"); }
+const baseChunks=[
+  "City General Hospital Alliance — Preferred Provider Tier (p.12)",
+  "St. Jude’s Medical Center and Westside Health Center — network (p.8)",
+  "Westside Health emergency only if pre-authorized 48h (p.31)",
+  "Legal disclaimer — Physicians weekends not guaranteed (p.2)",
+  "Dental benefits separate (p.44)"
+];
+function test(){
+  const query=q.value.trim()||"Which hospitals are covered?";
+  const doBlur=blur.checked, size=+cs.value, k=+tk.value;
+  let chunks=baseChunks.slice();
+  if(doBlur){ chunks=chunks.map(corrupt); blurOut.textContent='Corrupted: “MediCal C3nter” — vector now far (0.41 vs 0.92).'; } else { blurOut.textContent=''; }
+  // simulate chunk size effect: small loses context
+  let scorePenalty = 0;
+  let msg="";
+  if(size<180){ scorePenalty+=0.35; msg+=" Chunk too small → “St. Jude’s” cut → score -0.35. "; }
+  else if(size>750){ scorePenalty+=0.15; msg+=" Chunk too big → legal fluff dilutes → -0.15. "; }
+  const ranked=chunks.map(c=>({text:c, raw: cosine(mockEmbed(c), mockEmbed(query)) - scorePenalty})).sort((a,b)=>b.raw-a.raw);
+  const top=ranked.slice(0,k);
+  const best=top[0]?.raw||0;
+  if(best<0.4){
+    res.style.background="#FEF2F2"; res.style.borderColor="#FECACA"; res.style.color="#991B1B";
+    res.innerHTML = `<strong>✘ Hallucination risk</strong> — best score ${best.toFixed(2)}.<br>“No relevant chunk. Model would guess.”<br><span style="color:#5A6C80;font-size:12px">Mitigate: fix blur / increase chunk / raise Top-K.</span>`;
+    mit.textContent=msg+" Fix: disable blur, size ~500, Top-K 3-4.";
+  } else if(k<3 && ranked[2].raw>0.6){
+    res.style.background="#FFFBEB"; res.style.borderColor="#FDE68A"; res.style.color="#92400E";
+    res.innerHTML = `<strong>⚠ Partial answer</strong> — Top-${k} misses Westside (rank 3, ${ranked[2].raw.toFixed(2)}).<br>“City General, St. Jude’s…” — Westside omitted.`;
+    mit.textContent=msg+" Raise Top-K to 3-4 to include third hospital.";
+  } else {
+    res.style.background="#ECFDF5"; res.style.borderColor="#6EE7B7"; res.style.color="#065F46";
+    res.innerHTML = `<strong>✓ Grounded answer</strong> — Top-${k} includes ${top.map(t=>t.text.split("—")[0]).join(", ")} (scores ${top.map(t=>t.raw.toFixed(2)).join(", ")}).<br>“Covered at City General, St. Jude’s Medical Center, and Westside Health (p.12, p.8).”`;
+    mit.textContent=msg||"Good settings: no blur, 450-550 chunk, Top-K 3-4.";
+  }
+}
+document.getElementById('test').addEventListener('click', test); test();
+</script>
+</body>
+</html>

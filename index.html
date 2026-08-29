@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>RAG Explainer — Build Your Personal Document Assistant | TCS France</title>
+<meta name="description" content="How AI answers from private PDFs — Vector Search explained step-by-step. 7 mobile demos, no setup.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-mark">TF</div>
+      <div>RAG Explainer <small>TCS France • Private PDF Assistant</small></div>
+    </div>
+    <nav class="nav">
+      <a href="slides/rag_explainer.pptx">Download PPT</a>
+      <a href="resources.html">Resources</a>
+      <a class="primary" href="#demos">Try Demos ↓</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="kicker">TCS France • Mixed Audience • 25 MIN</div>
+    <h1>Build Your Personal <span>Document Assistant</span></h1>
+    <p class="lead">How AI answers from data it was never trained on. One 50-page insurance policy, one question — see the whole pipeline from PDF to trusted answer. All demos run on your phone, no download.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="slides/rag_explainer.pptx">⬇ Download PPT (18 slides)</a>
+      <a class="btn btn-secondary" href="#demos">▶ Try Closest-Match Map</a>
+      <a class="btn btn-ghost" href="resources.html">Explore Further →</a>
+    </div>
+    <div class="qr-card">
+      <div class="qr"><img alt="QR to this site" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://uiyuvi.github.io/rag-explainer/"></div>
+      <div class="qr-meta">
+        <strong>Scan to open on your phone</strong>
+        https://uiyuvi.github.io/rag-explainer/<br>
+        <span style="color:#5A6C80">No app, no login, works on office Wi-Fi. Try during the talk.</span><br>
+        <a href="resources.html" style="font-weight:700;color:#12549E">One QR for all links → resources.html</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2>One Flow — The Big Picture</h2><p>Follow the insurance question through each box</p></div>
+    <div class="pipeline">
+      <span class="pipe-step">PDF Policy</span><span class="pipe-arrow">→</span>
+      <span class="pipe-step">Chunking</span><span class="pipe-arrow">→</span>
+      <span class="pipe-step">Encoder</span><span class="pipe-arrow">→</span>
+      <span class="pipe-step">Vector DB</span><span class="pipe-arrow">→</span>
+      <span class="pipe-step" style="background:#EAF0F8;border-color:#12549E">LLM Answer + Citations</span>
+    </div>
+    <p class="note" style="margin-top:12px">We turn text into <strong>Meaning Fingerprints (Vectors)</strong>, store them, find the closest match to your question, and let the AI write the answer. Each demo below is one box.</p>
+  </section>
+
+  <section class="section" id="demos">
+    <div class="section-head"><h2>7 Micro-Demos — Tap to Play</h2><p>For Everyone + For Builders (accordion)</p></div>
+    <div class="grid grid-3">
+      <a class="card" href="demos/03_vector_map.html">
+        <span class="badge badge-everyone">Hero • Everyone</span>
+        <h3>03 — Closest-Match Map ⭐</h3>
+        <p>Type any word → see it fly to its neighbors. <strong>Hospital ≈ Medical Center</strong> (0.92) ≠ Car (0.03). Like TensorFlow Projector but instant on phone.</p>
+        <div class="kpi"><span>TF Projector idea</span><span>Mock • 8D</span></div>
+      </a>
+      <a class="card" href="demos/01_keyword_vs_vector.html">
+        <span class="badge badge-everyone">Everyone</span>
+        <h3>01 — Keyword vs Vector</h3>
+        <p>Toggle switch: “Hospitals” fails with Ctrl+F, succeeds with meaning. The receptionist analogy live.</p>
+        <div class="kpi"><span>Ctrl+F 0 hits</span><span>Vector 0.89</span></div>
+      </a>
+      <a class="card" href="demos/02_chunk_lab.html">
+        <span class="badge badge-everyone">Everyone</span>
+        <h3>02 — Baguette Slicer Lab</h3>
+        <p>Slide chunk size + overlap → watch the 50-page loaf split. Too small loses context, too big misses precision.</p>
+        <div class="kpi"><span>500 + 50 overlap</span><span>Mobile slider</span></div>
+      </a>
+      <a class="card" href="demos/04_similarity_rank.html">
+        <span class="badge badge-builders">Builders</span>
+        <h3>04 — Closest-Match Game</h3>
+        <p>Type “Which hospitals are covered?” → ranked chunks with cosine bars. Move Top-K slider (1→5).</p>
+        <div class="kpi"><span>cosine</span><span>Top-K</span></div>
+      </a>
+      <a class="card" href="demos/05_context_window.html">
+        <span class="badge badge-everyone">Everyone</span>
+        <h3>05 — Lawyer’s Desk</h3>
+        <p>Drag 3 chunks into the token window until it fills. LLM only sees what fits — not 50 pages.</p>
+        <div class="kpi"><span>Token window</span><span>4,096</span></div>
+      </a>
+      <a class="card" href="demos/06_e2e_rag.html">
+        <span class="badge badge-everyone">Everyone</span>
+        <h3>06 — Full Pipeline Simulator</h3>
+        <p>One click → console logs Ingest → Chunk → Embed → Search → Answer with page citations. 5-page mock PDF.</p>
+        <div class="kpi"><span>End-to-end</span><span>Grounded</span></div>
+      </a>
+      <a class="card" href="demos/07_limits.html">
+        <span class="badge badge-builders">Builders</span>
+        <h3>07 — Limits Explorer</h3>
+        <p>Make it fail: blurry PDF, tiny chunks, wrong Top-K → hallucination. Then fix it.</p>
+        <div class="kpi"><span>Failure mode</span><span>Mitigation</span></div>
+      </a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2>Where RAG Is Used — Generic</h2><p>Same pattern everywhere</p></div>
+    <div class="grid grid-3">
+      <div class="card"><h3>Customer Support</h3><p>Manuals + tickets → cited answer. Faster resolution.</p></div>
+      <div class="card"><h3>Healthcare</h3><p>Records → private assistant for doctors (on-prem).</p></div>
+      <div class="card"><h3>Finance / Insurance</h3><p>Policies, claims → “what is covered?” with page ref.</p></div>
+      <div class="card"><h3>Legal</h3><p>Contracts → “find risky clause + page”.</p></div>
+      <div class="card"><h3>Education</h3><p>Textbooks → Q&A with sources for students.</p></div>
+      <div class="card"><h3>Enterprise</h3><p>Handbooks → “leave policy?” in seconds.</p></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2>Beyond Basic RAG — When to Level Up</h2><p>2 lines each • all need re-processing on update</p></div>
+    <div class="grid grid-3">
+      <div class="card" style="border-top:3px solid #12549E"><span class="badge badge-everyone">Today</span><h3>Basic RAG</h3><p>Split → embed → Top-K → answer.<br><strong>On update:</strong> re-chunk + re-embed only that file. Cheapest, fastest.</p></div>
+      <div class="card" style="border-top:3px solid #5A6C80"><span class="badge badge-builders">Builders</span><h3>GraphRAG</h3><p>Builds entity graph (Hospital ↔ covers ↔ City).<br><strong>On update:</strong> rebuild graph. Great for “how are X and Y connected?” but heavy.</p></div>
+      <div class="card" style="border-top:3px solid #EF413D"><span class="badge badge-builders">Builders</span><h3>Agentic RAG</h3><p>Agent loops: search → check → search again.<br><strong>On update:</strong> no storage, but slower + higher token cost. For multi-hop questions.</p></div>
+    </div>
+    <p class="note">All 3 require re-processing on change — Basic cheapest per file. See <a href="resources.html">resources.html</a> for one link per card.</p>
+  </section>
+
+  <section class="section">
+    <div class="card" style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+      <div class="qr"><img alt="QR resources" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://uiyuvi.github.io/rag-explainer/resources.html"></div>
+      <div>
+        <h3 style="margin:0;color:#0A1931">Go Further — Scan After Session</h3>
+        <p style="margin:6px 0;color:#5A6C80;font-size:14px">One QR → <a href="resources.html">resources.html</a> — separate file, 5 curated links: TensorFlow Projector (your enwiki link), Embedding Atlas, Sentence-Transformers, Vector DB intro, RAG/GraphRAG/Agentic guides. No URLs to type on slides.</p>
+        <p style="margin:0;font-weight:700;color:#12549E">https://uiyuvi.github.io/rag-explainer/resources.html</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <details class="card">
+      <summary>For Builders — How the mock works (tap to expand)</summary>
+      <p style="color:#5A6C80;font-size:13px">No API, no backend. <code>mockEmbed(text)</code> → deterministic 8-D vector (hash → sin waves, L2 normalized). Synonym map forces <code>Hospital ≈ Medical Center (0.92)</code>. Cosine = dot product (vectors normalized). Slider values update live. Real model swap: enable Transformers.js <code>all-MiniLM-L6-v2</code> (~25MB) as opt-in.</p>
+    </details>
+  </section>
+</main>
+
+<footer class="footer">
+  TCS France • RAG Explainer • Private data stays private • Built for mixed audience (non-tech + tech) • 18 slides + 7 demos • <a href="resources.html">Resources</a> • <a href="slides/rag_explainer.pptx">PPT</a>
+</footer>
+</body>
+</html>
