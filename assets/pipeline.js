@@ -4,8 +4,8 @@ const PIPELINE = [
   {id:'chunking',  label:'Chunking',   demo:'02_chunk_lab.html',         anchor:'',        desc:'Cuts the 50-page policy into slices (chunks) so we can find the exact page.'},
   {id:'embeddings',label:'Embeddings', demo:'03_vector_map.html',        anchor:'',        desc:'Turns slices into Meaning Fingerprints — similar meanings get similar numbers (Encoder + Vector).'},
   {id:'vectordb',  label:'Vector DB',  demo:'04b_vectordb.html',         anchor:'',        desc:'Smart library — groups fingerprints so “Hospital” sits near “Medical Center”. No search here, just storage.'},
-  {id:'query',     label:'Query',      demo:'04_similarity_rank.html',   anchor:'#query',  desc:'Your question also becomes a fingerprint — same translator as the slices.'},
-  {id:'search',    label:'Search',     demo:'04_similarity_rank.html',   anchor:'#search', desc:'Closest-match game — ranks every slice by meaning.'},
+  {id:'query',     label:'Query',      demo:'04a_query.html',            anchor:'',        desc:'Your question also becomes a fingerprint — same translator as the slices.'},
+  {id:'search',    label:'Search',     demo:'04_similarity_rank.html',   anchor:'',        desc:'Closest-match game — ranks every slice by meaning.'},
   {id:'context',   label:'Context',    demo:'05_context_window.html',    anchor:'',        desc:'Lawyer’s desk — gives the AI only the 3 best slices (fits the token window).'},
   {id:'answer',    label:'Answer',     demo:'06_e2e_rag.html',           anchor:'',        desc:'Grounded answer with citations — verify the page.'},
 ];

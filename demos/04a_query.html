@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Query — RAG Explainer</title>
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+.fpbar{display:flex;gap:4px;align-items:flex-end;height:80px;margin:10px 0}
+.fpbar .col{flex:1;background:#12549E;border-radius:6px 6px 0 0;min-width:8px;position:relative}
+.fpbar .col span{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:10px;color:#5A6C80}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner"><div class="brand"><div class="brand-mark">RE</div><div>RAG Explainer <small>Query — question as numbers</small></div></div><nav class="nav"><a href="../index.html">Home</a><a href="../index.html#visualise">Visualise</a><a href="../resources.html">Resources</a></nav></div></header>
+<main class="wrap">
+  <div id="pipeline" style="margin-bottom:12px"></div>
+  <div class="kicker">Query • Your question becomes a fingerprint</div>
+  <h1 style="color:#0A1931;margin:8px 0 6px">The question goes through the same translator</h1>
+  <p style="color:#5A6C80;margin:0">Before Search can rank anything, your question is turned into numbers — exactly like the PDF slices were. Same Encoder, same fingerprint idea.</p>
+
+  <div class="card" style="margin-top:12px">
+    <h3 style="margin:0;color:#0A1931">Type your question</h3>
+    <div class="demo-bar"><input id="q" value="Which hospitals are covered?"><button class="btn btn-primary" id="go">Encode</button></div>
+    <div id="fp" style="display:none">
+      <div style="font-size:12px;font-weight:700;color:#0A1931;margin-top:8px">Meaning Fingerprint (8-D mock):</div>
+      <div class="fpbar" id="fpbar"></div>
+      <div id="fpnums" style="font-size:12px;color:#5A6C80;font-family:ui-monospace,Menlo,monospace"></div>
+    </div>
+  </div>
+
+  <div class="grid grid-2" style="margin-top:12px">
+    <div class="card"><h3>Why this matters</h3><p style="font-size:13px;color:#5A6C80">“hospitals” and “Medical Center” become <strong>nearby numbers</strong> — so the next step (Search) can compare meanings, not letters. Without this fingerprint, Search has nothing to compare.</p></div>
+    <div class="card"><h3>Try it — same meaning, different words</h3><p style="font-size:13px;color:#5A6C80">Type “Which <strong>medical centers</strong> are covered?” — the fingerprint stays close to the “hospitals” one. That’s the whole trick of vector search.</p></div>
+  </div>
+
+  <div class="card" style="margin-top:12px;background:#FEF2F2;border-color:#FECACA">
+    <h3 style="margin:0;color:#0A1931">Next: Search</h3>
+    <p style="font-size:13px;color:#5A6C80;margin:6px 0">Now that the question is a fingerprint, <a href="04_similarity_rank.html" style="font-weight:700">Search ranks every chunk against it →</a></p>
+  </div>
+</main>
+<script src="../assets/pipeline.js?v=10"></script>
+<script src="../assets/common.js"></script>
+<script>
+const q=document.getElementById('q'), go=document.getElementById('go'), fp=document.getElementById('fp'), fpbar=document.getElementById('fpbar'), fpnums=document.getElementById('fpnums');
+function encode(){
+  const query=q.value.trim()||"Which hospitals are covered?";
+  const v=mockEmbed(query);
+  const min=Math.min(...v), max=Math.max(...v);
+  fpbar.innerHTML=v.map((x,i)=>{
+    const h=Math.round(((x-min)/((max-min)||1))*70+10);
+    return `<div class="col" style="height:${h}px"><span>${i+1}</span></div>`;
+  }).join("");
+  fpnums.textContent="["+v.map(x=>x.toFixed(2)).join(", ")+"]";
+  fp.style.display="block";
+}
+go.addEventListener('click', encode);
+q.addEventListener('keydown', e=>{ if(e.key==='Enter') encode(); });
+encode();
+renderPipeline('query');
+</script>
+</body>
+</html>

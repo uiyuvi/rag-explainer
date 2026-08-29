@@ -10,29 +10,20 @@
 <header class="topbar"><div class="topbar-inner"><div class="brand"><div class="brand-mark">RE</div><div>RAG Explainer <small>04 • Similarity Rank </small></div></div><nav class="nav"><a href="../index.html">Home</a><a href="../index.html#visualise">Visualise Concepts</a><a href="../resources.html">Resources</a></nav></div></header>
 <main class="wrap">
   <div id="pipeline" style="margin-bottom:12px"></div>
-  <div class="kicker">Query + Search • Two steps on one page</div>
-  <h1 style="color:#0A1931">Your question becomes a fingerprint — then we rank</h1>
-  <p style="color:#5A6C80">This page shows two pipeline steps: <strong>Query</strong> (question → numbers) and <strong>Search</strong> (rank chunks). Use the pipeline bar above to switch focus.</p>
+  <div class="kicker">Search • Closest-Match Game</div>
+  <h1 style="color:#0A1931">Rank every chunk by meaning</h1>
+  <p style="color:#5A6C80">Your question is already a fingerprint (previous step). Now compare it against 8 mock chunks from the insurance PDF — see which bubble up.</p>
 
-  <!-- STEP: QUERY -->
-  <div class="card" id="query" style="margin-top:12px;border-left:4px solid #12549E">
-    <div class="kicker" style="background:#EFF6FF">Query — your question as numbers</div>
-    <div class="demo-bar" style="margin:10px 0 6px"><input id="q" value="Which hospitals are covered?"><button class="btn btn-primary" id="go">Make fingerprint</button></div>
-    <div id="qfp" style="font-size:13px;color:#0A1931;background:#F4F7FA;border:1px solid #E9EEF3;border-radius:10px;padding:10px;font-family:ui-monospace,Menlo,monospace"></div>
-    <p class="flow-note" style="margin-top:8px">The question goes through the <strong>same Encoder</strong> as the PDF slices — that’s why “hospitals” can match “Medical Center”. No fingerprint, no search.</p>
+  <div class="card">
+    <div class="demo-bar"><input id="q" value="Which hospitals are covered?"><select id="k"><option value="3">Top 3</option><option value="4" selected>Top 4</option><option value="6">Top 6</option></select><button class="btn btn-primary" id="go">Rank</button></div>
+    <div class="range-row">Threshold: show only &gt; <span id="thrV">0.30</span> <input type="range" id="thr" min="0" max="80" value="30"></div>
   </div>
 
-  <!-- STEP: SEARCH -->
-  <div class="card" id="search" style="margin-top:14px;border-left:4px solid #EF413D">
-    <div class="kicker" style="background:#FEF2F2;color:#EF413D">Search — rank chunks by meaning</div>
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0"><label style="font-size:13px;font-weight:700;color:#0A1931">Top-K <select id="k"><option value="3">Top 3</option><option value="4" selected>Top 4</option><option value="6">Top 6</option></select></label><span style="font-size:13px;color:#5A6C80">Threshold &gt; <span id="thrV">0.30</span> <input type="range" id="thr" min="0" max="80" value="30"></span></div>
-    <div id="list" class="grid"></div>
-  </div>
-
+  <div id="list" class="grid"></div>
   <p class="note" style="margin-top:12px">Top-K chunks are the only ones sent to the LLM. Others are ignored — like discarding 40 pages of legal fluff.</p>
   <details class="card details"><summary>For Builders — cosine</summary><p class="flow-note">cosine = dot(a,b) for normalized vectors. Here Top-K=4. Real DBs use ANN for 10k+ vectors.</p></details>
 </main>
-<script src="../assets/pipeline.js?v=9"></script>
+<script src="../assets/pipeline.js?v=10"></script>
 <script src="../assets/common.js"></script>
 <script>
 const chunks=[
@@ -45,13 +36,8 @@ const chunks=[
   "Definitions: ‘Medical Center’ includes hospital and clinic facilities (p.1).",
   "Preferred Provider Tier includes comprehensive care at listed centers (p.12)."
 ];
-const q=document.getElementById('q'), kSel=document.getElementById('k'), thr=document.getElementById('thr'), thrV=document.getElementById('thrV'), list=document.getElementById('list'), qfp=document.getElementById('qfp');
-function renderQuery(){
-  const query=q.value.trim()||"Which hospitals are covered?";
-  const v=mockEmbed(query);
-  qfp.innerHTML=`“${query.replace(/</g,'&lt;')}” →<br><strong>[</strong> ${v.map(x=>x.toFixed(2)).join(', ')} <strong>]</strong> <span style="color:#5A6C80">(8-D mock, normalized)</span>`;
-}
-function renderSearch(){
+const q=document.getElementById('q'), kSel=document.getElementById('k'), thr=document.getElementById('thr'), thrV=document.getElementById('thrV'), list=document.getElementById('list');
+function render(){
   const query=q.value.trim()||"Which hospitals are covered?";
   const k=parseInt(kSel.value,10); const t=parseInt(thr.value,10)/100; thrV.textContent=t.toFixed(2);
   const ranked=chunks.map(c=>({text:c, score:cosine(mockEmbed(query), mockEmbed(c))})).sort((a,b)=>b.score-a.score);
@@ -63,23 +49,8 @@ function renderSearch(){
     return `<div class="card" style="${isTop?'border-color:#12549E;background:#EFF6FF':''}"><div style="display:flex;justify-content:space-between;gap:8px"><strong style="color:${isTop?'#12549E':'#0A1931'}">#${i+1} ${isTop?'★ Top-K':''}</strong><span class="score">${r.score.toFixed(2)}</span></div><div style="font-size:13px;color:#152536;margin-top:6px">${r.text}</div><div class="bar"><div class="fill" style="width:${w}%;${isTop?'background:#EF413D':''}"></div></div></div>`;
   }).join("");
 }
-function render(){ renderQuery(); renderSearch(); }
-document.getElementById('go').addEventListener('click', render); thr.addEventListener('input', renderSearch); kSel.addEventListener('change', renderSearch); q.addEventListener('keydown', e=>{if(e.key==='Enter') render();}); q.addEventListener('input', renderQuery); render();
-</script>
-<script>
-// Hash decides focus: #query → Query pill, #search → Search pill
-function focusFromHash(){
-  const h=location.hash;
-  if(h==='#query'){
-    renderPipeline('query');
-    document.getElementById('query').scrollIntoView({behavior:'smooth', block:'start'});
-  } else {
-    renderPipeline('search');
-    document.getElementById('search').scrollIntoView({behavior:'smooth', block:'start'});
-  }
-}
-window.addEventListener('hashchange', focusFromHash);
-focusFromHash();
+document.getElementById('go').addEventListener('click', render); thr.addEventListener('input', render); kSel.addEventListener('change', render); q.addEventListener('keydown', e=>{if(e.key==='Enter') render();}); render();
+renderPipeline('search');
 </script>
 </body>
 </html>
