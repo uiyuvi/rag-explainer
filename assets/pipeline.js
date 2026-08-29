@@ -1,13 +1,13 @@
 // Shared pipeline navigator — 8 steps (Encoder+Vector merged → Embeddings), clickable, highlight current
 const PIPELINE = [
-  {id:'ingest',    label:'Ingest',     demo:'00_ingest.html',            anchor:'',        desc:'Reads your PDF — text, tables, images — as the single source of truth.'},
-  {id:'chunking',  label:'Chunking',   demo:'02_chunk_lab.html',         anchor:'',        desc:'Cuts the 50-page policy into slices (chunks) so we can find the exact page.'},
-  {id:'embeddings',label:'Embeddings', demo:'03_vector_map.html',        anchor:'',        desc:'Turns slices into Meaning Fingerprints — similar meanings get similar numbers (Encoder + Vector).'},
-  {id:'vectordb',  label:'Vector DB',  demo:'04b_vectordb.html',         anchor:'',        desc:'Smart library — groups fingerprints so “Hospital” sits near “Medical Center”. No search here, just storage.'},
-  {id:'query',     label:'Query',      demo:'04a_query.html',            anchor:'',        desc:'Your question also becomes a fingerprint — same translator as the slices.'},
-  {id:'search',    label:'Search',     demo:'04_similarity_rank.html',   anchor:'',        desc:'Closest-match game — ranks every slice by meaning.'},
-  {id:'context',   label:'Context',    demo:'05_context_window.html',    anchor:'',        desc:'Lawyer’s desk — gives the AI only the 3 best slices (fits the token window).'},
-  {id:'answer',    label:'Answer',     demo:'06_e2e_rag.html',           anchor:'',        desc:'Grounded answer with citations — verify the page.'},
+  {id:'ingest',    label:'Ingest',     demo:'00_ingest.html',            anchor:'',        desc:'Reads your PDF — text, tables, images. Model: OCR (only for scanned pages).'},
+  {id:'chunking',  label:'Chunking',   demo:'02_chunk_lab.html',         anchor:'',        desc:'Cuts the 50-page policy into slices so we can find the exact page. No model — plain code.'},
+  {id:'embeddings',label:'Embeddings', demo:'03_vector_map.html',        anchor:'',        desc:'Turns slices into Meaning Fingerprints — similar meanings get similar numbers. Model: embedding model.'},
+  {id:'vectordb',  label:'Vector DB',  demo:'04b_vectordb.html',         anchor:'',        desc:'Smart library — groups fingerprints so “Hospital” sits near “Medical Center”. No model — storage only.'},
+  {id:'query',     label:'Query',      demo:'04a_query.html',            anchor:'',        desc:'Your question also becomes a fingerprint. Model: same embedding model as the slices.'},
+  {id:'search',    label:'Search',     demo:'04_similarity_rank.html',   anchor:'',        desc:'Ranks every slice by meaning. No model — cosine math.'},
+  {id:'context',   label:'Context',    demo:'05_context_window.html',    anchor:'',        desc:'Lawyer’s desk — assembles the winning slices into the LLM’s reading window. No model — assembly.'},
+  {id:'answer',    label:'Answer',     demo:'06_e2e_rag.html',           anchor:'',        desc:'The only step where the LLM works: reads the slices, writes the answer with citations.'},
 ];
 
 function renderPipeline(currentId, containerId='pipeline'){

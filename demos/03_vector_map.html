@@ -68,6 +68,7 @@
 
   <div class="card" id="rankCard">
     <h3 style="margin:0">Ranked — closest first <span style="font-weight:600;color:#5A6C80;font-size:12px">(your word is excluded; rank 1 = its best match)</span></h3>
+    <p class="help" style="margin:2px 0 6px">Facilities rank closest to facilities (hospital → medical center → clinic); the practitioners (physician, doctor) come next — related, but a different kind of thing.</p>
     <ul id="list" class="list"></ul>
   </div>
   <div class="card" id="howCard" style="display:none">
@@ -85,10 +86,10 @@
 <script>
 const WORDS=["hospital","medical center","medical care center","clinic","doctor","physician","insurance","policy","apple","pear","fruit","car","vehicle"];
 const POS={
-  "hospital":[150,250], "medical center":[290,270], "clinic":[310,340], "doctor":[150,360], "physician":[230,430], "medical care center":[410,360],
-  "insurance":[470,140], "policy":[530,200],
-  "apple":[700,120], "pear":[770,170], "fruit":[720,70],
-  "car":[730,380], "vehicle":[700,440]
+  "hospital":[70,120], "medical center":[185,135], "clinic":[210,190], "physician":[140,222], "doctor":[85,190], "medical care center":[275,195],
+  "insurance":[330,60], "policy":[358,112],
+  "apple":[398,45], "pear":[424,82], "fruit":[402,18],
+  "car":[398,172], "vehicle":[372,218]
 };
 const canvas=document.getElementById('map'), ctx=canvas.getContext('2d');
 const list=document.getElementById('list'), chipsDiv=document.getElementById('chips'), selInfo=document.getElementById('selInfo'), legendK=document.getElementById('legendK');
@@ -129,18 +130,18 @@ function draw(){
   lastRanked = topK(query, WORDS, WORDS.length);
   // CSS-pixel drawing space: model positions scale by k, fonts render true-size
   const dpr = window.devicePixelRatio || 1;
-  const W = canvas.clientWidth, H = Math.round(W*520/900);
-  const k = W/900;
+  const W = canvas.clientWidth, H = Math.round(W*270/460);
+  const k = W/460;
   const s = (spread/100)*(zoom/100)*k;
   const cx=W/2+panX, cy=H/2+panY;
   ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.clearRect(0,0,W,H);
   ctx.strokeStyle="#E9EEF3"; ctx.lineWidth=1;
-  const step=90*k;
+  const step=60*k;
   for(let x=0;x<=W;x+=step){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
   for(let y=0;y<=H;y+=step){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
   const qKey = query.toLowerCase();
-  const qPos = POS[qKey] || [430, 320];
+  const qPos = POS[qKey] || [230, 135];
   function tr(p){ return [(p[0]-450)*s + cx, (p[1]-260)*s + cy]; }
   const tQ = tr(qPos);
   for(let i=0;i<Math.min(k_sel, lastRanked.length);i++){
@@ -154,10 +155,10 @@ function draw(){
     if(i>=3) ctx.setLineDash([6,4]); else ctx.setLineDash([]);
     ctx.beginPath(); ctx.moveTo(tQ[0], tQ[1]); ctx.lineTo(tp[0], tp[1]); ctx.stroke();
     ctx.setLineDash([]);
-    if(i<5){
-      const mid=[(tQ[0]+tp[0])/2,(tQ[1]+tp[1])/2];
-      ctx.fillStyle="#EF413D"; ctx.font="600 12px Inter, sans-serif";
-      ctx.fillText(r.score.toFixed(2), mid[0]+4, mid[1]-4);
+    if(i<3){
+      const mx=tQ[0]+(tp[0]-tQ[0])*0.45, my=tQ[1]+(tp[1]-tQ[1])*0.45;
+      ctx.fillStyle="#EF413D"; ctx.font="700 11px Inter, sans-serif";
+      ctx.fillText(r.score.toFixed(2), mx+3, my-5);
     }
   }
   for(const w of WORDS){
@@ -173,22 +174,23 @@ function draw(){
       ctx.fill();
     }
     ctx.beginPath();
-    ctx.arc(p[0], p[1], isQuery?12: isTopK?9:7, 0, Math.PI*2);
+    ctx.arc(p[0], p[1], isQuery?10: isTopK?8:6, 0, Math.PI*2);
     if(isQuery){ ctx.fillStyle="#12549E"; ctx.fill(); ctx.strokeStyle="#0A1931"; ctx.lineWidth=2; ctx.stroke(); }
     else if(isTopK){ ctx.fillStyle = isTop3 ? "#EF413D" : "#12549E"; ctx.fill(); }
     else { ctx.fillStyle="#7A8AA6"; ctx.fill(); }
-    ctx.font = isQuery ? "700 17px Inter" : isTopK ? "600 15px Inter" : "600 13.5px Inter";
+    ctx.font = isQuery ? "700 15px Inter" : isTopK ? "600 13.5px Inter" : "600 12px Inter";
     ctx.fillStyle= isQuery||isTopK ? "#0A1931" : "#2E3A50";
     const labelW = ctx.measureText(w).width;
-    let lx = p[0]+14, ly = p[1]+4;
-    if(p[0] + labelW + 16 > W){ lx = p[0] - labelW - 14; }
-    if(p[1] < 26) ly = p[1]+18;
-    if(p[1] > H-26) ly = p[1]-8;
+    let lx = p[0]+12, ly = p[1]+4;
+    if(p[0] + labelW + 14 > W){ lx = p[0] - labelW - 12; }
+    if(isTopK && rank % 2 === 1){ ly = p[1]-8; }      // alternate above/below to avoid collisions
+    if(ly < 14) ly = p[1]+16;
+    if(ly > H-12) ly = p[1]-8;
     ctx.fillText(w, lx, ly);
-    if(isTopK){
+    if(isTop3){                                       // rank sublabel only for top-3 (less clutter)
       ctx.fillStyle= isTop3 ? "#EF413D" : "#12549E";
-      ctx.font="600 12px Inter";
-      ctx.fillText(`${rank+1}. ${score.toFixed(2)}`, lx, ly+16);
+      ctx.font="700 11px Inter";
+      ctx.fillText(score.toFixed(2), lx, ly+14);
     }
   }
   const topKList = lastRanked.slice(0,k_sel);
@@ -269,7 +271,7 @@ canvas.addEventListener('touchend', e=>{
   if(now-lastTap<300 && e.touches.length===0){ panX=0; panY=0; zoom=100; spread=90; document.getElementById('zoom').value=zoom; document.getElementById('spread').value=spread; draw(); }
   lastTap=now;
 });
-if(window.innerWidth<640){ zoom=95; spread=90; document.getElementById('zoom').value=zoom; document.getElementById('spread').value=spread; draw(); }
+if(window.innerWidth<640){ zoom=95; spread=95; document.getElementById('zoom').value=zoom; document.getElementById('spread').value=spread; draw(); }
 </script>
 </body>
 </html>
