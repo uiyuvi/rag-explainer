@@ -12,7 +12,7 @@
   <div id="pipeline" style="margin-bottom:12px"></div>
   <div class="kicker">Answer — Full Pipeline</div>
   <h1 style="color:#0A1931">Full pipeline simulator — 5-page mock PDF</h1>
-  <p style="color:#5A6C80">One click → logs each step: Ingest → Chunking → Embeddings → Search → Answer. All in your browser. Watch the model badges: <strong>OCR</strong> at Ingest, <strong>embedding model</strong> at Embeddings, <strong>LLM</strong> at Answer — the rest is plain code, no model. The LLM appears only in the last step: same input, same output everywhere else.</p>
+  <p style="color:#5A6C80">One click → logs all 8 steps, exactly as in the pipeline bar above. Watch the model badges: <strong>OCR</strong> at Ingest, <strong>embedding model</strong> at Embeddings and Query, <strong>LLM</strong> at Answer — the rest is plain code, no model. The LLM appears only in the last step: same input, same output everywhere else. Vector DB runs twice — fingerprints are <strong>filed</strong> after Embeddings, then <strong>searched</strong> during Search.</p>
 
   <style>.mflag{font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;background:#EAF0F8;color:#12549E;white-space:nowrap}.mflag.nomodel{background:#F4F7FA;color:#5A6C80}.mflag.llm{background:#FEF2F2;color:#EF413D}</style>
 
@@ -24,8 +24,11 @@
         <div class="card step" id="s1"><strong>Ingest</strong> <span style="color:#5A6C80">— extract text/tables</span> <span class="mflag">OCR model if scanned</span></div>
         <div class="card step" id="s2"><strong>Chunking</strong> <span style="color:#5A6C80">— 500 + 50 overlap</span> <span class="mflag nomodel">no model — plain code</span></div>
         <div class="card step" id="s3"><strong>Embeddings</strong> <span style="color:#5A6C80">— 8-D mock vectors</span> <span class="mflag">embedding model</span></div>
-        <div class="card step" id="s4"><strong>Search</strong> <span style="color:#5A6C80">— cosine Top-K=3</span> <span class="mflag nomodel">no model — cosine math</span></div>
-        <div class="card step" id="s5"><strong>Answer</strong> <span style="color:#5A6C80">— grounded, with citations</span> <span class="mflag llm">LLM</span></div>
+        <div class="card step" id="s4"><strong>Vector DB</strong> <span style="color:#5A6C80">— file + group by meaning</span> <span class="mflag nomodel">no model — storage</span></div>
+        <div class="card step" id="s5"><strong>Query</strong> <span style="color:#5A6C80">— question → fingerprint</span> <span class="mflag">embedding model — same as slices</span></div>
+        <div class="card step" id="s6"><strong>Search</strong> <span style="color:#5A6C80">— inside the Vector DB, cosine Top-K=3</span> <span class="mflag nomodel">no model — cosine math</span></div>
+        <div class="card step" id="s7"><strong>Context</strong> <span style="color:#5A6C80">— Top-K into the token window</span> <span class="mflag nomodel">no model — assembly</span></div>
+        <div class="card step" id="s8"><strong>Answer</strong> <span style="color:#5A6C80">— grounded, with citations</span> <span class="mflag llm">LLM</span></div>
       </div>
       <div class="card" id="answer" style="margin-top:12px;display:none"></div>
       <div class="card" id="nextsteps" style="margin-top:12px;display:none;background:#F9FAFB">
@@ -49,7 +52,7 @@ const PAGES=[
   "PAGE 31 — Westside Health emergency only if pre-authorized within 48 hours. Emergency admissions without pre-authorization will be reviewed for medical necessity. Reimbursement is guaranteed only for documented emergencies under Section 4.2.2."
 ];
 const q=document.getElementById('q'), log=document.getElementById('log'), answer=document.getElementById('answer');
-const steps=["s1","s2","s3","s4","s5"];
+const steps=["s1","s2","s3","s4","s5","s6","s7","s8"];
 function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
 async function run(){
   log.textContent=""; answer.style.display="none";
@@ -57,10 +60,13 @@ async function run(){
   const query=q.value.trim()||"Which hospitals are covered?";
   function add(s){ log.textContent+=s+"\n"; log.scrollTop=log.scrollHeight; }
   renderPipeline('ingest'); document.getElementById('s1').classList.add('active'); add("→ Ingest: 5 pages extracted ("+PAGES.join(" ").length+" chars) · OCR model only if scanned"); await delay(400);
-  renderPipeline('chunking'); document.getElementById('s2').classList.add('active'); const chunks=chunkText(PAGES.join(" "), 500, 50); add("→ Chunking: "+chunks.length+" chunks (500 + 50 overlap) · no model — plain code"); const ex = chunks[Math.min(2, chunks.length-1)] || chunks[0]; add("   e.g., “"+ex.slice(0,70)+"…”"); await delay(500);
-  renderPipeline('embeddings'); document.getElementById('s3').classList.add('active'); const vecs=chunks.map(c=>mockEmbed(c)); add("→ Embeddings: "+vecs.length+" vectors (8-D normalized) · embedding model"); add("   query fingerprint: ["+mockEmbed(query).slice(0,3).map(v=>v.toFixed(2)).join(", ")+"…]"); await delay(500);
-  renderPipeline('search'); document.getElementById('s4').classList.add('active'); const ranked=chunks.map((c,i)=>({text:c, score:cosine(mockEmbed(c), mockEmbed(query)), page: i<2?1: i<4?8:12})).sort((a,b)=>b.score-a.score); const top=ranked.slice(0,3); add("→ Search: Top-3 cosine · no model — cosine math"); top.forEach(t=> add(`   ${t.score.toFixed(2)} — ${t.text.slice(0,60)}…`)); await delay(500);
-  renderPipeline('answer'); document.getElementById('s5').classList.add('active'); add("→ Context: 3 chunks (~1,400 tokens) · no model — assembly"); add("→ LLM generates the answer…"); await delay(600);
+  renderPipeline('chunking'); document.getElementById('s2').classList.add('active'); const chunks=chunkText(PAGES.join(" "), 500, 50); add("→ Chunking: "+chunks.length+" chunks (500 + 50 overlap) · no model — plain code"); const ex = chunks[Math.min(2, chunks.length-1)] || chunks[0]; add("   e.g., “"+ex.slice(0,70)+"…”"); await delay(450);
+  renderPipeline('embeddings'); document.getElementById('s3').classList.add('active'); const vecs=chunks.map(c=>mockEmbed(c)); add("→ Embeddings: "+vecs.length+" chunk vectors (8-D normalized) · embedding model"); await delay(450);
+  renderPipeline('vectordb'); document.getElementById('s4').classList.add('active'); add("→ Vector DB: "+vecs.length+" vectors filed, grouped by meaning · no model — storage"); await delay(450);
+  renderPipeline('query'); document.getElementById('s5').classList.add('active'); add("→ Query: fingerprint ["+mockEmbed(query).slice(0,3).map(v=>v.toFixed(2)).join(", ")+"…] · same embedding model as the slices"); await delay(450);
+  renderPipeline('search'); document.getElementById('s6').classList.add('active'); const ranked=chunks.map((c,i)=>({text:c, score:cosine(mockEmbed(c), mockEmbed(query)), page: i<2?1: i<4?8:12})).sort((a,b)=>b.score-a.score); const top=ranked.slice(0,3); add("→ Search inside the Vector DB: Top-3 · no model — cosine math"); top.forEach(t=> add(`   ${t.score.toFixed(2)} — ${t.text.slice(0,60)}…`)); await delay(500);
+  renderPipeline('context'); document.getElementById('s7').classList.add('active'); add("→ Context: 3 chunks (~1,400 tokens) into the token window · no model — assembly"); await delay(450);
+  renderPipeline('answer'); document.getElementById('s8').classList.add('active'); add("→ Answer: LLM writes, with citations · model: LLM"); await delay(600);
   answer.style.display="block"; document.getElementById('nextsteps').style.display="block";
   const has = top.some(t=> t.text.toLowerCase().includes("city general")||t.text.toLowerCase().includes("st. jude"));
   if(has){ answer.innerHTML='<strong style="color:#065F46">✓ Answer (grounded):</strong> “According to your policy (p.12, p.8), you are covered at <strong>City General, St. Jude’s Medical Center, and Westside Health</strong>.”<br><span style="color:#5A6C80;font-size:12px">Citations: p.12, p.8 — verify in PDF. Query “'+query+'” matched 3 chunks (0.93, 0.91, 0.84).</span>'; add("✓ Answer ready with citations."); }

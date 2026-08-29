@@ -7,7 +7,7 @@ const PIPELINE = [
   {id:'query',     label:'Query',      demo:'04a_query.html',            anchor:'',        desc:'Your question also becomes a fingerprint. Model: same embedding model as the slices.'},
   {id:'search',    label:'Search',     demo:'04_similarity_rank.html',   anchor:'',        desc:'Ranks every slice by meaning. No model — cosine math.'},
   {id:'context',   label:'Context',    demo:'05_context_window.html',    anchor:'',        desc:'Lawyer’s desk — assembles the winning slices into the LLM’s reading window. No model — assembly.'},
-  {id:'answer',    label:'Answer',     demo:'06_e2e_rag.html',           anchor:'',        desc:'The only step where the LLM works: reads the slices, writes the answer with citations.'},
+  {id:'answer',    label:'Answer',     demo:'06_e2e_rag.html',           anchor:'',        desc:'Model: LLM — reads the slices, writes the answer with citations. The only step where the LLM works.'},
 ];
 
 function renderPipeline(currentId, containerId='pipeline'){
