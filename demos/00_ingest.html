@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ingest — RAG Explainer</title><link rel="stylesheet" href="../assets/style.css">
+<style>.pdfpage{border:1px solid #D4DDE8;border-radius:10px;padding:10px 12px;margin:6px 0;background:#fff;font-size:13px;color:#152536}.pdfpage b{color:#0A1931}</style>
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner"><div class="brand"><div class="brand-mark">RE</div><div>RAG Explainer <small>Ingest — Reading the PDF</small></div></div><nav class="nav"><a href="../index.html">Home</a><a href="../index.html#visualise">Visualise</a><a href="../resources.html">Resources</a></nav></div></header>
+<main class="wrap">
+  <div id="pipeline" style="margin-bottom:12px"></div>
+  <div class="kicker">Ingest • Reading the source files</div>
+  <h1 style="color:#0A1931;margin:8px 0 6px">Step zero — the system reads your PDF</h1>
+  <p style="color:#5A6C80;margin:0">Before anything smart happens, the pipeline extracts every word from the 50-page policy. Garbage in → garbage out, so this step decides answer quality.</p>
+
+  <div class="card" style="margin-top:12px">
+    <h3 style="margin:0;color:#0A1931">What gets extracted — tap a page</h3>
+    <div id="pages">
+      <div class="pdfpage" onclick="pick(this,'Definitions — ‘Medical Center’ includes hospital and clinic facilities.','Clean digital text → extracted word-for-word.')"><b>Page 1</b> — Definitions (digital text) ✅</div>
+      <div class="pdfpage" onclick="pick(this,'Schedule table: City General · St. Jude’s · Westside','Tables are read row-by-row, not as a picture.')"><b>Page 8</b> — Provider table 📊</div>
+      <div class="pdfpage" onclick="pick(this,'[scanned signature page]','Scanned image → needs OCR. Blurry scan → OCR errors → wrong answers later.')"><b>Page 22</b> — Scanned signature 🖼️ ⚠️</div>
+    </div>
+    <div id="explain" style="margin-top:10px;padding:10px;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px;font-size:13px;color:#0A1931">Tap a page above to see how it is read.</div>
+  </div>
+
+  <div class="grid grid-2" style="margin-top:12px">
+    <div class="card"><h3>What it does</h3><ul style="font-size:13px;color:#5A6C80;padding-left:18px;margin:6px 0"><li>Reads text, tables and images (OCR)</li><li>Keeps data inside your system — private</li><li>Acts as the single source of truth</li></ul></div>
+    <div class="card"><h3>What it does NOT do</h3><ul style="font-size:13px;color:#5A6C80;padding-left:18px;margin:6px 0"><li>No slicing yet (that’s Chunking)</li><li>No meaning yet (that’s Embeddings)</li><li>Does not “look” at the PDF like you do — it extracts</li></ul></div>
+  </div>
+
+  <div class="card" style="margin-top:12px;background:#F9FAFB"><h3>Next: Chunking</h3>
+  <p style="font-size:13px;color:#5A6C80;margin:6px 0">Extracted text is still 50 pages. Next the pipeline <a href="02_chunk_lab.html" style="font-weight:700">cuts it into slices →</a></p></div>
+</main>
+<script src="../assets/pipeline.js?v=11"></script>
+<script>
+function pick(el, what, note){
+  document.querySelectorAll('.pdfpage').forEach(p=>p.style.borderColor='#D4DDE8');
+  el.style.borderColor='#12549E';
+  document.getElementById('explain').innerHTML='<strong>'+what+'</strong><br><span style="color:#5A6C80">'+note+'</span>';
+}
+renderPipeline('ingest');
+</script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 // Shared pipeline navigator — 8 steps (Encoder+Vector merged → Embeddings), clickable, highlight current
 const PIPELINE = [
-  {id:'ingest',    label:'Ingest',     demo:'01_keyword_vs_vector.html', anchor:'',        desc:'Reads your PDF — text, tables, images — as the single source of truth.'},
+  {id:'ingest',    label:'Ingest',     demo:'00_ingest.html',            anchor:'',        desc:'Reads your PDF — text, tables, images — as the single source of truth.'},
   {id:'chunking',  label:'Chunking',   demo:'02_chunk_lab.html',         anchor:'',        desc:'Cuts the 50-page policy into slices (chunks) so we can find the exact page.'},
   {id:'embeddings',label:'Embeddings', demo:'03_vector_map.html',        anchor:'',        desc:'Turns slices into Meaning Fingerprints — similar meanings get similar numbers (Encoder + Vector).'},
   {id:'vectordb',  label:'Vector DB',  demo:'04b_vectordb.html',         anchor:'',        desc:'Smart library — groups fingerprints so “Hospital” sits near “Medical Center”. No search here, just storage.'},
