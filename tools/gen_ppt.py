@@ -1,250 +1,153 @@
 #!/usr/bin/env python3
 """
-RAG Explainer — RAG Explainer PPT Generator (pure stdlib, no python-pptx)
-Generates slides/rag_explainer.pptx with 18 slides, professional theme, mobile-ready narrative.
-Stdlib only: zipfile + xml escaping. Based on images_to_pptx ZipFile pattern.
+RAG Explainer deck generator — TEMPLATE-BASED (ground truth: tools/template.pptx).
+Every infrastructure part is copied byte-for-byte from a file that opens in
+PowerPoint (python-pptx fixture txt-text.pptx). Only slide XML is generated,
+using that file's own <p:sp> textbox pattern. No hand-written theme/master.
 """
 from pathlib import Path
-import html
-from datetime import datetime, timezone
+import re, html
 from zipfile import ZipFile, ZIP_DEFLATED
 
-SLIDE_WIDTH_EMU = 12192000
-SLIDE_HEIGHT_EMU = 6858000
-OUT = Path(__file__).parent.parent / "slides" / "rag_explainer.pptx"
+HERE = Path(__file__).parent
+TEMPLATE = HERE / "template.pptx"
+OUT = HERE.parent / "slides" / "rag_explainer.pptx"
 
-def xml_escape(s): return html.escape(s, quote=True)
+def esc(s):
+    return html.escape(s, quote=False).replace('"', "&quot;")
 
-# Reuse core XML helpers adapted from images_to_pptx.py (no image deps)
-def content_types_xml(n):
-    overrides = "\n".join(f'  <Override PartName="/ppt/slides/slide{i}.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/>' for i in range(1, n+1))
-    return f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-  <Default Extension="xml" ContentType="application/xml"/>
-  <Default Extension="png" ContentType="image/png"/>
-  <Default Extension="jpg" ContentType="image/jpeg"/>
-  <Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
-  <Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
-  <Override PartName="/ppt/presentation.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"/>
-  <Override PartName="/ppt/presProps.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presProps+xml"/>
-  <Override PartName="/ppt/viewProps.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.viewProps+xml"/>
-  <Override PartName="/ppt/tableStyles.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.tableStyles+xml"/>
-  <Override PartName="/ppt/slideMasters/slideMaster1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideMaster+xml"/>
-  <Override PartName="/ppt/slideLayouts/slideLayout1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideLayout+xml"/>
-  <Override PartName="/ppt/theme/theme1.xml" ContentType="application/vnd.openxmlformats-officedocument.theme+xml"/>
-{overrides}
-</Types>
-'''
+def para_xml(p, default_sz=1100):
+    if isinstance(p, str):
+        p = {"text": p}
+    sz = p.get("size", default_sz)
+    bold = p.get("bold", False)
+    color = p.get("color", "152536")
+    text = p.get("text", "")
+    if text == "":
+        return f'<a:p><a:endParaRPr lang="en-US" sz="{sz}"/></a:p>'
+    if p.get("bullet") and not text.startswith("\u2022"):
+        text = "\u2022  " + text
+    b = ' b="1"' if bold else ""
+    out = []
+    # split explicit newlines into separate paragraphs
+    for chunk in text.split("\n"):
+        col = f'<a:solidFill><a:srgbClr val="{color}"/></a:solidFill>'
+        out.append(
+            f'<a:p><a:pPr algn="l"/><a:r><a:rPr lang="en-US" sz="{sz}"{b} dirty="0">{col}</a:rPr>'
+            f"<a:t>{esc(chunk)}</a:t></a:r></a:p>"
+        )
+    return "".join(out)
 
-def root_rels_xml():
-    return '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="ppt/presentation.xml"/>
-  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>
-  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/>
-</Relationships>
-'''
+def box(id_, name, x, y, cx, cy, paragraphs, default_sz=1100):
+    body = "".join(para_xml(p, default_sz) for p in paragraphs)
+    return (
+        f'<p:sp><p:nvSpPr><p:cNvPr id="{id_}" name="{esc(name)}"/>'
+        f'<p:cNvSpPr txBox="1"/><p:nvPr/></p:nvSpPr>'
+        f'<p:spPr><a:xfrm><a:off x="{x}" y="{y}"/><a:ext cx="{cx}" cy="{cy}"/></a:xfrm>'
+        f'<a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/></p:spPr>'
+        f'<p:txBody><a:bodyPr wrap="square" rtlCol="0"/><a:lstStyle/>{body}</p:txBody></p:sp>'
+    )
 
-def app_xml(n):
-    return f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
-  <Application>rag_explainer</Application>
-  <PresentationFormat>On-screen Show (16:9)</PresentationFormat>
-  <Slides>{n}</Slides><Notes>0</Notes><HiddenSlides>0</HiddenSlides><MMClips>0</MMClips><ScaleCrop>false</ScaleCrop>
-  <HeadingPairs><vt:vector size="2" baseType="variant"><vt:variant><vt:lpstr>Slides</vt:lpstr></vt:variant><vt:variant><vt:i4>{n}</vt:i4></vt:variant></vt:vector></HeadingPairs>
-  <TitlesOfParts><vt:vector size="{n}" baseType="lpstr">{''.join(f'<vt:lpstr>Slide {i}</vt:lpstr>' for i in range(1,n+1))}</vt:vector></TitlesOfParts>
-  <Company/><LinksUpToDate>false</LinksUpToDate><SharedDoc>false</SharedDoc><HyperlinksChanged>false</HyperlinksChanged><AppVersion>16.0000</AppVersion>
-</Properties>
-'''
+GROUP = ('<p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr>'
+         '<p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/>'
+         '<a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr>')
 
-def core_xml(title):
-    now = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00","Z")
-    return f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <dc:title>{xml_escape(title)}</dc:title><dc:creator>RAG Explainer</dc:creator><cp:lastModifiedBy>RAG Explainer</cp:lastModifiedBy>
-  <dcterms:created xsi:type="dcterms:W3CDTF">{now}</dcterms:created><dcterms:modified xsi:type="dcterms:W3CDTF">{now}</dcterms:modified>
-</cp:coreProperties>
-'''
+FOOTER_TEXT = "RAG Explainer  |  Private data stays private  |  uiyuvi.github.io/rag-explainer"
 
-def presentation_xml(n):
-    ids = "\n".join(f'    <p:sldId id="{255+i}" r:id="rId{i+1}"/>' for i in range(1,n+1))
-    return f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<p:presentation xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
-  <p:sldMasterIdLst><p:sldMasterId id="2147483648" r:id="rId1"/></p:sldMasterIdLst>
-  <p:sldIdLst>
-{ids}
-  </p:sldIdLst>
-  <p:sldSz cx="{SLIDE_WIDTH_EMU}" cy="{SLIDE_HEIGHT_EMU}" type="wide"/><p:notesSz cx="6858000" cy="9144000"/><p:defaultTextStyle/>
-</p:presentation>
-'''
-
-def presentation_rels_xml(n):
-    rels = "\n".join(f'  <Relationship Id="rId{i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide{i}.xml"/>' for i in range(1,n+1))
-    return f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster" Target="slideMasters/slideMaster1.xml"/>
-{rels}
-  <Relationship Id="rId{n+2}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/presProps" Target="presProps.xml"/>
-  <Relationship Id="rId{n+3}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/viewProps" Target="viewProps.xml"/>
-  <Relationship Id="rId{n+4}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/tableStyles" Target="tableStyles.xml"/>
-</Relationships>
-'''
-
-def pres_props_xml(): return '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?><p:presentationPr xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"/>'''
-def view_props_xml(): return '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?><p:viewPr xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"><p:normalViewPr><p:restoredLeft sz="15620"/><p:restoredTop sz="94660"/></p:normalViewPr><p:slideViewPr><p:cSldViewPr><p:cViewPr varScale="1"><p:scale><a:sx n="100" d="100"/><a:sy n="100" d="100"/></p:scale><p:origin x="0" y="0"/></p:cViewPr><p:guideLst/></p:cSldViewPr></p:slideViewPr><p:notesTextViewPr><p:cViewPr><p:scale><a:sx n="100" d="100"/><a:sy n="100" d="100"/></p:scale><p:origin x="0" y="0"/></p:cViewPr></p:notesTextViewPr><p:gridSpacing cx="72008" cy="72008"/></p:viewPr>'''
-def table_styles_xml(): return '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?><a:tblStyleLst xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" def="{5C22544A-7EE6-4342-B048-85BDC9FD1C3A}"/>'''
-def slide_master_rels_xml(): return '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme" Target="../theme/theme1.xml"/></Relationships>'''
-def slide_layout_rels_xml(): return '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster" Target="../slideMasters/slideMaster1.xml"/></Relationships>'''
-
-def group_xml(): return '''      <p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr><p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr>'''
-
-def slide_master_xml(): return f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<p:sldMaster xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
-  <p:cSld><p:bg><p:bgRef idx="1001"><a:schemeClr val="bg1"/></p:bgRef></p:bg><p:spTree>{group_xml()}</p:spTree></p:cSld>
-  <p:clrMap bg1="lt1" tx1="dk1" bg2="lt2" tx2="dk2" accent1="accent1" accent2="accent2" accent3="accent3" accent4="accent4" accent5="accent5" accent6="accent6" hlink="hlink" folHlink="folHlink"/>
-  <p:sldLayoutIdLst><p:sldLayoutId id="2147483649" r:id="rId1"/></p:sldLayoutIdLst><p:txStyles><p:titleStyle/><p:bodyStyle/><p:otherStyle/></p:txStyles>
-</p:sldMaster>'''
-
-def slide_layout_xml(): return f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<p:sldLayout xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" type="blank" preserve="1">
-  <p:cSld name="Blank"><p:spTree>{group_xml()}</p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr>
-</p:sldLayout>'''
-
-def theme_xml():
-    # ECMA-376 strict: fillStyleLst/lnStyleLst/effectStyleLst/bgFillStyleLst need EXACTLY 3 entries;
-    # fontScheme requires a:ea and a:cs. Missing these triggers PowerPoint's repair dialog.
-    return '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="RAG Explainer">
-  <a:themeElements>
-    <a:clrScheme name="RAGExplainer">
-      <a:dk1><a:srgbClr val="0A1931"/></a:dk1>
-      <a:lt1><a:srgbClr val="FFFFFF"/></a:lt1>
-      <a:dk2><a:srgbClr val="1F2A44"/></a:dk2>
-      <a:lt2><a:srgbClr val="F4F7FA"/></a:lt2>
-      <a:accent1><a:srgbClr val="12549E"/></a:accent1>
-      <a:accent2><a:srgbClr val="EF413D"/></a:accent2>
-      <a:accent3><a:srgbClr val="5B9BD5"/></a:accent3>
-      <a:accent4><a:srgbClr val="70AD47"/></a:accent4>
-      <a:accent5><a:srgbClr val="ED7D31"/></a:accent5>
-      <a:accent6><a:srgbClr val="A5A5A5"/></a:accent6>
-      <a:hlink><a:srgbClr val="12549E"/></a:hlink>
-      <a:folHlink><a:srgbClr val="0A1931"/></a:folHlink>
-    </a:clrScheme>
-    <a:fontScheme name="RAGExplainer">
-      <a:majorFont><a:latin typeface="Calibri Light"/><a:ea typeface=""/><a:cs typeface=""/></a:majorFont>
-      <a:minorFont><a:latin typeface="Calibri"/><a:ea typeface=""/><a:cs typeface=""/></a:minorFont>
-    </a:fontScheme>
-    <a:fmtScheme name="RAGExplainer">
-      <a:fillStyleLst>
-        <a:solidFill><a:schemeClr val="phClr"/></a:solidFill>
-        <a:gradFill rotWithShape="1">
-          <a:gsLst>
-            <a:gs pos="0"><a:schemeClr val="phClr"><a:lumMod val="110000"/><a:satMod val="105000"/><a:tint val="67000"/></a:schemeClr></a:gs>
-            <a:gs pos="50000"><a:schemeClr val="phClr"><a:lumMod val="105000"/><a:satMod val="103000"/><a:tint val="73000"/></a:schemeClr></a:gs>
-            <a:gs pos="100000"><a:schemeClr val="phClr"><a:lumMod val="105000"/><a:satMod val="109000"/><a:tint val="81000"/></a:schemeClr></a:gs>
-          </a:gsLst>
-          <a:lin ang="5400000" scaled="0"/>
-        </a:gradFill>
-        <a:gradFill rotWithShape="1">
-          <a:gsLst>
-            <a:gs pos="0"><a:schemeClr val="phClr"><a:satMod val="103000"/><a:lumMod val="102000"/><a:tint val="94000"/></a:schemeClr></a:gs>
-            <a:gs pos="50000"><a:schemeClr val="phClr"><a:satMod val="110000"/><a:lumMod val="100000"/><a:shade val="100000"/></a:schemeClr></a:gs>
-            <a:gs pos="100000"><a:schemeClr val="phClr"><a:lumMod val="99000"/><a:satMod val="120000"/><a:shade val="78000"/></a:schemeClr></a:gs>
-          </a:gsLst>
-          <a:lin ang="5400000" scaled="0"/>
-        </a:gradFill>
-      </a:fillStyleLst>
-      <a:lnStyleLst>
-        <a:ln w="6350" cap="flat" cmpd="sng" algn="ctr"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:prstDash val="solid"/><a:miter lim="800000"/></a:ln>
-        <a:ln w="12700" cap="flat" cmpd="sng" algn="ctr"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:prstDash val="solid"/><a:miter lim="800000"/></a:ln>
-        <a:ln w="19050" cap="flat" cmpd="sng" algn="ctr"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:prstDash val="solid"/><a:miter lim="800000"/></a:ln>
-      </a:lnStyleLst>
-      <a:effectStyleLst>
-        <a:effectStyle><a:effectLst/></a:effectStyle>
-        <a:effectStyle><a:effectLst/></a:effectStyle>
-        <a:effectStyle><a:effectLst><a:outerShdw blurRad="57150" dist="19050" dir="5400000" algn="ctr" rotWithShape="0"><a:srgbClr val="000000"><a:alpha val="63000"/></a:srgbClr></a:outerShdw></a:effectLst></a:effectStyle>
-      </a:effectStyleLst>
-      <a:bgFillStyleLst>
-        <a:solidFill><a:schemeClr val="phClr"/></a:solidFill>
-        <a:solidFill><a:schemeClr val="phClr"><a:tint val="95000"/><a:satMod val="170000"/></a:schemeClr></a:solidFill>
-        <a:gradFill rotWithShape="1">
-          <a:gsLst>
-            <a:gs pos="0"><a:schemeClr val="phClr"><a:tint val="93000"/><a:satMod val="150000"/><a:shade val="98000"/><a:lumMod val="102000"/></a:schemeClr></a:gs>
-            <a:gs pos="50000"><a:schemeClr val="phClr"><a:tint val="98000"/><a:satMod val="130000"/><a:shade val="90000"/><a:lumMod val="103000"/></a:schemeClr></a:gs>
-            <a:gs pos="100000"><a:schemeClr val="phClr"><a:shade val="63000"/><a:satMod val="120000"/></a:schemeClr></a:gs>
-          </a:gsLst>
-          <a:lin ang="5400000" scaled="0"/>
-        </a:gradFill>
-      </a:bgFillStyleLst>
-    </a:fmtScheme>
-  </a:themeElements>
-  <a:objectDefaults/>
-  <a:extraClrSchemeLst/>
-</a:theme>'''
-
-# Improved tx builder
-def build_paragraphs_xml(paragraphs, default_size=1000, default_color=None, default_bold=False, align=None):
-    out=""
-    for para in paragraphs:
-        if isinstance(para, str):
-            para={"text": para}
-        text = xml_escape(para.get("text",""))
-        size = para.get("size", default_size)
-        bold = para.get("bold", default_bold)
-        color = para.get("color", default_color)
-        bullet = para.get("bullet", False)
-        is_bullet = bool(bullet)
-        aln = f' algn="{align}"' if align else ""
-        b_attr = ' b="1"' if bold else ""
-        col = f'<a:solidFill><a:srgbClr val="{color}"/></a:solidFill>' if color else '<a:solidFill><a:schemeClr val="tx1"/></a:solidFill>'
-        if text=="":
-            out+= f'<a:p{aln}><a:pPr>{("<a:buChar char=\"•\"/>" if is_bullet else "<a:buNone/>")}</a:pPr><a:endParaRPr sz="{size}"{b_attr}>{col}</a:endParaRPr></a:p>'
+def slide_shapes(d):
+    shapes = []
+    t = d.get("type")
+    if t == "title":
+        paras = [{"text": d["title"], "size": 3200, "bold": True, "color": "0A1931"}]
+        if d.get("subtitle"):
+            paras.append({"text": "", "size": 600})
+            paras.append({"text": d["subtitle"], "size": 1300, "color": "5A6C80"})
+        shapes.append(box(2, "Title", 500000, 1700000, 11192000, 2000000, paras))
+        if d.get("kicker"):
+            shapes.append(box(3, "Kicker", 500000, 900000, 11192000, 400000,
+                              [{"text": d["kicker"], "size": 1000, "bold": True, "color": "12549E"}]))
+    else:
+        head = []
+        if d.get("kicker"):
+            head.append({"text": d["kicker"], "size": 1000, "bold": True, "color": "12549E"})
+            head.append({"text": "", "size": 300})
+        head.append({"text": d["title"], "size": 2200, "bold": True, "color": "0A1931"})
+        shapes.append(box(2, "Header", 360000, 250000, 11472000, 1100000, head))
+        if t == "split":
+            shapes.append(box(3, "Body", 360000, 1550000, 5800000, 4650000, d["body"]))
+            shapes.append(box(4, "Side", 6450000, 1550000, 5380000, 4650000, d["side"]))
         else:
-            bu = '<a:buChar char="•"/>' if is_bullet else '<a:buNone/>'
-            out+= f'<a:p{aln}><a:pPr>{bu}</a:pPr><a:r><a:rPr sz="{size}"{b_attr}>{col}</a:rPr><a:t>{text}</a:t></a:r></a:p>'
-    return out
+            shapes.append(box(3, "Body", 360000, 1550000, 11472000, 4650000, d["body"]))
+    shapes.append(box(9, "Footer", 360000, 6380000, 11472000, 330000,
+                      [{"text": FOOTER_TEXT, "size": 800, "color": "5A6C80"}]))
+    return "".join(shapes)
 
-def shape_tx(id_, name, x,y,cx,cy, paragraphs, fill=None, line=None):
-    body = build_paragraphs_xml(paragraphs, default_size=1100)
-    fill_xml = f'<a:solidFill><a:srgbClr val="{fill}"/></a:solidFill>' if fill else '<a:noFill/>'
-    ln_xml = '<a:ln><a:noFill/></a:ln>' if not line else f'<a:ln w="12700"><a:solidFill><a:srgbClr val="{line}"/></a:solidFill><a:prstDash val="solid"/></a:ln>'
-    return f'''
-      <p:sp>
-        <p:nvSpPr><p:cNvPr id="{id_}" name="{xml_escape(name)}"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>
-        <p:spPr><a:xfrm><a:off x="{x}" y="{y}"/><a:ext cx="{cx}" cy="{cy}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom>{fill_xml}{ln_xml}</p:spPr>
-        <p:txBody><a:bodyPr wrap="square" lIns="72000" rIns="72000" tIns="36000" bIns="36000"/><a:lstStyle/>{body}</p:txBody>
-      </p:sp>'''
+def slide_xml(d):
+    return (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" '
+        'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" '
+        'xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">'
+        f"<p:cSld><p:spTree>{GROUP}{slide_shapes(d)}</p:spTree></p:cSld>"
+        "<p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sld>"
+    )
 
-# Specialized shape helpers for the deck
-def title_shape(text, subtitle=None):
-    paras=[{"text": text, "size":2400, "bold": True, "color":"0A1931"}]
-    if subtitle:
-        paras.append({"text":"", "size":800})
-        paras.append({"text": subtitle, "size":1100, "color":"5A6C80"})
-    return shape_tx(2,"Title", 360000, 300000, 11472000, 1400000, paras)
+def slide_rels():
+    return ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+            '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+            '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/></Relationships>')
 
-def header_shape(text, kicker=None):
-    paras=[]
-    if kicker:
-        paras.append({"text": kicker, "size":800, "bold":True, "color":"12549E"})
-        paras.append({"text":"", "size":400})
-    paras.append({"text": text, "size":1800, "bold":True, "color":"0A1931"})
-    return shape_tx(2,"Header", 360000, 200000, 11472000, 1100000, paras)
+def build():
+    tz = ZipFile(TEMPLATE)
+    parts = {n: tz.read(n) for n in tz.namelist()}
+    n = len(SLIDES)
 
-def body_shape(paras):
-    return shape_tx(3,"Body", 360000, 1500000, 5820000, 4600000, paras)
+    # presentation.xml — patch slide list + 16:9 size
+    pres = parts["ppt/presentation.xml"].decode()
+    ids = "".join(f'<p:sldId id="{255+i}" r:id="rId{i+1}"/>' for i in range(1, n + 1))
+    pres = re.sub(r"<p:sldIdLst>.*?</p:sldIdLst>", f"<p:sldIdLst>{ids}</p:sldIdLst>", pres, flags=re.S)
+    pres = re.sub(r'(<p:sldSz cx=")\d+(")', r"\g<1>12192000\g<2>", pres)
+    parts["ppt/presentation.xml"] = pres.encode()
 
-def side_shape(paras):
-    return shape_tx(4,"Side", 6500000, 1500000, 5000000, 4600000, paras)
+    # presentation rels — replace slide relationships, keep master/props/theme/tableStyles
+    rels = parts["ppt/_rels/presentation.xml.rels"].decode()
+    rels = re.sub(r'<Relationship Id="rId\d+" Type="[^"]*/slide" Target="slides/slide\d+\.xml"/>', "", rels)
+    slide_rels_xml = "".join(
+        f'<Relationship Id="rId{i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide{i}.xml"/>'
+        for i in range(1, n + 1)
+    )
+    rels = rels.replace("</Relationships>", slide_rels_xml + "</Relationships>")
+    parts["ppt/_rels/presentation.xml.rels"] = rels.encode()
 
-def footer_shape():
-    return shape_tx(5,"Footer", 360000, 6400000, 11472000, 300000, [{"text":"RAG Explainer  •  Private data stays private  •  uiyuvi.github.io/rag-explainer","size":700,"color":"5A6C80"}])
+    # content types — replace slide overrides with n of them
+    ct = parts["[Content_Types].xml"].decode()
+    ct = re.sub(r'<Override PartName="/ppt/slides/slide\d+\.xml"[^>]*/>', "", ct)
+    overrides = "".join(
+        f'<Override PartName="/ppt/slides/slide{i}.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/>'
+        for i in range(1, n + 1)
+    )
+    ct = ct.replace("</Types>", overrides + "</Types>")
+    parts["[Content_Types].xml"] = ct.encode()
 
-def full_shape(paras, y=1500000, h=4600000):
-    return shape_tx(3,"Full", 360000, y, 11472000, h, paras)
+    # core metadata — title/creator only (text nodes)
+    core = parts["docProps/core.xml"].decode()
+    core = re.sub(r"<dc:title>.*?</dc:title>", "<dc:title>RAG Explainer - Build Your Personal Document Assistant</dc:title>", core, flags=re.S)
+    core = re.sub(r"<dc:creator>.*?</dc:creator>", "<dc:creator>RAG Explainer</dc:creator>", core, flags=re.S)
+    core = re.sub(r"<cp:lastModifiedBy>.*?</cp:lastModifiedBy>", "<cp:lastModifiedBy>RAG Explainer</cp:lastModifiedBy>", core, flags=re.S)
+    parts["docProps/core.xml"] = core.encode()
 
-# Slide definitions — 18 slides, professional English
+    # generate slides + rels
+    for i, d in enumerate(SLIDES, start=1):
+        parts[f"ppt/slides/slide{i}.xml"] = slide_xml(d).encode()
+        parts[f"ppt/slides/_rels/slide{i}.xml.rels"] = slide_rels().encode()
+
+    OUT.parent.mkdir(parents=True, exist_ok=True)
+    order = ["[Content_Types].xml"] + [k for k in parts if k != "[Content_Types].xml"]
+    with ZipFile(OUT, "w", ZIP_DEFLATED) as z:
+        for name in order:
+            z.writestr(name, parts[name])
+    print(f"Generated {OUT} ({n} slides, template-based)")
+
 SLIDES = [
   # 1 Title
   {"type":"title", "title":"Build Your Personal\nDocument Assistant", "subtitle":"How AI answers from data it was never trained on — the RAG technique behind private PDFs", "notes":"Welcome. Today we demystify how AI reads your private documents. One example, full pipeline, zero magic."},
@@ -465,60 +368,5 @@ SLIDES = [
   ]},
 ]
 
-def slide_xml_for(idx, data):
-    # idx 1-based
-    t = data.get("type")
-    shapes=[]
-    if t=="title":
-        shapes.append(title_shape(data["title"], data.get("subtitle")))
-        shapes.append(footer_shape())
-        inner="\n".join(shapes)
-    elif t=="full":
-        shapes.append(header_shape(data["title"], data.get("kicker")))
-        shapes.append(full_shape(data["body"]))
-        shapes.append(footer_shape())
-        inner="\n".join(shapes)
-    elif t=="header_body_side":
-        shapes.append(header_shape(data["title"], data.get("kicker")))
-        shapes.append(body_shape(data["body"]))
-        shapes.append(side_shape(data["side"]))
-        shapes.append(footer_shape())
-        inner="\n".join(shapes)
-    else:
-        inner=full_shape(data.get("body",[]))
-    return f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
-  <p:cSld><p:spTree>{group_xml()}
-{inner}
-  </p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr>
-</p:sld>
-'''
-
-def slide_rels_xml_text():
-    return '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/></Relationships>'''
-
-def build():
-    n=len(SLIDES)
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    with ZipFile(OUT,"w",ZIP_DEFLATED) as z:
-        z.writestr("[Content_Types].xml", content_types_xml(n))
-        z.writestr("_rels/.rels", root_rels_xml())
-        z.writestr("docProps/app.xml", app_xml(n))
-        z.writestr("docProps/core.xml", core_xml("RAG Explainer — Build Your Personal Document Assistant"))
-        z.writestr("ppt/presentation.xml", presentation_xml(n))
-        z.writestr("ppt/_rels/presentation.xml.rels", presentation_rels_xml(n))
-        z.writestr("ppt/presProps.xml", pres_props_xml())
-        z.writestr("ppt/viewProps.xml", view_props_xml())
-        z.writestr("ppt/tableStyles.xml", table_styles_xml())
-        z.writestr("ppt/slideMasters/slideMaster1.xml", slide_master_xml())
-        z.writestr("ppt/slideMasters/_rels/slideMaster1.xml.rels", slide_master_rels_xml())
-        z.writestr("ppt/slideLayouts/slideLayout1.xml", slide_layout_xml())
-        z.writestr("ppt/slideLayouts/_rels/slideLayout1.xml.rels", slide_layout_rels_xml())
-        z.writestr("ppt/theme/theme1.xml", theme_xml())
-        for i, s in enumerate(SLIDES, start=1):
-            z.writestr(f"ppt/slides/slide{i}.xml", slide_xml_for(i, s))
-            z.writestr(f"ppt/slides/_rels/slide{i}.xml.rels", slide_rels_xml_text())
-    print(f"Generated {OUT} ({n} slides)")
-
-if __name__=="__main__":
+if __name__ == "__main__":
     build()
