@@ -34,11 +34,11 @@
 <script src="../assets/common.js"></script>
 <script>
 const PAGES=[
-  "PAGE 1 — Definitions: ‘Medical Center’ includes hospital and clinic facilities. Network = Preferred Provider Tier.",
-  "PAGE 2 — Legal disclaimer: Does not guarantee Physicians on weekends. See Section 5.",
-  "PAGE 8 — Schedule: St. Jude’s Medical Center and Westside Health Center are network providers.",
-  "PAGE 12 — City General Hospital Alliance under Preferred Provider Tier. Comprehensive care at listed centers.",
-  "PAGE 31 — Westside Health emergency only if pre-authorized within 48 hours."
+  "PAGE 1 — Definitions: ‘Medical Center’ includes hospital and clinic facilities. Network = Preferred Provider Tier. This section defines key terms used throughout the policy, including covered institutions, network tiers, and reimbursement rules. All definitions apply to subsequent sections and should be read first.",
+  "PAGE 2 — Legal disclaimer: Does not guarantee Physicians on weekends. See Section 5 for liability and weekend coverage exceptions. The insurer is not liable for out-of-network referrals without prior authorization. Weekend staffing varies by facility and is subject to local regulations.",
+  "PAGE 8 — Schedule: St. Jude’s Medical Center and Westside Health Center are network providers. Both facilities offer 24-hour emergency and scheduled care. Referrals within the network do not require additional co-pay beyond the standard tier rate.",
+  "PAGE 12 — City General Hospital Alliance under Preferred Provider Tier. Comprehensive care at listed centers includes surgery, maternity, and intensive care. City General is the primary hub for the alliance and coordinates referrals to St. Jude’s and Westside.",
+  "PAGE 31 — Westside Health emergency only if pre-authorized within 48 hours. Emergency admissions without pre-authorization will be reviewed for medical necessity. Reimbursement is guaranteed only for documented emergencies under Section 4.2.2."
 ];
 const q=document.getElementById('q'), log=document.getElementById('log'), answer=document.getElementById('answer');
 const steps=["s1","s2","s3","s4","s5"];
@@ -49,7 +49,7 @@ async function run(){
   const query=q.value.trim()||"Which hospitals are covered?";
   function add(s){ log.textContent+=s+"\n"; log.scrollTop=log.scrollHeight; }
   renderPipeline('ingest'); document.getElementById('s1').classList.add('active'); add("→ Ingest: 5 pages extracted ("+PAGES.join(" ").length+" chars)"); await delay(400);
-  renderPipeline('chunking'); document.getElementById('s2').classList.add('active'); const chunks=chunkText(PAGES.join(" "), 500, 50); add("→ Chunk: "+chunks.length+" chunks (500 + 50 overlap)"); add("   e.g., “"+chunks[2].slice(0,70)+"…”"); await delay(500);
+  renderPipeline('chunking'); document.getElementById('s2').classList.add('active'); const chunks=chunkText(PAGES.join(" "), 500, 50); add("→ Chunk: "+chunks.length+" chunks (500 + 50 overlap)"); const ex = chunks[Math.min(2, chunks.length-1)] || chunks[0]; add("   e.g., “"+ex.slice(0,70)+"…”"); await delay(500);
   renderPipeline('embeddings'); document.getElementById('s3').classList.add('active'); const vecs=chunks.map(c=>mockEmbed(c)); add("→ Embed: "+vecs.length+" vectors (8-D normalized)"); add("   query fingerprint: ["+mockEmbed(query).slice(0,3).map(v=>v.toFixed(2)).join(", ")+"…]"); await delay(500);
   renderPipeline('search'); document.getElementById('s4').classList.add('active'); const ranked=chunks.map((c,i)=>({text:c, score:cosine(mockEmbed(c), mockEmbed(query)), page: i<2?1: i<4?8:12})).sort((a,b)=>b.score-a.score); const top=ranked.slice(0,3); add("→ Search: Top-3 cosine"); top.forEach(t=> add(`   ${t.score.toFixed(2)} — ${t.text.slice(0,60)}…`)); await delay(500);
   renderPipeline('answer'); document.getElementById('s5').classList.add('active'); add("→ LLM context: 3 chunks (~1,400 tokens)"); add("→ Generate…"); await delay(600);
