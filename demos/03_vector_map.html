@@ -55,7 +55,7 @@
       <span><i class="dot" style="background:#5A6C80"></i>Others</span>
       <span>Metric: cosine similarity</span>
     </div>
-    <div class="range-row"><label>Zoom <input type="range" id="zoom" min="60" max="140" value="100"></label><label>Spread <input type="range" id="spread" min="60" max="140" value="100"></label><span id="hint" class="flow-note">Tap “physician” → watch red cluster</span></div>
+    <div class="range-row"><label>Zoom <input type="range" id="zoom" min="60" max="140" value="85"></label><label>Spread <input type="range" id="spread" min="60" max="140" value="85"></label><span id="hint" class="flow-note">Tap “physician” → watch red cluster • Tap “car” → see fruit far</span></div>
   </div>
 
   <div class="card" id="rankCard">
@@ -75,15 +75,16 @@
 <script src="../assets/common.js"></script>
 <script>
 const WORDS=["hospital","medical center","clinic","doctor","physician","apple","pear","fruit","car","vehicle","insurance","policy","hospital covered","medical care center","physicians","hospitals"];
+// Spread POS to fill canvas 900x520 with 60px margin, avoid overlap
 const POS={
-  "hospital":[220,220], "medical center":[280,240], "clinic":[310,280], "doctor":[200,320], "physician":[240,360],
-  "apple":[700,180], "pear":[740,220], "fruit":[720,140],
-  "car":[700,380], "vehicle":[680,430], "insurance":[430,200], "policy":[460,260], "hospital covered":[320,180], "medical care center":[350,300], "physicians":[250,400], "hospitals":[200,200]
+  "hospital":[180,200], "medical center":[300,220], "clinic":[340,300], "doctor":[160,320], "physician":[200,400],
+  "apple":[720,120], "pear":[760,170], "fruit":[710,70],
+  "car":[730,370], "vehicle":[710,430], "insurance":[430,110], "policy":[470,190], "hospital covered":[300,110], "medical care center":[420,330], "physicians":[240,450], "hospitals":[130,170]
 };
 const canvas=document.getElementById('map'), ctx=canvas.getContext('2d');
 const list=document.getElementById('list'), chipsDiv=document.getElementById('chips'), selInfo=document.getElementById('selInfo'), legendK=document.getElementById('legendK');
 let selectedQuery="hospital", selectedK=5;
-let zoom=100, spread=100;
+let zoom=85, spread=85;
 document.getElementById('zoom').addEventListener('input', e=>{zoom=+e.target.value; draw();});
 document.getElementById('spread').addEventListener('input', e=>{spread=+e.target.value; draw();});
 
@@ -148,7 +149,7 @@ function draw(){
       ctx.fillText(r.score.toFixed(2), mid[0]+4, mid[1]-4);
     }
   }
-  // draw words — TopK highlighted
+  // draw words — TopK highlighted (fix right-edge clipping + readability)
   for(const w of WORDS){
     const p=tr(POS[w]||[400,300]);
     const rank = lastRanked.findIndex(r=>r.text===w);
@@ -156,25 +157,34 @@ function draw(){
     const isQuery = w.toLowerCase()===qKey;
     const isTopK = rank>=0 && rank<k && !isQuery;
     const isTop3 = rank>=0 && rank<3;
-    // halo for TopK
     if(isTopK){
-      ctx.beginPath(); ctx.arc(p[0], p[1], 14, 0, Math.PI*2);
-      ctx.fillStyle = isTop3 ? "rgba(239,65,61,0.15)" : "rgba(18,84,158,0.08)";
+      ctx.beginPath(); ctx.arc(p[0], p[1], 15, 0, Math.PI*2);
+      ctx.fillStyle = isTop3 ? "rgba(239,65,61,0.14)" : "rgba(18,84,158,0.09)";
       ctx.fill();
     }
     ctx.beginPath();
-    ctx.arc(p[0], p[1], isQuery?11: isTopK?8:5.5, 0, Math.PI*2);
+    ctx.arc(p[0], p[1], isQuery?11: isTopK?8:7, 0, Math.PI*2);
     if(isQuery){ ctx.fillStyle="#12549E"; ctx.fill(); ctx.strokeStyle="#0A1931"; ctx.lineWidth=2; ctx.stroke(); }
     else if(isTopK){ ctx.fillStyle = isTop3 ? "#EF413D" : "#12549E"; ctx.fill(); }
-    else { ctx.fillStyle="#9AA8BC"; ctx.fill(); }
-    ctx.fillStyle= isQuery||isTopK ? "#0A1931" : "#5A6C80";
-    ctx.font = isQuery ? "700 13px Inter" : isTopK ? "600 12px Inter" : "500 11px Inter";
-    ctx.fillText(w, p[0]+10, p[1]+4);
+    else { ctx.fillStyle="#7A8AA6"; ctx.fill(); }
+    // label placement: avoid right-edge clipping
+    const labelW = ctx.measureText(w).width;
+    const scoreLabel = isTopK ? `${rank+1}. ${score.toFixed(2)}` : "";
+    // font for measurement
+    ctx.font = isQuery ? "700 13px Inter" : isTopK ? "600 12px Inter" : "600 12px Inter";
+    ctx.fillStyle= isQuery||isTopK ? "#0A1931" : "#2E3A50";
+    let lx = p[0]+12, ly = p[1]+4;
+    // if near right edge, flip to left
+    if(p[0] + labelW + 16 > canvas.width){ lx = p[0] - labelW - 12; }
+    // if near top, offset down; near bottom offset up
+    if(p[1] < 24) ly = p[1]+16;
+    if(p[1] > canvas.height-24) ly = p[1]-8;
+    ctx.fillText(w, lx, ly);
     if(isTopK){
       ctx.fillStyle= isTop3 ? "#EF413D" : "#12549E";
       ctx.font="11px Inter";
-      const label = `${rank+1}. ${score.toFixed(2)}`;
-      ctx.fillText(label, p[0]+10, p[1]+16);
+      // score below word, same x as label
+      ctx.fillText(scoreLabel, lx, ly+14);
     }
   }
   // ranked list — grouped visual feedback
