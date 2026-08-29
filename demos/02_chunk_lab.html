@@ -53,13 +53,13 @@
     </div>
 
     <div class="range-card">
-      <div class="range-row"><label>Chunk size <input type="range" id="size" min="150" max="900" value="450"> <span class="val" id="sizeV">450</span></label></div>
-      <div class="help">Characters per slice. Try <strong>180</strong> → “St. Jude’s” gets cut in half. Try <strong>800</strong> → one slice holds legal fluff + hospitals together.</div>
-      <div class="range-row"><label>Overlap <input type="range" id="over" min="0" max="200" value="50"> <span class="val" id="overV">50</span></label></div>
-      <div class="help">Shared characters between slices. Try <strong>0</strong> → context breaks at the cut. <strong>50</strong> (shaded stripes) keeps the sentence intact.</div>
+      <div class="range-row"><label>Chunk size — move this first <input type="range" id="size" min="150" max="900" value="450"> <span class="val" id="sizeV">450</span></label></div>
+      <div class="help">How big each slice is. Watch the baguette above and the blue <strong>Best slice</strong> in section 3. Try preset <strong>180</strong> → “St. Jude’s” cut in half; <strong>800</strong> → legal fluff + hospitals together (diluted).</div>
+      <div class="range-row"><label>Overlap — move second <input type="range" id="over" min="0" max="200" value="50"> <span class="val" id="overV">50</span></label></div>
+      <div class="help">How much slices share at the boundary. Striped overlap on the baguette = shared characters. Try <strong>0</strong> → sentence breaks at the cut; <strong>50</strong> keeps it intact. <span style="color:#5A6C80">Note: this short excerpt has only 2–4 slices — overlap adds more slices only when text is longer than chunk size. For a 50-page doc, more overlap = noticeably more slices — that’s normal.</span></div>
     </div>
 
-    <details class="details" style="margin-top:8px"><summary>How to use — 10 seconds</summary><p class="help">1) Move Chunk size → count changes. 2) Move Overlap → stripes appear on baguette (overlap). 3) Look below — blue slice is the one the AI would retrieve. Tap any slice to see why.</p></details>
+    <details class="details" style="margin-top:8px"><summary>How to use — 10 seconds</summary><p class="help">1) Move <strong>Chunk size</strong> → slice count changes. 2) Move <strong>Overlap</strong> → striped shared area appears on baguette. 3) Look at section 3 — the blue slice is the winner for “Which hospitals are covered?”. Tap any slice to see its score.</p></details>
   </div>
 
   <!-- Source text (collapsible to save space) -->
@@ -83,7 +83,7 @@
       <div id="bestExplain" style="font-size:12px;color:#5A6C80;margin-top:8px"></div>
       <div style="margin-top:10px;padding:10px;background:#F9FAFB;border:1px solid #E9EEF3;border-radius:10px">
         <div style="font-size:12px;font-weight:700;color:#0A1931">Why this one is highlighted</div>
-        <p class="help" style="margin:4px 0 0">We compute <code>cosine(mockEmbed(slice), mockEmbed(question))</code> for every slice. The highest score wins — that’s the meaningful “garlic slice”. Move the slider → winner changes → you see why size matters.</p>
+        <p class="help" style="margin:4px 0 0">We compute <code>cosine(slice, “Which hospitals are covered?”)</code> for every slice — highest wins. <strong>Move the Chunk size slider above</strong> and watch the winner change. Move <strong>Overlap</strong> to see how sharing prevents a sentence from being cut.</p>
       </div>
       <details class="details"><summary>For builders</summary><p class="help">Real pipeline: 500 chars + 50 overlap, 768-D embeddings. Overlap prevents sentence cut. Try 0 vs 50 to see the boundary sentence stay intact.</p></details>
     </div>
