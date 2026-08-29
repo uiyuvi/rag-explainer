@@ -8,6 +8,7 @@
 <body>
 <header class="topbar"><div class="topbar-inner"><div class="brand"><div class="brand-mark">RE</div><div>RAG Explainer <small>07 • Limits Explorer </small></div></div><nav class="nav"><a href="../index.html">Home</a><a href="../index.html#visualise">Visualise Concepts</a><a href="../resources.html">Resources</a></nav></div></header>
 <main class="wrap">
+  <div id="pipeline" style="margin-bottom:12px"></div>
   <div class="kicker">Trust — make it fail, then fix it</div>
   <h1 style="color:#0A1931">Limits Explorer</h1>
   <p style="color:#5A6C80">Three knobs that break RAG. Move them → see the answer degrade → learn the mitigation.</p>
@@ -42,6 +43,7 @@
     <div class="card"><h3>For Builders — cost</h3><p style="font-size:13px;color:#5A6C80">Embedding 50 pages ≈ cents. Re-embedding on update = same. GraphRAG rebuild = heavier. Agentic = higher token loops.</p></div>
   </div>
 </main>
+<script src="../assets/pipeline.js"></script>
 <script src="../assets/common.js"></script>
 <script>
 const q=document.getElementById('q'), res=document.getElementById('res'), mit=document.getElementById('mit'), blur=document.getElementById('blur'), cs=document.getElementById('cs'), csV=document.getElementById('csV'), tk=document.getElementById('tk'), tkV=document.getElementById('tkV'), blurOut=document.getElementById('blurOut');
@@ -83,5 +85,6 @@ function test(){
 }
 document.getElementById('test').addEventListener('click', test); test();
 </script>
+<script>renderPipeline('answer');</script>
 </body>
 </html>

@@ -9,6 +9,7 @@
 <body>
 <header class="topbar"><div class="topbar-inner"><div class="brand"><div class="brand-mark">RE</div><div>RAG Explainer <small>04 • Similarity Rank </small></div></div><nav class="nav"><a href="../index.html">Home</a><a href="../index.html#visualise">Visualise Concepts</a><a href="../resources.html">Resources</a></nav></div></header>
 <main class="wrap">
+  <div id="pipeline" style="margin-bottom:12px"></div>
   <div class="kicker">Step 7 — “Closest Match” Game</div>
   <h1 style="color:#0A1931">Rank every chunk by meaning</h1>
   <p style="color:#5A6C80">Mock 8 chunks from the insurance PDF. Type your question — see which chunks bubble up.</p>
@@ -22,6 +23,7 @@
   <p class="note">Top-K chunks are the only ones sent to the LLM. Others are ignored — like discarding 40 pages of legal fluff.</p>
   <details class="card details"><summary>For Builders — cosine</summary><p class="flow-note">cosine = dot(a,b) for normalized vectors. Here Top-K=4. Real DBs use ANN for 10k+ vectors.</p></details>
 </main>
+<script src="../assets/pipeline.js"></script>
 <script src="../assets/common.js"></script>
 <script>
 const chunks=[
@@ -50,5 +52,6 @@ function render(){
 }
 document.getElementById('go').addEventListener('click', render); thr.addEventListener('input', render); kSel.addEventListener('change', render); q.addEventListener('keydown', e=>{if(e.key==='Enter') render();}); render();
 </script>
+<script>renderPipeline('search');</script>
 </body>
 </html>

@@ -51,44 +51,9 @@
   </section>
 
   <section class="section" id="visualise">
-    <div class="section-head"><h2>Visualise Concepts — Tap to Explore</h2><p>Everyone can use every demo — open any, learn at your pace</p></div>
-    <div class="grid grid-3">
-      <a class="card" href="demos/03_vector_map.html">
-        <h3>Closest-Match Map</h3>
-        <p>Type any word → see it fly to its neighbors. <strong>Hospital ≈ Medical Center</strong> (0.92) ≠ Car (0.03). Like TensorFlow Projector but instant on phone.</p>
-        <div class="kpi"><span>Coordinates</span><span>Cosine</span></div>
-      </a>
-      <a class="card" href="demos/01_keyword_vs_vector.html">
-        <h3>Keyword vs Vector</h3>
-        <p>Toggle switch: “Hospitals” fails with Ctrl+F, succeeds with meaning. The receptionist analogy live.</p>
-        <div class="kpi"><span>Literal</span><span>Meaning</span></div>
-      </a>
-      <a class="card" href="demos/02_chunk_lab.html">
-        <h3>Baguette Slicer Lab</h3>
-        <p>Slide chunk size + overlap → watch the 50-page loaf split. Too small loses context, too big misses precision.</p>
-        <div class="kpi"><span>Chunk</span><span>Overlap</span></div>
-      </a>
-      <a class="card" href="demos/04_similarity_rank.html">
-        <h3>Similarity Rank</h3>
-        <p>Type “Which hospitals are covered?” → ranked chunks with bars. Move Top-K slider.</p>
-        <div class="kpi"><span>Top-K</span><span>Score</span></div>
-      </a>
-      <a class="card" href="demos/05_context_window.html">
-        <h3>Lawyer’s Desk</h3>
-        <p>Drag 3 chunks into the token window until it fills. LLM only sees what fits — not 50 pages.</p>
-        <div class="kpi"><span>Token window</span><span>4,096</span></div>
-      </a>
-      <a class="card" href="demos/06_e2e_rag.html">
-        <h3>Full Pipeline Simulator</h3>
-        <p>One click → console logs Ingest → Chunk → Embed → Search → Answer with page citations. 5-page mock PDF.</p>
-        <div class="kpi"><span>End-to-end</span><span>Grounded</span></div>
-      </a>
-      <a class="card" href="demos/07_limits.html">
-        <h3>Limits Explorer</h3>
-        <p>Make it fail: blurry PDF, tiny chunks, wrong Top-K → hallucination. Then fix it.</p>
-        <div class="kpi"><span>Failure</span><span>Fix</span></div>
-      </a>
-    </div>
+    <div class="section-head"><h2>Visualise Concepts — Tap Any Step</h2><p>Same 9 steps as the PPT — no numbers to memorise, just tap to explore</p></div>
+    <div id="pipeline"></div>
+    <p class="note" style="margin-top:10px">Each pill opens its demo. “You are here” explains what that step does — no PPT needed. Try <strong>Chunking</strong> → <strong>Encoder</strong> → <strong>Search</strong> in order.</p>
   </section>
 
   <section class="section">
@@ -134,5 +99,7 @@
 <footer class="footer">
   RAG Explainer • Private data stays private • 18 slides + 7 demos • <a href="resources.html">Resources</a> • <a href="slides/rag_explainer.pptx">Slides</a>
 </footer>
+<script src="assets/pipeline.js"></script>
+<script>renderPipeline('chunking');</script>
 </body>
 </html>

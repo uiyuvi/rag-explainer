@@ -9,6 +9,7 @@
 <body>
 <header class="topbar"><div class="topbar-inner"><div class="brand"><div class="brand-mark">RE</div><div>RAG Explainer <small>05 • Lawyer’s Desk</small></div></div><nav class="nav"><a href="../index.html">Home</a><a href="../index.html#visualise">Visualise Concepts</a><a href="../resources.html">Resources</a></nav></div></header>
 <main class="wrap">
+  <div id="pipeline" style="margin-bottom:12px"></div>
   <div class="kicker">Step 8 — Feeding the Expert</div>
   <h1 style="color:#0A1931">The Lawyer’s Desk — token window</h1>
   <p style="color:#5A6C80">We give the LLM <strong>only</strong> the 3 relevant pages, not the whole box. Drag chunks into the window until it fills (4,096 tokens demo).</p>
@@ -28,6 +29,7 @@
   </div>
   <p class="note">Why not all 50 pages? Token limit + cheaper + less hallucination. Context is precious.</p>
 </main>
+<script src="../assets/pipeline.js"></script>
 <script src="../assets/common.js"></script>
 <script>
 const chunks=[
@@ -73,5 +75,6 @@ win.addEventListener('dragover', e=> e.preventDefault());
 win.addEventListener('drop', e=>{ e.preventDefault(); const id=+e.dataTransfer.getData('text/plain'); if(id) add(id); });
 renderAll();
 </script>
+<script>renderPipeline('context');</script>
 </body>
 </html>

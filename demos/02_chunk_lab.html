@@ -28,6 +28,7 @@
 <body>
 <header class="topbar"><div class="topbar-inner"><div class="brand"><div class="brand-mark">RE</div><div>RAG Explainer <small>Baguette Slicer</small></div></div><nav class="nav"><a href="../index.html">Home</a><a href="../index.html#visualise">Visualise Concepts</a><a href="../resources.html">Resources</a></nav></div></header>
 <main class="wrap">
+  <div id="pipeline" style="margin-bottom:12px"></div>
   <div class="kicker">Step 2 — Chunking • Everyone</div>
   <h1 style="color:#0A1931;margin:8px 0 6px">Cut the baguette — find the garlic slice</h1>
   <p style="color:#5A6C80;margin:0">A 50-page policy is too long for AI. We cut it into slices (chunks). <strong>Use the sliders</strong> — watch how the best slice for your question changes.</p>
@@ -89,6 +90,7 @@
     </div>
   </div>
 </main>
+<script src="../assets/pipeline.js"></script>
 <script src="../assets/common.js"></script>
 <script>
 const txt=document.getElementById('txt'), size=document.getElementById('size'), over=document.getElementById('over'), sizeV=document.getElementById('sizeV'), overV=document.getElementById('overV'), chunksDiv=document.getElementById('chunks'), best=document.getElementById('best'), bestExplain=document.getElementById('bestExplain'), count=document.getElementById('count'), timeEl=document.getElementById('time'), baguette=document.getElementById('baguette');
@@ -156,5 +158,6 @@ document.querySelectorAll('.preset button').forEach(b=>{
 });
 render();
 </script>
+<script>renderPipeline('chunking');</script>
 </body>
 </html>

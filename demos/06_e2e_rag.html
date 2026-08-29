@@ -9,6 +9,7 @@
 <body>
 <header class="topbar"><div class="topbar-inner"><div class="brand"><div class="brand-mark">RE</div><div>RAG Explainer <small>06 • End-to-End</small></div></div><nav class="nav"><a href="../index.html">Home</a><a href="../index.html#visualise">Visualise Concepts</a><a href="../resources.html">Resources</a></nav></div></header>
 <main class="wrap">
+  <div id="pipeline" style="margin-bottom:12px"></div>
   <div class="kicker">End-to-end — no backend</div>
   <h1 style="color:#0A1931">Full pipeline simulator — 5-page mock PDF</h1>
   <p style="color:#5A6C80">One click → logs each step: Ingest → Chunk → Embed → Search → Answer. All in your browser.</p>
@@ -29,6 +30,7 @@
     <div class="card"><h3>Console</h3><div id="log" class="log">Press Run…</div></div>
   </div>
 </main>
+<script src="../assets/pipeline.js"></script>
 <script src="../assets/common.js"></script>
 <script>
 const PAGES=[
@@ -59,5 +61,6 @@ async function run(){
 document.getElementById('run').addEventListener('click', run);
 document.getElementById('reset').addEventListener('click', ()=>{ log.textContent="Press Run…"; answer.style.display="none"; steps.forEach(id=>document.getElementById(id).classList.remove('active'));});
 </script>
+<script>renderPipeline('answer');</script>
 </body>
 </html>

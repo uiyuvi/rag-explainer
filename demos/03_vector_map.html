@@ -36,6 +36,7 @@
   <nav class="nav"><a href="../index.html">Home</a><a href="../index.html#visualise">Visualise Concepts</a><a href="../resources.html">Resources</a></nav>
 </div></header>
 <main class="wrap">
+  <div id="pipeline" style="margin-bottom:12px"></div>
   <div class="kicker">Like TensorFlow Projector — but instant on your phone</div>
   <h1 style="margin:8px 0 6px;color:#0A1931">Which word is closest in meaning?</h1>
   <p style="color:#5A6C80;margin:0 0 10px">Everyone can explore. Tap a supported word below → see its Meaning Fingerprint and nearest neighbors. <strong>Hospital ≈ Medical Center (0.92) ≠ Car (0.03)</strong>.</p>
@@ -81,6 +82,7 @@
     </ul>
   </div>
 </main>
+<script src="../assets/pipeline.js"></script>
 <script src="../assets/common.js"></script>
 <script>
 const WORDS=["hospital","medical center","clinic","doctor","physician","apple","pear","fruit","car","vehicle","insurance","policy","hospital covered","medical care center","physicians","hospitals"];
@@ -292,5 +294,6 @@ canvas.addEventListener('touchend', e=>{
 // mobile initial fit
 if(window.innerWidth<640){ zoom=70; spread=90; document.getElementById('zoom').value=zoom; document.getElementById('spread').value=spread; draw(); }
 </script>
+<script>renderPipeline('encoder');</script>
 </body>
 </html>

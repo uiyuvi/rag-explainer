@@ -9,6 +9,7 @@
 <body>
 <header class="topbar"><div class="topbar-inner"><div class="brand"><div class="brand-mark">RE</div><div>RAG Explainer <small>01 • Keyword vs Vector</small></div></div><nav class="nav"><a href="../index.html">Home</a><a href="../index.html#visualise">Visualise Concepts</a><a href="../resources.html">Resources</a></nav></div></header>
 <main class="wrap">
+  <div id="pipeline" style="margin-bottom:12px"></div>
   <div class="kicker">The Problem — live proof</div>
   <h1 style="color:#0A1931">Keyword misses, meaning finds</h1>
   <p style="color:#5A6C80">Policy sentence: <em>“Covered providers: City General and St. Jude’s <strong>Medical Center</strong>.”</em> You search for <strong>“Hospitals”</strong>.</p>
@@ -26,6 +27,7 @@
   <div class="card" style="margin-top:12px;background:#F4F7FA"><strong>Receptionist analogy:</strong> “Is there a doctor?” → “No, only Physicians.” Literal vs semantic. Vector search bridges it.</div>
   <details class="card details"><summary>For Builders</summary><p class="flow-note">Keyword = string equality. Vector = cosine(query,“Medical Center”)=0.89. Encoder maps synonyms near each other.</p></details>
 </main>
+<script src="../assets/pipeline.js"></script>
 <script src="../assets/common.js"></script>
 <script>
 const q=document.getElementById('q'), res=document.getElementById('res'), finger=document.getElementById('finger'), score=document.getElementById('score'), tog=document.getElementById('tog'), label=document.getElementById('modeLabel');
@@ -53,5 +55,6 @@ function update(){
 tog.addEventListener('click',()=>{isVector=!isVector; tog.classList.toggle('on', isVector); label.textContent=isVector?"Vector (Meaning)":"Keyword (Ctrl+F)"; label.style.color=isVector?"#12549E":"#EF413D"; update();});
 q.addEventListener('input', update); update();
 </script>
+<script>renderPipeline('ingest');</script>
 </body>
 </html>
