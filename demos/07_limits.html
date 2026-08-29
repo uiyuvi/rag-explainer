@@ -43,7 +43,7 @@
     <div class="card"><h3>For Builders — cost</h3><p style="font-size:13px;color:#5A6C80">Embedding 50 pages ≈ cents. Re-embedding on update = same. GraphRAG rebuild = heavier. Agentic = higher token loops.</p></div>
   </div>
 </main>
-<script src="../assets/pipeline.js"></script>
+<script src="../assets/pipeline.js?v=8"></script>
 <script src="../assets/common.js"></script>
 <script>
 const q=document.getElementById('q'), res=document.getElementById('res'), mit=document.getElementById('mit'), blur=document.getElementById('blur'), cs=document.getElementById('cs'), csV=document.getElementById('csV'), tk=document.getElementById('tk'), tkV=document.getElementById('tkV'), blurOut=document.getElementById('blurOut');
@@ -85,6 +85,6 @@ function test(){
 }
 document.getElementById('test').addEventListener('click', test); test();
 </script>
-<script>renderPipeline('answer');</script>
+<script>renderPipelineOverview('pipeline');</script>
 </body>
 </html>

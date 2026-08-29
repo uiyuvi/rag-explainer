@@ -30,7 +30,7 @@
     <div class="card"><h3>Console</h3><div id="log" class="log">Press Run…</div></div>
   </div>
 </main>
-<script src="../assets/pipeline.js"></script>
+<script src="../assets/pipeline.js?v=8"></script>
 <script src="../assets/common.js"></script>
 <script>
 const PAGES=[
@@ -59,8 +59,11 @@ async function run(){
   else { answer.innerHTML='<strong style="color:#991B1B">No answer found in provided chunks.</strong> <span style="color:#5A6C80">Provide more pages or adjust chunking.</span>'; add("✘ No relevant chunk in Top-K."); }
 }
 document.getElementById('run').addEventListener('click', run);
-document.getElementById('reset').addEventListener('click', ()=>{ log.textContent="Press Run…"; answer.style.display="none"; steps.forEach(id=>document.getElementById(id).classList.remove('active'));});
+document.getElementById('reset').addEventListener('click', ()=>{
+  log.textContent="Press Run…"; answer.style.display="none"; steps.forEach(id=>document.getElementById(id).classList.remove('active'));
+  renderPipelineOverview('pipeline');
+});
 </script>
-<script>renderPipeline('answer');</script>
+<script>renderPipelineOverview('pipeline');</script>
 </body>
 </html>
