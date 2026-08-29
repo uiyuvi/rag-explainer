@@ -189,17 +189,13 @@ def build_paragraphs_xml(paragraphs, default_size=1000, default_color=None, defa
     return out
 
 def shape_tx(id_, name, x,y,cx,cy, paragraphs, fill=None, line=None):
-    # paragraphs already as list of dicts
-    # Use build_paragraphs_xml
-    # Determine font defaults?
-    # caller passes paragraphs with size/color
     body = build_paragraphs_xml(paragraphs, default_size=1100)
     fill_xml = f'<a:solidFill><a:srgbClr val="{fill}"/></a:solidFill>' if fill else '<a:noFill/>'
-    ln_xml = '<a:ln><a:noFill/></a:ln>' if not line else f'<a:ln w="12700"><a:solidFill><a:srgbClr val="{line}"/></a:solidFill></a:ln>'
+    ln_xml = '<a:ln><a:noFill/></a:ln>' if not line else f'<a:ln w="12700"><a:solidFill><a:srgbClr val="{line}"/></a:solidFill><a:prstDash val="solid"/></a:ln>'
     return f'''
       <p:sp>
-        <p:nvSpPr><p:cNvPr id="{id_}" name="{xml_escape(name)}"/><p:cNvPr/><p:nvPr/></p:nvSpPr>
-        <p:spPr><a:xfrm><a:off x="{x}" y="{y}"/><a:ext cx="{cx}" cy="{cy}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:solidFill>{fill_xml}</a:solidFill>{ln_xml}</p:spPr>
+        <p:nvSpPr><p:cNvPr id="{id_}" name="{xml_escape(name)}"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>
+        <p:spPr><a:xfrm><a:off x="{x}" y="{y}"/><a:ext cx="{cx}" cy="{cy}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom>{fill_xml}{ln_xml}</p:spPr>
         <p:txBody><a:bodyPr wrap="square" lIns="72000" rIns="72000" tIns="36000" bIns="36000"/><a:lstStyle/>{body}</p:txBody>
       </p:sp>'''
 

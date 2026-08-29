@@ -16,13 +16,17 @@
 </head>
 <body>
 <header class="topbar"><div class="topbar-inner">
-  <div class="brand"><div class="brand-mark">TF</div><div>RAG Explainer <small>03 • Closest-Match Map • Hero</small></div></div>
-  <nav class="nav"><a href="../index.html">← Home</a><a href="../resources.html">Resources</a></nav>
+  <div class="brand"><div class="brand-mark">RE</div><div>RAG Explainer <small>Closest-Match Map</small></div></div>
+  <nav class="nav"><a href="../index.html">Home</a><a href="../index.html#visualise">Visualise Concepts</a><a href="../resources.html">Resources</a></nav>
 </div></header>
 <main class="wrap">
   <div class="kicker">Like TensorFlow Projector — but instant on your phone</div>
   <h1 style="margin:8px 0 6px;color:#0A1931">Which word is closest in meaning?</h1>
-  <p style="color:#5A6C80;margin:0 0 10px">Type a word. We make a Meaning Fingerprint (mock 8-D) and show its nearest neighbors. <strong>Hospital ≈ Medical Center (0.92) ≠ Car (0.03)</strong>. Drag to pan, pinch to zoom is simulated via sliders for mobile.</p>
+  <p style="color:#5A6C80;margin:0 0 10px">Everyone can explore. Type a word → see its Meaning Fingerprint and nearest neighbors. <strong>Hospital ≈ Medical Center (0.92) ≠ Car (0.03)</strong>.</p>
+  <div style="display:flex;gap:8px;margin:10px 0">
+    <button class="btn btn-primary" id="tabVisual" style="padding:8px 14px;font-size:13px">Visual Map</button>
+    <button class="btn btn-secondary" id="tabHow" style="padding:8px 14px;font-size:13px">How it scores</button>
+  </div>
 
   <div class="demo-bar">
     <input id="q" placeholder="Type: hospital, physician, apple, car…" value="hospital">
@@ -41,10 +45,18 @@
     <div class="range-row"><label>Zoom <input type="range" id="zoom" min="60" max="140" value="100"></label><label>Spread <input type="range" id="spread" min="60" max="140" value="100"></label><span id="hint" class="flow-note">Try: “physician” → near “doctor”, far from “car”</span></div>
   </div>
 
-  <div class="card">
+  <div class="card" id="rankCard">
     <h3 style="margin:0">Ranked — closest first</h3>
     <ul id="list" class="list"></ul>
-    <details class="details"><summary>For Builders — how mock works</summary><p class="flow-note">No API. <code>mockEmbed(word)</code> → 8-D normalized vector (synonym map for demo words, hash→sin for others). Cosine = dot. Real TF projector uses 300-D Word2Vec; we use 8-D for instant phone. Swap to <code>Transformers.js</code> later if you want.</p></details>
+  </div>
+  <div class="card" id="howCard" style="display:none">
+    <h3 style="margin:0">How it scores — inside the umbrella</h3>
+    <p class="flow-note">No API. <code>mockEmbed(word)</code> → deterministic 8-D vector (synonym map for demo words, hash→sin for others). <code>cosine(a,b)= dot(a,b)</code> for normalized vectors. Real TF Projector uses 300-D Word2Vec; we use 8-D for instant phone. Same demo — visual map above, scoring details here. Everyone can access both.</p>
+    <ul style="font-size:13px;color:#5A6C80;padding-left:18px;margin:8px 0">
+      <li><strong>Visual Map tab:</strong> see coordinates and lines.</li>
+      <li><strong>How it scores tab:</strong> see numeric cosine and ranking.</li>
+      <li>Swap to <code>Transformers.js all-MiniLM-L6-v2</code> (~25MB) as opt-in for real embeddings.</li>
+    </ul>
   </div>
 </main>
 <script src="../assets/common.js"></script>
@@ -125,6 +137,20 @@ function draw(){
 document.getElementById('go').addEventListener('click', draw);
 q.addEventListener('keydown', e=>{ if(e.key==='Enter') draw(); });
 kSel.addEventListener('change', draw);
+// tabs umbrella
+const tabVisual=document.getElementById('tabVisual'), tabHow=document.getElementById('tabHow'), rankCard=document.getElementById('rankCard'), howCard=document.getElementById('howCard'), canvasWrap=document.querySelector('.canvas-wrap');
+function showTab(which){
+  const isVisual = which==='visual';
+  rankCard.style.display = isVisual ? 'block' : 'none';
+  canvasWrap.style.display = isVisual ? 'block' : 'none';
+  document.querySelector('.demo-bar').style.display = isVisual ? 'flex' : 'none';
+  howCard.style.display = isVisual ? 'none' : 'block';
+  tabVisual.className = isVisual ? 'btn btn-primary' : 'btn btn-secondary';
+  tabHow.className = isVisual ? 'btn btn-secondary' : 'btn btn-primary';
+  if(!isVisual) howCard.scrollIntoView({behavior:'smooth'});
+}
+tabVisual.addEventListener('click', ()=> showTab('visual'));
+tabHow.addEventListener('click', ()=> showTab('how'));
 draw();
 // responsive canvas
 function resize(){ const w=canvas.clientWidth; canvas.width=w*2; canvas.height=520*2; canvas.style.height="520px"; draw(); }
