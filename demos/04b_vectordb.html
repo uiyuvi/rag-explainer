@@ -31,13 +31,13 @@
   </div>
 </main>
 <script src="../assets/pipeline.js?v=11"></script>
-<script src="../assets/common.js"></script>
+<script src="../assets/common.js?v=12"></script>
 <script>
 const SHELVES=[
-  {id:'medical', title:'🏥 Medical shelf', items:['hospital','medical center','clinic','doctor','physician']},
-  {id:'fruit', title:'🍎 Fruit shelf', items:['apple','pear','fruit']},
-  {id:'transport', title:'🚗 Transport shelf', items:['car','vehicle']},
-  {id:'policy', title:'📄 Policy shelf', items:['insurance','policy','hospital covered','medical care center']},
+  {id:'medical', title:'Medical shelf', items:['hospital','medical center','clinic','doctor','physician']},
+  {id:'fruit', title:'Fruit shelf', items:['apple','pear','fruit']},
+  {id:'transport', title:'Transport shelf', items:['car','vehicle']},
+  {id:'policy', title:'Policy shelf', items:['insurance','policy','hospital covered','medical care center']},
 ];
 const ALL=["hospital","medical center","clinic","doctor","apple","pear","fruit","car","vehicle","insurance","policy"];
 const shelvesDiv=document.getElementById('shelves'), wordsDiv=document.getElementById('words'), explain=document.getElementById('explain');
@@ -45,7 +45,7 @@ function findShelf(w){ return SHELVES.find(s=>s.items.includes(w)); }
 function renderShelves(activeWord){
   shelvesDiv.innerHTML=SHELVES.map(s=>{
     const active = s.items.includes(activeWord);
-    return `<div class="shelf ${active?'hl':''}"><span><strong>${s.title}</strong> <span style="color:#5A6C80">— ${s.items.join(', ')}</span></span><span class="tag">${active?'★ here':''}</span></div>`;
+    return `<div class="shelf ${active?'hl':''}"><span><strong>${s.title}</strong> <span style="color:#5A6C80">— ${s.items.join(', ')}</span></span><span class="tag">${active?'here':''}</span></div>`;
   }).join("");
   explain.textContent = activeWord ? `"${activeWord}" would be filed on the ${findShelf(activeWord)?.title} — near ${findShelf(activeWord)?.items.filter(x=>x!==activeWord).slice(0,2).join(' & ')}.` : 'Tap a word below.';
 }

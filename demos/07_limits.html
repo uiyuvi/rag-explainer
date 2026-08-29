@@ -44,7 +44,7 @@
   </div>
 </main>
 <script src="../assets/pipeline.js?v=11"></script>
-<script src="../assets/common.js"></script>
+<script src="../assets/common.js?v=12"></script>
 <script>
 const q=document.getElementById('q'), res=document.getElementById('res'), mit=document.getElementById('mit'), blur=document.getElementById('blur'), cs=document.getElementById('cs'), csV=document.getElementById('csV'), tk=document.getElementById('tk'), tkV=document.getElementById('tkV'), blurOut=document.getElementById('blurOut');
 cs.addEventListener('input', ()=> csV.textContent=cs.value); tk.addEventListener('input', ()=> tkV.textContent=tk.value);
@@ -75,7 +75,7 @@ function test(){
     mit.textContent=msg+" Fix: disable blur, size ~500, Top-K 3-4.";
   } else if(k<3 && ranked[2].raw>0.6){
     res.style.background="#FFFBEB"; res.style.borderColor="#FDE68A"; res.style.color="#92400E";
-    res.innerHTML = `<strong>⚠ Partial answer</strong> — Top-${k} misses Westside (rank 3, ${ranked[2].raw.toFixed(2)}).<br>“City General, St. Jude’s…” — Westside omitted.`;
+    res.innerHTML = `<strong>Partial answer</strong> — Top-${k} misses Westside (rank 3, ${ranked[2].raw.toFixed(2)}).<br>“City General, St. Jude’s…” — Westside omitted.`;
     mit.textContent=msg+" Raise Top-K to 3-4 to include third hospital.";
   } else {
     res.style.background="#ECFDF5"; res.style.borderColor="#6EE7B7"; res.style.color="#065F46";

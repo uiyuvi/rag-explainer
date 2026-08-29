@@ -30,7 +30,7 @@
   <p class="note">Why not all 50 pages? Token limit + cheaper + less hallucination. Context is precious.</p>
 </main>
 <script src="../assets/pipeline.js?v=11"></script>
-<script src="../assets/common.js"></script>
+<script src="../assets/common.js?v=12"></script>
 <script>
 const chunks=[
   {id:1, text:"City General Hospital Alliance — Preferred Provider Tier (p.12)", tokens:520, score:0.93},
@@ -57,7 +57,7 @@ function renderWindow(){
     return `<span class="chunk-pill" style="background:#EFF6FF;border-color:#12549E" data-id="${c.id}">${c.text} ✕</span>`;
   }).join("")||'<span style="color:#5A6C80;font-size:12px">Empty — drag here or click Auto-fill.</span>';
   win.querySelectorAll('.chunk-pill').forEach(el=> el.addEventListener('click', ()=>{ used=used.filter(x=>x!==+el.dataset.id); renderAll(); }));
-  if(total>4096){ status.textContent="⚠ Window overflow — remove a chunk. LLM would truncate."; answer.style.display="none"; }
+  if(total>4096){ status.textContent="Window overflow — remove a chunk. LLM would truncate."; answer.style.display="none"; }
   else if(total===0){ status.textContent="Tap a chunk to add it (or drag it in). When the window has context, the LLM answers."; answer.style.display="none"; }
   else {
     status.textContent=`Using ${used.length} chunk(s) • ${total} tokens. LLM can answer.`;

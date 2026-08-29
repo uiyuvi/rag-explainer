@@ -23,7 +23,7 @@ function renderPipeline(currentId, containerId='pipeline'){
   }).join('<span class="pipe-arrow">→</span>');
 
   const cur = PIPELINE.find(s=>s.id===currentId);
-  const desc = cur ? `<div class="pipe-desc"><strong>★ You are here: ${cur.label}</strong> — ${cur.desc}</div>` : `<div class="pipe-desc">Tap any step to visualise it.</div>`;
+  const desc = cur ? `<div class="pipe-desc"><strong>You are here: ${cur.label}</strong> — ${cur.desc}</div>` : `<div class="pipe-desc">Tap any step to visualise it.</div>`;
 
   el.innerHTML = `
     <div class="pipeline-wrap">

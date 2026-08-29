@@ -24,7 +24,7 @@
   <details class="card details"><summary>For Builders — cosine</summary><p class="flow-note">cosine = dot(a,b) for normalized vectors. Here Top-K=4. Real DBs use ANN for 10k+ vectors.</p></details>
 </main>
 <script src="../assets/pipeline.js?v=11"></script>
-<script src="../assets/common.js"></script>
+<script src="../assets/common.js?v=12"></script>
 <script>
 const chunks=[
   "Covered providers: City General Hospital Alliance under Preferred Provider Tier (p.12).",
@@ -46,7 +46,7 @@ function render(){
   list.innerHTML=ranked.map((r,i)=>{
     const isTop = top.some(x=>x.text===r.text);
     const w=Math.max(4, Math.round((r.score)*100));
-    return `<div class="card" style="${isTop?'border-color:#12549E;background:#EFF6FF':''}"><div style="display:flex;justify-content:space-between;gap:8px"><strong style="color:${isTop?'#12549E':'#0A1931'}">#${i+1} ${isTop?'★ Top-K':''}</strong><span class="score">${r.score.toFixed(2)}</span></div><div style="font-size:13px;color:#152536;margin-top:6px">${r.text}</div><div class="bar"><div class="fill" style="width:${w}%;${isTop?'background:#EF413D':''}"></div></div></div>`;
+    return `<div class="card" style="${isTop?'border-color:#12549E;background:#EFF6FF':''}"><div style="display:flex;justify-content:space-between;gap:8px"><strong style="color:${isTop?'#12549E':'#0A1931'}">#${i+1} ${isTop?'Top-K':''}</strong><span class="score">${r.score.toFixed(2)}</span></div><div style="font-size:13px;color:#152536;margin-top:6px">${r.text}</div><div class="bar"><div class="fill" style="width:${w}%;${isTop?'background:#EF413D':''}"></div></div></div>`;
   }).join("");
 }
 document.getElementById('go').addEventListener('click', render); thr.addEventListener('input', render); kSel.addEventListener('change', render); q.addEventListener('keydown', e=>{if(e.key==='Enter') render();}); render();

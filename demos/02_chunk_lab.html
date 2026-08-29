@@ -13,7 +13,7 @@
 .slice .sn{font-size:11px;font-weight:800;color:#0A1931;line-height:1}
 .slice .sr{font-size:9px;font-weight:700;color:#5A6C80;line-height:1;white-space:nowrap}
 .baguette.dense .sr{display:none}
-.bnd{width:26px;flex:0 0 26px;display:grid;place-items:center;font-size:9px;font-weight:800;color:#12549E;background:repeating-linear-gradient(45deg, rgba(18,84,158,.16), rgba(18,84,158,.16) 5px, rgba(18,84,158,.05) 5px, rgba(18,84,158,.05) 9px)}
+.bnd{width:26px;flex:0 0 26px;display:grid;place-items:center;font-size:9px;font-weight:800;color:#12549E;background:rgba(18,84,158,.12)}
 .bag-summary{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
 .bag-summary span{background:#fff;border:1px solid #E9EEF3;border-radius:999px;padding:4px 9px;font-size:11px;font-weight:700;color:#0A1931}
 .bag-summary span.hl{border-color:#12549E;color:#12549E;background:#EFF6FF}
@@ -37,6 +37,7 @@
 .scorefill{height:100%;background:#12549E;border-radius:999px}
 .scorefill.bestfill{background:#EF413D}
 .slicerange{font-size:11px;color:#5A6C80;font-weight:600}
+.sh{background:rgba(18,84,158,.16);border-radius:3px;padding:0 2px}
 </style>
 </head>
 <body>
@@ -54,7 +55,7 @@
   </div>
 
   <div class="card">
-    <h3 style="margin:0;color:#0A1931">1 — Slice the document</h3>
+    <h3 style="margin:0;color:#0A1931">Slice the document</h3>
     <p class="help">Drag the sliders below. The baguette shows <strong>each slice’s character range</strong> and the <strong>↩shared overlap</strong> at every cut.</p>
 
     <div class="baguette" id="baguette"></div>
@@ -83,13 +84,15 @@
 
   <div class="grid grid-2" style="margin-top:12px">
     <div class="card">
-      <h3 style="margin:0;color:#0A1931">2 — Your slices — tap any</h3>
-      <p class="help">Blue = <strong>best for your question</strong> (would be sent to AI). Gray = others. Score = cosine similarity.</p>
+      <h3 style="margin:0;color:#0A1931">Your slices — tap any</h3>
+      <p class="help">Blue = <strong>best for your question</strong> — at the Search step this is what the AI receives. Gray = others. Score = cosine similarity.</p>
+      <p class="help"><span class="sh" style="padding:0 4px">Highlighted text</span> = shared with the neighbouring slice — it is read twice.</p>
       <div id="chunks"></div>
       <div style="font-size:11px;color:#5A6C80;margin-top:8px"><span id="count">0 chunks</span> • <span id="time">~0 ms</span></div>
     </div>
     <div class="card" style="position:sticky;top:72px;align-self:start">
-      <h3 style="margin:0;color:#0A1931">3 — Which slice would the AI see?</h3>
+      <h3 style="margin:0;color:#0A1931">What Search will retrieve</h3>
+      <p class="help" style="margin:2px 0 6px">Nothing is sent to the AI yet — this is a <strong>preview</strong>. At the Search step, the highest-scoring slice (like the one below) is what gets sent.</p>
       <div id="best" style="margin-top:8px;padding:12px;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px;color:#0A1931">Move sliders to see the best slice.</div>
       <div id="bestExplain" style="font-size:12px;color:#5A6C80;margin-top:8px"></div>
       <div style="margin-top:10px;padding:10px;background:#F9FAFB;border:1px solid #E9EEF3;border-radius:10px">
@@ -101,7 +104,7 @@
   </div>
 </main>
 <script src="../assets/pipeline.js?v=11"></script>
-<script src="../assets/common.js"></script>
+<script src="../assets/common.js?v=12"></script>
 <script>
 const txt=document.getElementById('txt'), size=document.getElementById('size'), over=document.getElementById('over'), sizeV=document.getElementById('sizeV'), overV=document.getElementById('overV'), chunksDiv=document.getElementById('chunks'), best=document.getElementById('best'), bestExplain=document.getElementById('bestExplain'), count=document.getElementById('count'), timeEl=document.getElementById('time'), baguette=document.getElementById('baguette'), bagSummary=document.getElementById('bagSummary'), statusLive=document.getElementById('statusLive');
 const query="Which hospitals are covered in this policy?";
@@ -149,6 +152,39 @@ function renderBaguette(pieces, overlap, size){
     `<span>text = ${txt.value.length} chars</span>`;
 }
 
+function slicePreviewHTML(p, o, i, n){
+  const len=p.text.length;
+  const ranges=[];
+  if(o>0 && i>0) ranges.push([0, Math.min(o,len)]);
+  if(o>0 && i<n-1) ranges.push([Math.max(0,len-o), len]);
+  const esc=s=>s.replace(/</g,"&lt;");
+  const marked=(a,b)=>{
+    let out="", cur=a;
+    for(const [s0,e0] of ranges){
+      const s=Math.max(s0,cur), e=Math.min(e0,b);
+      if(e<=s) continue;
+      out+=esc(p.text.slice(cur,s));
+      out+='<span class="sh">'+esc(p.text.slice(s,e))+'</span>';
+      cur=Math.max(cur,e);
+    }
+    out+=esc(p.text.slice(cur,b));
+    return out;
+  };
+  if(!ranges.length) return esc(p.text.slice(0,200))+(len>200?"…":"");
+  if(len<=360) return marked(0,len);
+  const head=ranges[0], tail=ranges[ranges.length-1];
+  if(inHeadAndTail(head,tail,i,n)===false && i===0){ // tail only: start context + shared tail
+    return esc(p.text.slice(0,60))+" … "+marked(Math.max(0,tail[0]-40), len);
+  }
+  if(i===n-1){ // head only: shared head + a bit more
+    return marked(0, Math.min(len, head[1]+80))+(head[1]+80<len?" …":"");
+  }
+  const midStart=head[1]+40, midEnd=tail[0]-40;
+  if(midEnd<=midStart) return marked(0,len);
+  return marked(0, midStart)+" … "+marked(midEnd, len);
+}
+function inHeadAndTail(){return true;}
+
 function render(){
   const s=parseInt(size.value,10);
   // keep overlap sane: step must stay >= 50
@@ -171,11 +207,11 @@ function render(){
     const sc=scored.find(x=>x.idx===i).score;
     const isBest=p.text===bestScore.p.text;
     const pct=Math.round(sc*100);
-    const badge=isBest?'<span style="background:#12549E;color:#fff;font-size:11px;font-weight:800;padding:3px 7px;border-radius:999px;margin-left:6px">★ Best — would be retrieved</span>'
+    const badge=isBest?'<span style="background:#12549E;color:#fff;font-size:11px;font-weight:800;padding:3px 7px;border-radius:999px;margin-left:6px">Best — Search would pick this</span>'
       :`<span style="font-size:11px;color:#5A6C80;float:right">${sc.toFixed(2)} • ${pct}%</span>`;
-    const hit=p.text.toLowerCase().includes("st. jude")||p.text.toLowerCase().includes("city general")?"🏥 ":"";
+    const hit="";
     const share=(i>0&&o>0)?`<span class="slicerange">↩ shares ${o} with slice #${i}</span>`:"";
-    return `<div class="chunk ${isBest?'best':''}" data-idx="${i}"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:11px;font-weight:700;color:#5A6C80">S${i+1} • chars ${p.start}–${p.end} • ${p.text.length} chars ${share}</span>${badge}</div><div style="margin-top:4px">${hit}${p.text.slice(0,180).replace(/</g,"&lt;")}${p.text.length>180?"…":""}</div><div class="scorebar"><div class="scorefill ${isBest?'bestfill':''}" style="width:${Math.max(6,pct)}%"></div></div></div>`;
+    return `<div class="chunk ${isBest?'best':''}" data-idx="${i}"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:11px;font-weight:700;color:#5A6C80">S${i+1} • chars ${p.start}–${p.end} • ${p.text.length} chars ${share}</span>${badge}</div><div style="margin-top:4px">${hit}${slicePreviewHTML(p,o,i,pieces.length)}</div><div class="scorebar"><div class="scorefill ${isBest?'bestfill':''}" style="width:${Math.max(6,pct)}%"></div></div></div>`;
   }).join("");
 
   chunksDiv.querySelectorAll('.chunk').forEach(el=>{

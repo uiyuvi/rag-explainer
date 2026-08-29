@@ -42,7 +42,7 @@ a:hover{color:var(--re-blue-light)}
 }
 .brand-mark{
   width:32px;height:32px;border-radius:8px;
-  background:linear-gradient(135deg,var(--re-navy),var(--re-blue));
+  background:var(--re-navy);
   display:grid;place-items:center;color:#fff;font-size:13px;font-weight:800;
 }
 .brand small{display:block;font-weight:500;color:var(--re-gray-600);font-size:11px;letter-spacing:.6px;text-transform:uppercase;margin-top:-2px}
