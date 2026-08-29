@@ -77,7 +77,7 @@
     <ul style="font-size:13px;color:#5A6C80;padding-left:18px;margin:8px 0">
       <li><strong>Closer to 1.00 = same meaning = higher rank. 0.00 = unrelated.</strong> That’s the whole rule the map follows.</li>
       <li><code>mockEmbed(word)</code> → deterministic 8-D vector (each topic sits on its own axis; related words sit at nearby angles). <code>cosine(a,b) = dot(a,b)</code> for normalized vectors.</li>
-      <li><strong>Visual Map tab:</strong> see coordinates, clusters and distance lines.</li>
+      <li><strong>Visual Map tab:</strong> the same map plus the ranked list — closest first, with cut-off shown.</li>
       <li><strong>How it scores tab:</strong> see the numeric cosine and the ranking it produces.</li>
       <li>Real TF Projector uses 300-D Word2Vec; we use 8-D so it loads instantly on your phone. Swap to <code>Transformers.js all-MiniLM-L6-v2</code> later if you want real model scores.</li>
       <li><strong>Then tap “Visual Map”</strong> to see the same scores drawn as a map — clusters, distance lines, everything above made visual.</li>
@@ -212,11 +212,12 @@ const tabVisual=document.getElementById('tabVisual'), tabHow=document.getElement
 function showTab(which){
   const isVisual = which==='visual';
   rankCard.style.display = isVisual ? 'block' : 'none';
-  canvasWrap.style.display = isVisual ? 'block' : 'none';
+  canvasWrap.style.display = 'block';
   visualControls.style.display = 'block';
   howCard.style.display = isVisual ? 'none' : 'block';
   tabVisual.className = isVisual ? 'btn btn-primary' : 'btn btn-secondary';
   tabHow.className = isVisual ? 'btn btn-secondary' : 'btn btn-primary';
+  requestAnimationFrame(resize);
 }
 tabVisual.addEventListener('click', ()=> showTab('visual'));
 tabHow.addEventListener('click', ()=> showTab('how'));
