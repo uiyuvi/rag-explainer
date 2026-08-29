@@ -10,6 +10,13 @@
 .legend{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
 .legend span{font-size:11px;font-weight:700;padding:4px 8px;border-radius:999px;background:#fff;border:1px solid #D4DDE8;color:#0A1931}
 .dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:4px;vertical-align:middle}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.chip{padding:8px 12px;border-radius:999px;background:#fff;border:1px solid #D4DDE8;font-size:13px;font-weight:600;color:#0A1931;cursor:pointer;transition:.15s}
+.chip.active{background:#0A1931;color:#fff;border-color:#0A1931}
+.chip:active{transform:scale(.97)}
+.kbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}
+.kbar .kBtn{padding:8px 14px;border-radius:999px;border:1px solid #D4DDE8;background:#fff;font-size:13px;font-weight:700;cursor:pointer}
+.kbar .kBtn.active{background:#12549E;color:#fff;border-color:#12549E}
 .results{max-height:46vh;overflow:auto}
 @media(max-width:640px){.results{max-height:40vh}}
 </style>
@@ -22,27 +29,33 @@
 <main class="wrap">
   <div class="kicker">Like TensorFlow Projector — but instant on your phone</div>
   <h1 style="margin:8px 0 6px;color:#0A1931">Which word is closest in meaning?</h1>
-  <p style="color:#5A6C80;margin:0 0 10px">Everyone can explore. Type a word → see its Meaning Fingerprint and nearest neighbors. <strong>Hospital ≈ Medical Center (0.92) ≠ Car (0.03)</strong>.</p>
+  <p style="color:#5A6C80;margin:0 0 10px">Everyone can explore. Tap a supported word below → see its Meaning Fingerprint and nearest neighbors. <strong>Hospital ≈ Medical Center (0.92) ≠ Car (0.03)</strong>.</p>
   <div style="display:flex;gap:8px;margin:10px 0">
     <button class="btn btn-primary" id="tabVisual" style="padding:8px 14px;font-size:13px">Visual Map</button>
     <button class="btn btn-secondary" id="tabHow" style="padding:8px 14px;font-size:13px">How it scores</button>
   </div>
 
-  <div class="demo-bar">
-    <input id="q" placeholder="Type: hospital, physician, apple, car…" value="hospital">
-    <select id="k"><option value="5">Top 5</option><option value="8">Top 8</option><option value="12">Top 12</option></select>
-    <button class="btn btn-primary" id="go">Find Closest</button>
+  <div id="visualControls">
+    <div style="font-size:12px;font-weight:700;color:#0A1931;letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px">Supported words — mock fingerprints (tap any)</div>
+    <div id="chips" class="chips"></div>
+    <div class="kbar">
+      <span style="font-size:12px;font-weight:700;color:#5A6C80">Show closest:</span>
+      <button class="kBtn active" data-k="5">Top 5</button>
+      <button class="kBtn" data-k="8">Top 8</button>
+      <button class="kBtn" data-k="12">Top 12</button>
+      <span id="selInfo" style="font-size:12px;color:#5A6C80;margin-left:auto"></span>
+    </div>
   </div>
 
   <div class="canvas-wrap map-wrap">
     <canvas id="map" width="900" height="520"></canvas>
-    <div class="legend">
+    <div class="legend" id="legend">
       <span><i class="dot" style="background:#12549E"></i>Query</span>
-      <span><i class="dot" style="background:#EF413D"></i>Closest</span>
+      <span><i class="dot" style="background:#EF413D"></i>Top <span id="legendK">5</span> closest</span>
       <span><i class="dot" style="background:#5A6C80"></i>Others</span>
-      <span>Metric: cosine similarity (1 − distance)</span>
+      <span>Metric: cosine similarity</span>
     </div>
-    <div class="range-row"><label>Zoom <input type="range" id="zoom" min="60" max="140" value="100"></label><label>Spread <input type="range" id="spread" min="60" max="140" value="100"></label><span id="hint" class="flow-note">Try: “physician” → near “doctor”, far from “car”</span></div>
+    <div class="range-row"><label>Zoom <input type="range" id="zoom" min="60" max="140" value="100"></label><label>Spread <input type="range" id="spread" min="60" max="140" value="100"></label><span id="hint" class="flow-note">Tap “physician” → watch red cluster</span></div>
   </div>
 
   <div class="card" id="rankCard">
@@ -63,87 +76,130 @@
 <script>
 const WORDS=["hospital","medical center","clinic","doctor","physician","apple","pear","fruit","car","vehicle","insurance","policy","hospital covered","medical care center","physicians","hospitals"];
 const POS={
- "hospital":[220,220], "medical center":[280,240], "clinic":[310,280], "doctor":[200,320], "physician":[240,360],
- "apple":[700,180], "pear":[740,220], "fruit":[720,140],
- "car":[700,380], "vehicle":[680,430], "insurance":[430,200], "policy":[460,260], "hospital covered":[320,180], "medical care center":[350,300], "physicians":[250,400], "hospitals":[200,200]
+  "hospital":[220,220], "medical center":[280,240], "clinic":[310,280], "doctor":[200,320], "physician":[240,360],
+  "apple":[700,180], "pear":[740,220], "fruit":[720,140],
+  "car":[700,380], "vehicle":[680,430], "insurance":[430,200], "policy":[460,260], "hospital covered":[320,180], "medical care center":[350,300], "physicians":[250,400], "hospitals":[200,200]
 };
 const canvas=document.getElementById('map'), ctx=canvas.getContext('2d');
-const q=document.getElementById('q'), kSel=document.getElementById('k'), list=document.getElementById('list');
+const list=document.getElementById('list'), chipsDiv=document.getElementById('chips'), selInfo=document.getElementById('selInfo'), legendK=document.getElementById('legendK');
+let selectedQuery="hospital", selectedK=5;
 let zoom=100, spread=100;
 document.getElementById('zoom').addEventListener('input', e=>{zoom=+e.target.value; draw();});
 document.getElementById('spread').addEventListener('input', e=>{spread=+e.target.value; draw();});
 
-function ranked(query, k){
-  return topK(query, WORDS, k);
+// build chips
+function renderChips(){
+  chipsDiv.innerHTML=WORDS.map(w=>{
+    const active = w===selectedQuery ? ' active': '';
+    return `<button class="chip${active}" data-w="${w}">${w}</button>`;
+  }).join("");
+  chipsDiv.querySelectorAll('.chip').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      selectedQuery=btn.dataset.w;
+      renderChips();
+      draw();
+    });
+  });
+}
+document.querySelectorAll('.kBtn').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    document.querySelectorAll('.kBtn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    selectedK=parseInt(b.dataset.k,10);
+    draw();
+  });
+});
+
+function ranked(query){
+  return topK(query, WORDS, WORDS.length);
 }
 let lastRanked=[];
 function draw(){
-  const query = (q.value.trim()||"hospital");
-  const k = parseInt(kSel.value,10);
-  lastRanked = ranked(query, WORDS.length);
-  // layout scaling
+  const query = selectedQuery;
+  const k = selectedK;
+  legendK.textContent=k;
+  selInfo.textContent=`Query “${query}” • cosine`;
+  lastRanked = ranked(query);
   const s = spread/100, z = zoom/100;
   const cx=450, cy=260;
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  // grid
   ctx.strokeStyle="#E9EEF3"; ctx.lineWidth=1;
   for(let x=0;x<canvas.width;x+=90){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke(); }
   for(let y=0;y<canvas.height;y+=90){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke(); }
-  // draw lines from query to top-3
   const qKey = query.toLowerCase();
-  // query pos: if in POS use it else center-ish (hash)
   let qPos = POS[qKey] || [430, 320];
-  // scale around center
   function tr(p){ return [(p[0]-cx)*s*z + cx, (p[1]-cy)*s*z + cy]; }
   const tQ = tr(qPos);
-  // draw connections to top 3
-  for(let i=0;i<Math.min(3, lastRanked.length);i++){
+  // lines to TopK (not just 3) — opacity decreases
+  for(let i=0;i<Math.min(k, lastRanked.length);i++){
     const r=lastRanked[i];
-    const p=POS[r.text] || [500+ (Math.random()*80-40), 300+(Math.random()*80-40)];
+    if(r.text.toLowerCase()===qKey) continue;
+    const p=POS[r.text] || [500, 300];
     const tp=tr(p);
-    ctx.strokeStyle="rgba(18,84,158,0.25)"; ctx.lineWidth=2;
+    const alpha = 0.35 - (i*0.02);
+    ctx.strokeStyle=`rgba(239,65,61,${Math.max(0.12, alpha)})`;
+    ctx.lineWidth = i<3 ? 2.5 : 1.5;
+    if(i>=3) ctx.setLineDash([6,4]); else ctx.setLineDash([]);
     ctx.beginPath(); ctx.moveTo(tQ[0], tQ[1]); ctx.lineTo(tp[0], tp[1]); ctx.stroke();
-    // distance label
-    const mid=[(tQ[0]+tp[0])/2,(tQ[1]+tp[1])/2];
-    ctx.fillStyle="#12549E"; ctx.font="11px Inter, sans-serif";
-    ctx.fillText(r.score.toFixed(2), mid[0]+4, mid[1]-4);
+    ctx.setLineDash([]);
+    if(i<5){
+      const mid=[(tQ[0]+tp[0])/2,(tQ[1]+tp[1])/2];
+      ctx.fillStyle="#EF413D"; ctx.font="11px Inter, sans-serif";
+      ctx.fillText(r.score.toFixed(2), mid[0]+4, mid[1]-4);
+    }
   }
-  // draw all words
+  // draw words — TopK highlighted
   for(const w of WORDS){
     const p=tr(POS[w]||[400,300]);
     const rank = lastRanked.findIndex(r=>r.text===w);
     const score = rank>=0? lastRanked[rank].score : 0;
     const isQuery = w.toLowerCase()===qKey;
+    const isTopK = rank>=0 && rank<k && !isQuery;
     const isTop3 = rank>=0 && rank<3;
-    // dot
+    // halo for TopK
+    if(isTopK){
+      ctx.beginPath(); ctx.arc(p[0], p[1], 14, 0, Math.PI*2);
+      ctx.fillStyle = isTop3 ? "rgba(239,65,61,0.15)" : "rgba(18,84,158,0.08)";
+      ctx.fill();
+    }
     ctx.beginPath();
-    ctx.arc(p[0], p[1], isQuery?10: isTop3?8:6, 0, Math.PI*2);
+    ctx.arc(p[0], p[1], isQuery?11: isTopK?8:5.5, 0, Math.PI*2);
     if(isQuery){ ctx.fillStyle="#12549E"; ctx.fill(); ctx.strokeStyle="#0A1931"; ctx.lineWidth=2; ctx.stroke(); }
-    else if(isTop3){ ctx.fillStyle="#EF413D"; ctx.fill(); }
-    else { ctx.fillStyle="#5A6C80"; ctx.fill(); }
-    // label
-    ctx.fillStyle="#0A1931"; ctx.font = isQuery||isTop3 ? "700 13px Inter" : "500 12px Inter";
+    else if(isTopK){ ctx.fillStyle = isTop3 ? "#EF413D" : "#12549E"; ctx.fill(); }
+    else { ctx.fillStyle="#9AA8BC"; ctx.fill(); }
+    ctx.fillStyle= isQuery||isTopK ? "#0A1931" : "#5A6C80";
+    ctx.font = isQuery ? "700 13px Inter" : isTopK ? "600 12px Inter" : "500 11px Inter";
     ctx.fillText(w, p[0]+10, p[1]+4);
-    if(isTop3){ ctx.fillStyle="#12549E"; ctx.font="11px Inter"; ctx.fillText(score.toFixed(2), p[0]+10, p[1]+16); }
+    if(isTopK){
+      ctx.fillStyle= isTop3 ? "#EF413D" : "#12549E";
+      ctx.font="11px Inter";
+      const label = `${rank+1}. ${score.toFixed(2)}`;
+      ctx.fillText(label, p[0]+10, p[1]+16);
+    }
   }
-  // render list top-k
+  // ranked list — grouped visual feedback
   const topKList = lastRanked.slice(0,k);
+  // highlight grouping: put small TopK badge
   list.innerHTML = topKList.map((r,i)=>{
+    const isQueryDup = r.text.toLowerCase()===qKey && i===0;
     const pct = Math.round(r.score*100);
-    const col = i===0 ? "#12549E": i<3 ? "#EF413D":"#5A6C80";
-    return `<li><span><strong style="color:${col}">${i+1}. ${r.text}</strong> <span style="color:#5A6C80">— ${r.score.toFixed(2)} cosine</span></span><span class="score">${pct}%</span></li>`;
+    const col = i<3 ? "#EF413D" : "#12549E";
+    const bg = i<3 ? "#FEF2F2" : "#EFF6FF";
+    return `<li style="background:${bg};border-color:${col}30"><span><strong style="color:${col}">${i+1}. ${r.text}</strong> ${isQueryDup?'<span style="color:#5A6C80;font-size:11px">(query itself)</span>':''} <span style="color:#5A6C80">— ${r.score.toFixed(2)}</span></span><span class="score" style="color:${col}">${pct}%</span></li>`;
   }).join("");
+  // after TopK, show next 2 as context
+  if(lastRanked.length>k){
+    const next = lastRanked.slice(k, k+2);
+    list.innerHTML += `<li style="background:#F9FAFB;border-style:dashed"><span style="color:#5A6C80;font-size:12px">Next outside Top ${k}: ${next.map(n=>`${n.text} (${n.score.toFixed(2)})`).join(", ")}</span><span style="color:#5A6C80;font-size:11px">cut off</span></li>`;
+  }
 }
-document.getElementById('go').addEventListener('click', draw);
-q.addEventListener('keydown', e=>{ if(e.key==='Enter') draw(); });
-kSel.addEventListener('change', draw);
 // tabs umbrella
-const tabVisual=document.getElementById('tabVisual'), tabHow=document.getElementById('tabHow'), rankCard=document.getElementById('rankCard'), howCard=document.getElementById('howCard'), canvasWrap=document.querySelector('.canvas-wrap');
+const tabVisual=document.getElementById('tabVisual'), tabHow=document.getElementById('tabHow'), rankCard=document.getElementById('rankCard'), howCard=document.getElementById('howCard'), canvasWrap=document.querySelector('.canvas-wrap'), visualControls=document.getElementById('visualControls');
 function showTab(which){
   const isVisual = which==='visual';
   rankCard.style.display = isVisual ? 'block' : 'none';
   canvasWrap.style.display = isVisual ? 'block' : 'none';
-  document.querySelector('.demo-bar').style.display = isVisual ? 'flex' : 'none';
+  visualControls.style.display = isVisual ? 'block' : 'none';
   howCard.style.display = isVisual ? 'none' : 'block';
   tabVisual.className = isVisual ? 'btn btn-primary' : 'btn btn-secondary';
   tabHow.className = isVisual ? 'btn btn-secondary' : 'btn btn-primary';
@@ -151,8 +207,8 @@ function showTab(which){
 }
 tabVisual.addEventListener('click', ()=> showTab('visual'));
 tabHow.addEventListener('click', ()=> showTab('how'));
+renderChips();
 draw();
-// responsive canvas
 function resize(){ const w=canvas.clientWidth; canvas.width=w*2; canvas.height=520*2; canvas.style.height="520px"; draw(); }
 window.addEventListener('resize', resize); resize();
 </script>
