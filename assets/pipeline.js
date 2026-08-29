@@ -23,13 +23,13 @@ function renderPipeline(currentId, containerId='pipeline'){
   }).join('<span class="pipe-arrow">→</span>');
 
   const cur = PIPELINE.find(s=>s.id===currentId);
-  const desc = cur ? `<div class="pipe-desc"><strong>★ You are here: ${cur.label}</strong> — ${cur.desc}</div>` : `<div class="pipe-desc">Tap any step to visualise it — same 8 as the PPT.</div>`;
+  const desc = cur ? `<div class="pipe-desc"><strong>★ You are here: ${cur.label}</strong> — ${cur.desc}</div>` : `<div class="pipe-desc">Tap any step to visualise it.</div>`;
 
   el.innerHTML = `
     <div class="pipeline-wrap">
       <div class="pipeline">${stepsHtml}</div>
       ${desc}
-      <div style="margin-top:6px;font-size:11px;color:#5A6C80">Tap a step to jump — 8 steps, no numbers. <a href="${homeBase}resources.html" style="font-weight:700">Resources</a> for links. • <a href="${base}06_e2e_rag.html" style="font-weight:700">End-to-end</a></div>
+      <div style="margin-top:6px;font-size:11px;color:#5A6C80">Tap a step to jump — no numbers to memorise. <a href="${homeBase}resources.html" style="font-weight:700">Resources</a> for links. • <a href="${base}06_e2e_rag.html" style="font-weight:700">End-to-end</a></div>
     </div>
   `;
 }

@@ -7,14 +7,14 @@ How AI answers from data it was never trained on. The technique behind private P
 ## Quick Start — No Download
 
 - **Live site (after Pages enable):** `https://uiyuvi.github.io/rag-explainer/`
-- **QR:** Scan on the title slide → all 7 demos run on your phone, no app, no login.
+- **QR:** Scan on the title slide → the demos run on your phone, no app, no login.
 - **Local preview:** `python3 -m http.server 8080` inside this folder, open `http://localhost:8080`
 
 ## What’s Inside
 
-- **18-slide deck:** `slides/rag_explainer.pptx` — theme (Navy #0A1931 / Blue #12549E / Red #EF413D), 16:9
+- **Deck:** `slides/rag_explainer.pptx` — Navy #0A1931 / Blue #12549E / Red #EF413D, 16:9
   - Problem → Flow (9 steps) → Value (benefits/limits, generic use cases, Basic vs Graph vs Agentic RAG) → Go Further
-- **7 micro-demos:** `demos/` — tap to play
+- **Micro-demos:** `demos/` — tap to explore
   1. Keyword vs Vector — live “Hospitals” miss vs hit
   2. Baguette Slicer Lab — chunk size + overlap
   3. **Closest-Match Map** ⭐ — like TensorFlow Projector, mock, mobile
@@ -22,7 +22,7 @@ How AI answers from data it was never trained on. The technique behind private P
   5. Lawyer’s Desk — token window
   6. Full Pipeline Simulator — 5-page mock PDF, end-to-end
   7. Limits Explorer — make it fail, then fix
-- **Resources:** `resources.html` — separate file, one QR on final slide (5 curated links: TF Projector with your enwiki config, Embedding Atlas, Sentence-Transformers, Vector DB intro, RAG/GraphRAG/Agentic)
+- **Resources:** `resources.html` — separate file, one QR on final slide; each link is cited next to the concept it explains (TF Projector enwiki config, Embedding Atlas, Sentence-Transformers, Vector DB intro, RAG/GraphRAG/Agentic)
 
 ## Standards
 

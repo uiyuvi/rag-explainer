@@ -45,7 +45,7 @@
   </section>
 
   <section class="section" id="visualise">
-    <div class="section-head"><h2>Visualise Concepts — Tap Any Step</h2><p>Same 9 steps as the PPT — no numbers to memorise, just tap to explore</p></div>
+    <div class="section-head"><h2>Visualise Concepts — Tap Any Step</h2><p>Same steps as the deck — no numbers to memorise, just tap to explore</p></div>
     <div id="pipeline"></div>
     <p class="note" style="margin-top:10px">Each pill opens its demo. “You are here” explains what that step does — no PPT needed. Try <strong>Chunking</strong> → <strong>Encoder</strong> → <strong>Search</strong> in order.</p>
   </section>
@@ -63,7 +63,7 @@
   </section>
 
   <section class="section">
-    <div class="section-head"><h2>Beyond Basic RAG — When to Level Up</h2><p>2 lines each • all need re-processing on update</p></div>
+    <div class="section-head"><h2>Beyond Basic RAG — When to Level Up</h2><p>Each level trades cost for capability • all need re-processing on update</p></div>
     <div class="grid grid-3">
       <div class="card" style="border-top:3px solid #12549E"><h3>Basic RAG</h3><p>Split → embed → Top-K → answer.<br><strong>On update:</strong> re-chunk + re-embed only that file. Cheapest, fastest.</p></div>
       <div class="card" style="border-top:3px solid #5A6C80"><h3>GraphRAG</h3><p>Builds entity graph (Hospital ↔ covers ↔ City).<br><strong>On update:</strong> rebuild graph. Great for “how are X and Y connected?” but heavy.</p></div>
@@ -76,7 +76,7 @@
     <div class="card" style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
       <div>
         <h3 style="margin:0;color:#0A1931">Go Further — After the Session</h3>
-        <p style="margin:6px 0;color:#5A6C80;font-size:14px">Open <a href="resources.html">resources.html</a> for 5 curated links: TensorFlow Projector (your enwiki link), Embedding Atlas, Sentence-Transformers, Vector DB intro, RAG/GraphRAG/Agentic guides. QR code is on that page for the final slide.</p>
+        <p style="margin:6px 0;color:#5A6C80;font-size:14px">Open <a href="resources.html">resources.html</a> — curated links, each matched to the concept it explains: TensorFlow Projector (real enwiki vectors), Embedding Atlas, Sentence-Transformers, Vector DB intro, RAG/GraphRAG/Agentic guides. QR code is on that page for the final slide.</p>
         <p style="margin:0;font-weight:700;color:#12549E">uiyuvi.github.io/rag-explainer/resources.html</p>
       </div>
     </div>
@@ -84,7 +84,7 @@
 </main>
 
 <footer class="footer">
-  RAG Explainer • Private data stays private • 18 slides + 7 demos • <a href="resources.html">Resources</a> • <a href="slides/rag_explainer.pptx">Slides</a>
+  RAG Explainer • Private data stays private • <a href="resources.html">Resources</a> • <a href="slides/rag_explainer.pptx">Slides</a>
 </footer>
 <script src="assets/pipeline.js?v=11"></script>
 <script>renderPipelineOverview('pipeline'); renderPipelineOverview('pipeline-overview');</script>
