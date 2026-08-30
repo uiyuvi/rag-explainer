@@ -1,18 +1,18 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
 <title>05 Lawyer’s Desk — RAG Explainer</title>
-<link rel="stylesheet" href="../assets/style.css">
-<style>.window{border:2px dashed #12549E;border-radius:14px;padding:12px;min-height:180px;background:#F8FAFF}.chunk-pill{display:inline-block;padding:6px 10px;background:#fff;border:1px solid #D4DDE8;border-radius:999px;font-size:12px;margin:4px;cursor:grab}.window.full{border-color:#EF413D;background:#FEF2F2}</style>
+<link rel="stylesheet" href="../assets/style.css?v=2">
+<style>.window{border:2px dashed #111111;border-radius:14px;padding:12px;min-height:180px;background:#F7F7F5}.chunk-pill{display:inline-block;padding:6px 10px;background:#fff;border:1px solid #E3E3E0;border-radius:999px;font-size:12px;margin:4px;cursor:grab}.window.full{border-color:#111111;background:#F7F7F5}</style>
 </head>
 <body>
 <header class="topbar"><div class="topbar-inner"><div class="brand"><div class="brand-mark">RE</div><div>RAG Explainer <small>Context — Lawyer’s Desk</small></div></div><nav class="nav"><a href="../index.html">Home</a><a href="../index.html#visualise">Visualise Concepts</a><a href="../resources.html">Resources</a></nav></div></header>
 <main class="wrap">
   <div id="pipeline" style="margin-bottom:12px"></div>
   <div class="kicker">Context — Lawyer’s Desk</div>
-  <h1 style="color:#0A1931">The Lawyer’s Desk — token window</h1>
-  <p style="color:#5A6C80">We give the LLM <strong>only</strong> the 3 relevant pages, not the whole box. Drag chunks into the window until it fills (4,096 tokens demo).</p>
+  <h1 style="color:#111111">The Lawyer’s Desk — token window</h1>
+  <p style="color:#6F6F6F">We give the LLM <strong>only</strong> the 3 relevant pages, not the whole box. Drag chunks into the window until it fills (4,096 tokens demo).</p>
 
   <div class="grid grid-2">
     <div class="card">
@@ -21,27 +21,27 @@
       <div style="margin-top:10px;display:flex;gap:8px"><button class="btn btn-secondary" id="auto">Auto-fill Best 3</button><button class="btn btn-ghost" id="clear">Clear</button></div>
     </div>
     <div class="card">
-      <h3>LLM Token Window <span id="count" style="float:right;color:#12549E;font-weight:700">0 / 4096</span></h3>
+      <h3>LLM Token Window <span id="count" style="float:right;color:#111111;font-weight:700">0 / 4096</span></h3>
       <div id="window" class="window"></div>
-      <div id="status" style="margin-top:8px;font-size:13px;color:#5A6C80">Tap a chunk to add it (or drag it in). When the window has context, the LLM answers.</div>
-      <div id="answer" style="margin-top:10px;padding:10px;background:#fff;border:1px solid #E9EEF3;border-radius:10px;display:none"></div>
+      <div id="status" style="margin-top:8px;font-size:13px;color:#6F6F6F">Tap a chunk to add it (or drag it in). When the window has context, the LLM answers.</div>
+      <div id="answer" style="margin-top:10px;padding:10px;background:#fff;border:1px solid #E3E3E0;border-radius:10px;display:none"></div>
     </div>
   </div>
   <p class="note">Why not all 50 pages? Token limit + cheaper + less hallucination. Context is precious.</p>
 
-  <div class="card" style="margin-top:12px;background:#EFF6FF;border-color:#BFDBFE">
-    <h3 style="margin:0;color:#0A1931">Search vs Context — what’s the difference?</h3>
-    <p style="font-size:13px;color:#152536;margin:6px 0"><strong>Search</strong> (previous step) decides <strong>WHICH</strong> slices win — it ranks every slice and picks the Top-K.</p>
-    <p style="font-size:13px;color:#152536;margin:6px 0"><strong>Context</strong> (this step) decides <strong>HOW</strong> they’re handed over — the winners are assembled inside the LLM’s reading window, trimmed to fit the token limit.</p>
-    <p style="font-size:13px;font-weight:700;color:#12549E;margin:6px 0 0">One line: Search picks the pages; Context puts them on the lawyer’s desk.</p>
+  <div class="card" style="margin-top:12px;background:#F7F7F5;border-color:#E3E3E0">
+    <h3 style="margin:0;color:#111111">Search vs Context — what’s the difference?</h3>
+    <p style="font-size:13px;color:#333333;margin:6px 0"><strong>Search</strong> (previous step) decides <strong>WHICH</strong> slices win — it ranks every slice and picks the Top-K.</p>
+    <p style="font-size:13px;color:#333333;margin:6px 0"><strong>Context</strong> (this step) decides <strong>HOW</strong> they’re handed over — the winners are assembled inside the LLM’s reading window, trimmed to fit the token limit.</p>
+    <p style="font-size:13px;font-weight:700;color:#111111;margin:6px 0 0">One line: Search picks the pages; Context puts them on the lawyer’s desk.</p>
   </div>
 
-  <div class="card" style="margin-top:12px;background:#F9FAFB">
-    <h3 style="margin:0;color:#0A1931">Next: Answer — the only step where an LLM works</h3>
-    <p style="font-size:13px;color:#5A6C80;margin:6px 0">Everything before it (Ingest → Chunking → Embeddings → Vector DB → Query → Search → Context) is deterministic machinery: no LLM, no guessing — same input, same output. <a href="06_e2e_rag.html" style="font-weight:700">Run the full pipeline →</a></p>
+  <div class="card" style="margin-top:12px;background:#F7F7F5">
+    <h3 style="margin:0;color:#111111">Next: Answer — the only step where an LLM works</h3>
+    <p style="font-size:13px;color:#6F6F6F;margin:6px 0">Everything before it (Ingest → Chunking → Embeddings → Vector DB → Query → Search → Context) is deterministic machinery: no LLM, no guessing — same input, same output. <a href="06_e2e_rag.html" style="font-weight:700">Run the full pipeline →</a></p>
   </div>
 </main>
-<script src="../assets/pipeline.js?v=13"></script>
+<script src="../assets/pipeline.js?v=14"></script>
 <script src="../assets/common.js?v=12"></script>
 <script>
 const chunks=[
@@ -54,7 +54,7 @@ const chunks=[
 const pool=document.getElementById('pool'), win=document.getElementById('window'), count=document.getElementById('count'), status=document.getElementById('status'), answer=document.getElementById('answer');
 let used=[];
 function renderPool(){
-  pool.innerHTML=chunks.filter(c=>!used.includes(c.id)).map(c=>`<span class="chunk-pill" draggable="true" data-id="${c.id}">${c.text} <span style="color:#5A6C80">(${c.tokens} tok • ${c.score.toFixed(2)})</span></span>`).join("")||'<span style="color:#5A6C80;font-size:12px">All chunks in window — click a pill in window to remove.</span>';
+  pool.innerHTML=chunks.filter(c=>!used.includes(c.id)).map(c=>`<span class="chunk-pill" draggable="true" data-id="${c.id}">${c.text} <span style="color:#6F6F6F">(${c.tokens} tok • ${c.score.toFixed(2)})</span></span>`).join("")||'<span style="color:#6F6F6F;font-size:12px">All chunks in window — click a pill in window to remove.</span>';
   pool.querySelectorAll('.chunk-pill').forEach(el=>{
     el.addEventListener('dragstart', e=> e.dataTransfer.setData('text/plain', el.dataset.id));
     el.addEventListener('click', ()=> add(+el.dataset.id));
@@ -66,8 +66,8 @@ function renderWindow(){
   win.classList.toggle('full', total>4096);
   win.innerHTML=used.map(id=>{
     const c=chunks.find(x=>x.id===id);
-    return `<span class="chunk-pill" style="background:#EFF6FF;border-color:#12549E" data-id="${c.id}">${c.text} ✕</span>`;
-  }).join("")||'<span style="color:#5A6C80;font-size:12px">Empty — drag here or click Auto-fill.</span>';
+    return `<span class="chunk-pill" style="background:#F7F7F5;border-color:#111111" data-id="${c.id}">${c.text} ✕</span>`;
+  }).join("")||'<span style="color:#6F6F6F;font-size:12px">Empty — drag here or click Auto-fill.</span>';
   win.querySelectorAll('.chunk-pill').forEach(el=> el.addEventListener('click', ()=>{ used=used.filter(x=>x!==+el.dataset.id); renderAll(); }));
   if(total>4096){ status.textContent="Window overflow — remove a chunk. LLM would truncate."; answer.style.display="none"; }
   else if(total===0){ status.textContent="Tap a chunk to add it (or drag it in). When the window has context, the LLM answers."; answer.style.display="none"; }
@@ -75,8 +75,8 @@ function renderWindow(){
     status.textContent=`Using ${used.length} chunk(s) • ${total} tokens. LLM can answer.`;
     const hasHosp = used.some(id=>[1,2,3].includes(id));
     answer.style.display="block";
-    if(hasHosp){ answer.innerHTML='<strong style="color:#065F46">AI:</strong> “According to your policy (p.12, p.8), you are covered at <strong>City General, St. Jude’s Medical Center, and Westside Health</strong>.” <span style="color:#5A6C80">(grounded, cited)</span>'; }
-    else { answer.innerHTML='<strong style="color:#991B1B">AI:</strong> “No hospital coverage found in provided context. Please provide more pages.” <span style="color:#5A6C80">(hallucination avoided)</span>'; }
+    if(hasHosp){ answer.innerHTML='<strong style="color:#111111">AI:</strong> “According to your policy (p.12, p.8), you are covered at <strong>City General, St. Jude’s Medical Center, and Westside Health</strong>.” <span style="color:#6F6F6F">(grounded, cited)</span>'; }
+    else { answer.innerHTML='<strong style="color:#111111">AI:</strong> “No hospital coverage found in provided context. Please provide more pages.” <span style="color:#6F6F6F">(hallucination avoided)</span>'; }
   }
 }
 function add(id){ if(!used.includes(id)){ used.push(id); renderAll(); } }

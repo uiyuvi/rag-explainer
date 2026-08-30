@@ -1,21 +1,21 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
 <title>01 Keyword vs Vector — RAG Explainer</title>
-<link rel="stylesheet" href="../assets/style.css">
-<style>.toggle{width:64px;height:34px;background:#E9EEF3;border-radius:999px;position:relative;cursor:pointer;display:inline-block}.knob{position:absolute;top:3px;left:3px;width:28px;height:28px;background:#fff;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.15);transition:.2s}.toggle.on{background:#12549E}.toggle.on .knob{left:33px}</style>
+<link rel="stylesheet" href="../assets/style.css?v=2">
+<style>.toggle{width:64px;height:34px;background:#E3E3E0;border-radius:999px;position:relative;cursor:pointer;display:inline-block}.knob{position:absolute;top:3px;left:3px;width:28px;height:28px;background:#fff;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.15);transition:.2s}.toggle.on{background:#111111}.toggle.on .knob{left:33px}</style>
 </head>
 <body>
 <header class="topbar"><div class="topbar-inner"><div class="brand"><div class="brand-mark">RE</div><div>RAG Explainer <small>Keyword vs Vector</small></div></div><nav class="nav"><a href="../index.html">Home</a><a href="../index.html#visualise">Visualise Concepts</a><a href="../resources.html">Resources</a></nav></div></header>
 <main class="wrap">
   <div id="pipeline" style="margin-bottom:12px"></div>
   <div class="kicker">Keyword vs Vector</div>
-  <h1 style="color:#0A1931">Keyword misses, meaning finds</h1>
-  <p style="color:#5A6C80">Policy sentence: <em>“Covered providers: City General and St. Jude’s <strong>Medical Center</strong>.”</em> You search for <strong>“Hospitals”</strong>.</p>
-  <div class="card" style="margin-top:12px;background:#F9FAFB">
-    <h3 style="margin:0;color:#0A1931">How it works</h3>
-    <ol style="font-size:13px;color:#5A6C80;padding-left:18px;margin:8px 0 0;line-height:1.55">
+  <h1 style="color:#111111">Keyword misses, meaning finds</h1>
+  <p style="color:#6F6F6F">Policy sentence: <em>“Covered providers: City General and St. Jude’s <strong>Medical Center</strong>.”</em> You search for <strong>“Hospitals”</strong>.</p>
+  <div class="card" style="margin-top:12px;background:#F7F7F5">
+    <h3 style="margin:0;color:#111111">How it works</h3>
+    <ol style="font-size:13px;color:#6F6F6F;padding-left:18px;margin:8px 0 0;line-height:1.55">
       <li>Keyword match: same letters only — “Hospitals” never hits “Medical Center”.</li>
       <li>Vector match: same meaning, even with different letters.</li>
       <li>That’s why RAG Search uses fingerprints, not Ctrl+F.</li>
@@ -23,19 +23,19 @@
   </div>
 
   <div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
-    <div><strong>Mode:</strong> <span id="modeLabel" style="color:#EF413D">Keyword (Ctrl+F)</span></div>
-    <div style="display:flex;align-items:center;gap:10px"><span style="font-size:12px;color:#5A6C80">Keyword</span><div class="toggle" id="tog"><div class="knob"></div></div><span style="font-size:12px;color:#5A6C80">Vector (Meaning)</span></div>
+    <div><strong>Mode:</strong> <span id="modeLabel" style="color:#111111">Keyword (Ctrl+F)</span></div>
+    <div style="display:flex;align-items:center;gap:10px"><span style="font-size:12px;color:#6F6F6F">Keyword</span><div class="toggle" id="tog"><div class="knob"></div></div><span style="font-size:12px;color:#6F6F6F">Vector (Meaning)</span></div>
   </div>
 
   <div class="grid grid-2" style="margin-top:12px">
-    <div class="card"><h3>Your Query</h3><input id="q" value="Hospitals" style="width:100%;padding:12px;border:1px solid #D4DDE8;border-radius:10px;font-size:16px"><div id="finger" style="margin-top:10px;font-size:12px;color:#5A6C80">Fingerprint: —</div></div>
-    <div class="card"><h3>Result</h3><div id="res" style="padding:12px;border-radius:10px;background:#FEF2F2;border:1px solid #FECACA;color:#991B1B">✘ 0 hits — “Medical Center” not equal to “Hospitals”</div><div id="score" style="margin-top:8px;font-size:13px;color:#5A6C80"></div></div>
+    <div class="card"><h3>Your Query</h3><input id="q" value="Hospitals" style="width:100%;padding:12px;border:1px solid #E3E3E0;border-radius:10px;font-size:16px"><div id="finger" style="margin-top:10px;font-size:12px;color:#6F6F6F">Fingerprint: —</div></div>
+    <div class="card"><h3>Result</h3><div id="res" style="padding:12px;border-radius:10px;background:#F7F7F5;border:1px solid #E3E3E0;color:#111111">✘ 0 hits — “Medical Center” not equal to “Hospitals”</div><div id="score" style="margin-top:8px;font-size:13px;color:#6F6F6F"></div></div>
   </div>
 
-  <div class="card" style="margin-top:12px;background:#F4F7FA"><strong>Receptionist analogy:</strong> “Is there a doctor?” → “No, only Physicians.” Literal vs semantic. Vector search bridges it.</div>
+  <div class="card" style="margin-top:12px;background:#F7F7F5"><strong>Receptionist analogy:</strong> “Is there a doctor?” → “No, only Physicians.” Literal vs semantic. Vector search bridges it.</div>
   <details class="card details"><summary>For Builders</summary><p class="flow-note">Keyword = string equality. Vector = cosine(query,“Medical Center”)=0.99. Encoder maps synonyms near each other.</p></details>
 </main>
-<script src="../assets/pipeline.js?v=13"></script>
+<script src="../assets/pipeline.js?v=14"></script>
 <script src="../assets/common.js?v=12"></script>
 <script>
 const q=document.getElementById('q'), res=document.getElementById('res'), finger=document.getElementById('finger'), score=document.getElementById('score'), tog=document.getElementById('tog'), label=document.getElementById('modeLabel');
@@ -50,17 +50,17 @@ function update(){
     const has = query.toLowerCase()==="hospitals" ? false : query.toLowerCase().includes("medical");
     // actual policy contains Medical Center
     const hit = query.toLowerCase() === "medical center" || query.toLowerCase()==="medical";
-    if(hit){ res.textContent="✓ 1 hit — exact match"; res.style.background="#ECFDF5"; res.style.color="#065F46"; res.style.borderColor="#6EE7B7"; score.textContent="Keyword only finds same letters."; }
-    else { res.textContent='✘ 0 hits — “Medical Center” not equal to “'+query+'”'; res.style.background="#FEF2F2"; res.style.color="#991B1B"; res.style.borderColor="#FECACA"; score.textContent="Missed semantic match."; }
+    if(hit){ res.textContent="✓ 1 hit — exact match"; res.style.background="#F7F7F5"; res.style.color="#111111"; res.style.borderColor="#E3E3E0"; score.textContent="Keyword only finds same letters."; }
+    else { res.textContent='✘ 0 hits — “Medical Center” not equal to “'+query+'”'; res.style.background="#F7F7F5"; res.style.color="#111111"; res.style.borderColor="#E3E3E0"; score.textContent="Missed semantic match."; }
   } else {
     const s=cosine(mockEmbed(query), mockEmbed("Medical Center"));
     res.textContent='✓ Found: “St. Jude’s Medical Center” — closest meaning';
-    res.style.background="#EFF6FF"; res.style.color="#1E40AF"; res.style.borderColor="#BFDBFE";
+    res.style.background="#F7F7F5"; res.style.color="#111111"; res.style.borderColor="#E3E3E0";
     score.textContent="Cosine similarity: "+s.toFixed(2)+" ("+Math.round(s*100)+"%) — meaning fingerprint close.";
     if(s>0.85) res.textContent+=' (score '+s.toFixed(2)+')';
   }
 }
-tog.addEventListener('click',()=>{isVector=!isVector; tog.classList.toggle('on', isVector); label.textContent=isVector?"Vector (Meaning)":"Keyword (Ctrl+F)"; label.style.color=isVector?"#12549E":"#EF413D"; update();});
+tog.addEventListener('click',()=>{isVector=!isVector; tog.classList.toggle('on', isVector); label.textContent=isVector?"Vector (Meaning)":"Keyword (Ctrl+F)"; label.style.color=isVector?"#111111":"#111111"; update();});
 q.addEventListener('input', update); update();
 </script>
 <script>renderPipeline('ingest');</script>
