@@ -11,6 +11,14 @@
   <div class="kicker">Ingest • Reading the source files</div>
   <h1 style="color:#0A1931;margin:8px 0 6px">Step zero — the system reads your PDF</h1>
   <p style="color:#5A6C80;margin:0">Before anything smart happens, the pipeline extracts every word from the 50-page policy. Garbage in → garbage out, so this step decides answer quality.</p>
+  <div class="card" style="margin-top:12px;background:#F9FAFB">
+    <h3 style="margin:0;color:#0A1931">How it works</h3>
+    <ol style="font-size:13px;color:#5A6C80;padding-left:18px;margin:8px 0 0;line-height:1.55">
+      <li>PDF pages go in — scanned or digital.</li>
+      <li>Text and tables are extracted (OCR model only if scanned).</li>
+      <li>Every slice's Meaning Fingerprint gets stored, ready for Search.</li>
+    </ol>
+  </div>
 
   <div class="card" style="margin-top:12px">
     <h3 style="margin:0;color:#0A1931">What gets extracted — tap a page</h3>

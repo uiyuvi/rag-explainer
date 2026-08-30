@@ -13,6 +13,14 @@
   <div class="kicker">Keyword vs Vector</div>
   <h1 style="color:#0A1931">Keyword misses, meaning finds</h1>
   <p style="color:#5A6C80">Policy sentence: <em>“Covered providers: City General and St. Jude’s <strong>Medical Center</strong>.”</em> You search for <strong>“Hospitals”</strong>.</p>
+  <div class="card" style="margin-top:12px;background:#F9FAFB">
+    <h3 style="margin:0;color:#0A1931">How it works</h3>
+    <ol style="font-size:13px;color:#5A6C80;padding-left:18px;margin:8px 0 0;line-height:1.55">
+      <li>Keyword match: same letters only — “Hospitals” never hits “Medical Center”.</li>
+      <li>Vector match: same meaning, even with different letters.</li>
+      <li>That’s why RAG Search uses fingerprints, not Ctrl+F.</li>
+    </ol>
+  </div>
 
   <div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
     <div><strong>Mode:</strong> <span id="modeLabel" style="color:#EF413D">Keyword (Ctrl+F)</span></div>

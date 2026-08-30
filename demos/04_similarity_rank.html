@@ -13,6 +13,14 @@
   <div class="kicker">Search — Similarity Rank</div>
   <h1 style="color:#0A1931">Rank every chunk by meaning</h1>
   <p style="color:#5A6C80">Your question is already a fingerprint (previous step). Now compare it against 8 mock chunks from the insurance PDF — see which bubble up.</p>
+  <div class="card" style="margin-top:12px;background:#F9FAFB">
+    <h3 style="margin:0;color:#0A1931">How it works</h3>
+    <ol style="font-size:13px;color:#5A6C80;padding-left:18px;margin:8px 0 0;line-height:1.55">
+      <li>Cosine compares the question fingerprint with every chunk’s.</li>
+      <li>Scores run 0.00 (unrelated) to 1.00 (same meaning).</li>
+      <li>Sort all scores, keep only the Top-K, drop the rest.</li>
+    </ol>
+  </div>
 
   <div class="card">
     <div class="demo-bar"><input id="q" value="Which hospitals are covered?"><select id="k"><option value="3">Top 3</option><option value="4" selected>Top 4</option><option value="6">Top 6</option></select><button class="btn btn-primary" id="go">Rank</button></div>
