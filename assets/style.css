@@ -1,17 +1,17 @@
 /* RAG Explainer — Warm Paper (Smashing-style, brown ink, mobile first) */
 :root{
   --bg:#FDFBF7;
-  --surface:#F5EFE6;
-  --ink:#3B2A20;
-  --body:#4A372B;
-  --muted:#8A7566;
-  --border:#E8E0D8;
-  --border-strong:#3B2A20;
-  --console-bg:#241A13;
-  --console-fg:#E5DCD3;
+  --surface:#FFE6A7;
+  --ink:#6F1D1B;
+  --body:#6F1D1B;
+  --muted:#9C4B47;
+  --border:#F0DBB0;
+  --border-strong:#6F1D1B;
+  --console-bg:#2B0F0E;
+  --console-fg:#FFE6A7;
   --radius:10px;
-  --shadow:0 1px 2px rgba(59,42,32,.07);
-  --shadow-hover:0 2px 6px rgba(59,42,32,.12);
+  --shadow:0 1px 2px rgba(111,29,27,.08);
+  --shadow-hover:0 2px 6px rgba(111,29,27,.14);
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -52,7 +52,7 @@ h1,h2,h3{letter-spacing:-.3px}
   background:var(--surface);color:var(--ink);text-decoration:none;
 }
 .nav a.primary{background:var(--ink);color:#FDFBF7}
-.nav a.primary:hover{background:#4A372B}
+.nav a.primary:hover{background:#8A2A27}
 @media(max-width:640px){.nav{width:100%}.topbar-inner{flex-wrap:wrap}}
 /* Layout */
 .wrap{max-width:1100px;margin:0 auto;padding:24px 16px}
@@ -80,7 +80,7 @@ h1 span{color:var(--ink)}
 }
 .btn:active{transform:translateY(1px)}
 .btn-primary{background:var(--ink);color:#FDFBF7}
-.btn-primary:hover{background:#4A372B}
+.btn-primary:hover{background:#8A2A27}
 .btn-secondary{background:var(--bg);color:var(--ink);border:1px solid var(--border)}
 .btn-ghost{background:var(--surface);color:var(--ink)}
 .qr-card{

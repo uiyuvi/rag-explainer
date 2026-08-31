@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap">
 <title>Query — RAG Explainer</title>
-<link rel="stylesheet" href="../assets/style.css?v=4">
+<link rel="stylesheet" href="../assets/style.css?v=5">
 <style>
 .fpbar{display:flex;gap:4px;align-items:flex-end;height:80px;margin:10px 0}
-.fpbar .col{flex:1;background:#3B2A20;border-radius:6px 6px 0 0;min-width:8px;position:relative}
-.fpbar .col span{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:10px;color:#8A7566}
+.fpbar .col{flex:1;background:#6F1D1B;border-radius:6px 6px 0 0;min-width:8px;position:relative}
+.fpbar .col span{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:10px;color:#9C4B47}
 </style>
 </head>
 <body>
@@ -15,11 +15,11 @@
 <main class="wrap">
   <div id="pipeline" style="margin-bottom:12px"></div>
   <div class="kicker">Query — Question as Fingerprint</div>
-  <h1 style="color:#3B2A20;margin:8px 0 6px">The question goes through the same translator</h1>
-  <p style="color:#8A7566;margin:0">Before Search can rank anything, your question is turned into numbers — exactly like the PDF slices were. Same Embeddings step, same fingerprint idea. Model: the <strong>same embedding model</strong> used on the PDF slices.</p>
-  <div class="card" style="margin-top:12px;background:#F5EFE6">
-    <h3 style="margin:0;color:#3B2A20">How it works</h3>
-    <ol style="font-size:13px;color:#8A7566;padding-left:18px;margin:8px 0 0;line-height:1.55">
+  <h1 style="color:#6F1D1B;margin:8px 0 6px">The question goes through the same translator</h1>
+  <p style="color:#9C4B47;margin:0">Before Search can rank anything, your question is turned into numbers — exactly like the PDF slices were. Same Embeddings step, same fingerprint idea. Model: the <strong>same embedding model</strong> used on the PDF slices.</p>
+  <div class="card" style="margin-top:12px;background:#FFE6A7">
+    <h3 style="margin:0;color:#6F1D1B">How it works</h3>
+    <ol style="font-size:13px;color:#9C4B47;padding-left:18px;margin:8px 0 0;line-height:1.55">
       <li>Your question is plain text.</li>
       <li>The same embedding model turns it into a fingerprint (8-D here).</li>
       <li>Now it is directly comparable to the stored chunk fingerprints.</li>
@@ -27,26 +27,26 @@
   </div>
 
   <div class="card" style="margin-top:12px">
-    <h3 style="margin:0;color:#3B2A20">Type your question</h3>
+    <h3 style="margin:0;color:#6F1D1B">Type your question</h3>
     <div class="demo-bar"><input id="q" value="Which hospitals are covered?"><button class="btn btn-primary" id="go">Encode</button></div>
     <div id="fp" style="display:none">
-      <div style="font-size:12px;font-weight:700;color:#3B2A20;margin-top:8px">Meaning Fingerprint (8-D mock):</div>
+      <div style="font-size:12px;font-weight:700;color:#6F1D1B;margin-top:8px">Meaning Fingerprint (8-D mock):</div>
       <div class="fpbar" id="fpbar"></div>
-      <div id="fpnums" style="font-size:12px;color:#8A7566;font-family:ui-monospace,Menlo,monospace"></div>
+      <div id="fpnums" style="font-size:12px;color:#9C4B47;font-family:ui-monospace,Menlo,monospace"></div>
     </div>
   </div>
 
   <div class="grid grid-2" style="margin-top:12px">
-    <div class="card"><h3>Why this matters</h3><p style="font-size:13px;color:#8A7566">“hospitals” and “Medical Center” become <strong>nearby numbers</strong> — so the next step (Search) can compare meanings, not letters. Without this fingerprint, Search has nothing to compare.</p></div>
-    <div class="card"><h3>Try it — same meaning, different words</h3><p style="font-size:13px;color:#8A7566">Type “Which <strong>medical centers</strong> are covered?” — the fingerprint stays close to the “hospitals” one. That’s the whole trick of vector search.</p></div>
+    <div class="card"><h3>Why this matters</h3><p style="font-size:13px;color:#9C4B47">“hospitals” and “Medical Center” become <strong>nearby numbers</strong> — so the next step (Search) can compare meanings, not letters. Without this fingerprint, Search has nothing to compare.</p></div>
+    <div class="card"><h3>Try it — same meaning, different words</h3><p style="font-size:13px;color:#9C4B47">Type “Which <strong>medical centers</strong> are covered?” — the fingerprint stays close to the “hospitals” one. That’s the whole trick of vector search.</p></div>
   </div>
 
-  <div class="card" style="margin-top:12px;background:#F5EFE6;border-color:#E8E0D8">
-    <h3 style="margin:0;color:#3B2A20">Next: Search</h3>
-    <p style="font-size:13px;color:#8A7566;margin:6px 0">Now that the question is a fingerprint, <a href="04_similarity_rank.html" style="font-weight:700">Search ranks every chunk against it →</a></p>
+  <div class="card" style="margin-top:12px;background:#FFE6A7;border-color:#F0DBB0">
+    <h3 style="margin:0;color:#6F1D1B">Next: Search</h3>
+    <p style="font-size:13px;color:#9C4B47;margin:6px 0">Now that the question is a fingerprint, <a href="04_similarity_rank.html" style="font-weight:700">Search ranks every chunk against it →</a></p>
   </div>
 </main>
-<script src="../assets/pipeline.js?v=15"></script>
+<script src="../assets/pipeline.js?v=16"></script>
 <script src="../assets/common.js?v=12"></script>
 <script>
 const q=document.getElementById('q'), go=document.getElementById('go'), fp=document.getElementById('fp'), fpbar=document.getElementById('fpbar'), fpnums=document.getElementById('fpnums');

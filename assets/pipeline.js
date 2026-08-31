@@ -29,7 +29,7 @@ function renderPipeline(currentId, containerId='pipeline'){
     <div class="pipeline-wrap">
       <div class="pipeline">${stepsHtml}</div>
       ${desc}
-      <div style="margin-top:6px;font-size:11px;color:#8A7566">Tap a step to jump — no numbers to memorise. <a href="${homeBase}resources.html" style="font-weight:700">Resources</a> for links. • <a href="${base}06_e2e_rag.html" style="font-weight:700">End-to-end</a></div>
+      <div style="margin-top:6px;font-size:11px;color:#9C4B47">Tap a step to jump — no numbers to memorise. <a href="${homeBase}resources.html" style="font-weight:700">Resources</a> for links. • <a href="${base}06_e2e_rag.html" style="font-weight:700">End-to-end</a></div>
     </div>
   `;
 }

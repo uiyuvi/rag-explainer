@@ -4,26 +4,26 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap">
 <title>Closest-Match Map — RAG Explainer</title>
-<link rel="stylesheet" href="../assets/style.css?v=4">
+<link rel="stylesheet" href="../assets/style.css?v=5">
 <style>
 .map-wrap{position:relative;touch-action:none;overflow:hidden}
 .legend{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
-.legend span{font-size:12px;font-weight:700;padding:6px 10px;border-radius:999px;background:#FDFBF7;border:1px solid #E8E0D8;color:#3B2A20}
+.legend span{font-size:12px;font-weight:700;padding:6px 10px;border-radius:999px;background:#FDFBF7;border:1px solid #F0DBB0;color:#6F1D1B}
 @media(max-width:640px){.legend span{font-size:13px;padding:7px 12px}}
 .dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:4px;vertical-align:middle}
 .chips{display:flex;gap:8px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;margin:10px 0;-webkit-overflow-scrolling:touch}
 .chips::-webkit-scrollbar{display:none}
-.chip{padding:10px 14px;border-radius:999px;background:#FDFBF7;border:1px solid #E8E0D8;font-size:14px;font-weight:700;color:#3B2A20;cursor:pointer;transition:.15s;white-space:nowrap;flex-shrink:0}
+.chip{padding:10px 14px;border-radius:999px;background:#FFE6A7;border:1px solid #F0DBB0;font-size:14px;font-weight:700;color:#6F1D1B;cursor:pointer;transition:.15s;white-space:nowrap;flex-shrink:0}
 @media(max-width:640px){.chip{padding:11px 16px;font-size:15px}}
-.chip.active{background:#3B2A20;color:#FDFBF7;border-color:#3B2A20}
+.chip.active{background:#6F1D1B;color:#FDFBF7;border-color:#6F1D1B}
 .chip:active{transform:scale(.97)}
 .kbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}
-.kbar .kBtn{padding:10px 16px;border-radius:999px;border:1px solid #E8E0D8;background:#FDFBF7;font-size:14px;font-weight:700;cursor:pointer}
+.kbar .kBtn{padding:10px 16px;border-radius:999px;border:1px solid #F0DBB0;background:#FFE6A7;font-size:14px;font-weight:700;cursor:pointer}
 @media(max-width:640px){.kbar .kBtn{padding:11px 18px;font-size:15px}}
-.kbar .kBtn.active{background:#3B2A20;color:#FDFBF7;border-color:#3B2A20}
-.canvas-wrap{background:#FDFBF7;border:1px solid #E8E0D8;border-radius:14px;padding:8px;box-shadow:0 4px 24px rgba(59,42,32,.07)}
+.kbar .kBtn.active{background:#6F1D1B;color:#FDFBF7;border-color:#6F1D1B}
+.canvas-wrap{background:#FDFBF7;border:1px solid #F0DBB0;border-radius:14px;padding:8px;box-shadow:0 4px 24px rgba(111,29,27,.07)}
 .canvas-wrap canvas{width:100%;height:auto;display:block;border-radius:10px;touch-action:none}
-.score-hint{margin-top:8px;font-size:13px;font-weight:700;color:#3B2A20;background:#F5EFE6;border:1px solid #E8E0D8;border-radius:10px;padding:8px 10px}
+.score-hint{margin-top:8px;font-size:13px;font-weight:700;color:#6F1D1B;background:#FFE6A7;border:1px solid #F0DBB0;border-radius:10px;padding:8px 10px}
 .results{max-height:46vh;overflow:auto}
 @media(max-width:640px){.results{max-height:40vh}.canvas-wrap{padding:6px}}
 </style>
@@ -36,28 +36,28 @@
 <main class="wrap">
   <div id="pipeline" style="margin-bottom:12px"></div>
   <div class="kicker">Embeddings — Closest-Match Map</div>
-  <h1 style="margin:8px 0 6px;color:#3B2A20">Which word is closest in meaning?</h1>
-  <p style="color:#8A7566;margin:0 0 10px">Everyone can explore. Read how it works, then tap a supported word in the visualiser below → see its Meaning Fingerprint and nearest neighbors. <strong>Hospital ≈ Medical Center (0.99) ≠ Car (0.00)</strong>.</p>
+  <h1 style="margin:8px 0 6px;color:#6F1D1B">Which word is closest in meaning?</h1>
+  <p style="color:#9C4B47;margin:0 0 10px">Everyone can explore. Read how it works, then tap a supported word in the visualiser below → see its Meaning Fingerprint and nearest neighbors. <strong>Hospital ≈ Medical Center (0.99) ≠ Car (0.00)</strong>.</p>
 
   <div class="card" id="howCard">
     <h3 style="margin:0">How it scores — inside the umbrella</h3>
-    <ul style="font-size:13px;color:#8A7566;padding-left:18px;margin:8px 0">
+    <ul style="font-size:13px;color:#9C4B47;padding-left:18px;margin:8px 0">
       <li><strong>Closer to 1.00 = same meaning = higher rank. 0.00 = unrelated.</strong> That’s the whole rule the map follows.</li>
       <li><code>mockEmbed(word)</code> → deterministic 8-D vector (each topic sits on its own axis; related words sit at nearby angles). <code>cosine(a,b) = dot(a,b)</code> for normalized vectors.</li>
       <li>Real TF Projector uses 300-D Word2Vec; we use 8-D so it loads instantly on your phone. Swap to <code>Transformers.js all-MiniLM-L6-v2</code> later if you want real model scores.</li>
     </ul>
   </div>
 
-  <h2 style="margin:18px 0 2px;color:#3B2A20">Visualiser — tap a word, watch the map</h2>
+  <h2 style="margin:18px 0 2px;color:#6F1D1B">Visualiser — tap a word, watch the map</h2>
   <div id="visualControls">
-    <div style="font-size:12px;font-weight:700;color:#3B2A20;letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px">Supported words — mock fingerprints (tap any)</div>
+    <div style="font-size:12px;font-weight:700;color:#6F1D1B;letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px">Supported words — mock fingerprints (tap any)</div>
     <div id="chips" class="chips"></div>
     <div class="kbar">
-      <span style="font-size:12px;font-weight:700;color:#8A7566">Show closest:</span>
+      <span style="font-size:12px;font-weight:700;color:#9C4B47">Show closest:</span>
       <button class="kBtn active" data-k="5">Top 5</button>
       <button class="kBtn" data-k="8">Top 8</button>
       <button class="kBtn" data-k="12">Top 12</button>
-      <span id="selInfo" style="font-size:12px;color:#8A7566;margin-left:auto"></span>
+      <span id="selInfo" style="font-size:12px;color:#9C4B47;margin-left:auto"></span>
     </div>
   </div>
 
@@ -65,21 +65,21 @@
     <canvas id="map" width="900" height="520"></canvas>
     <div class="score-hint">Closer to <strong>1.00</strong> = same meaning = <strong>higher rank</strong> · 0.00 = unrelated</div>
     <div class="legend" id="legend">
-      <span><i class="dot" style="background:#3B2A20"></i>Query</span>
-      <span><i class="dot" style="background:#3B2A20"></i>Top <span id="legendK">5</span> closest</span>
-      <span><i class="dot" style="background:#C9BCAE"></i>Others</span>
+      <span><i class="dot" style="background:#6F1D1B"></i>Query</span>
+      <span><i class="dot" style="background:#6F1D1B"></i>Top <span id="legendK">5</span> closest</span>
+      <span><i class="dot" style="background:#D9A7A2"></i>Others</span>
       <span>Metric: cosine similarity</span>
     </div>
     <div class="range-row"><label>Zoom <input type="range" id="zoom" min="60" max="140" value="100"></label><label>Spread <input type="range" id="spread" min="60" max="140" value="90"></label><span id="hint" class="flow-note">Tap “physician” → watch red cluster • Tap “car” → see fruit far</span></div>
   </div>
 
   <div class="card" id="rankCard">
-    <h3 style="margin:0">Ranked — closest first <span style="font-weight:600;color:#8A7566;font-size:12px">(your word is excluded; rank 1 = its best match)</span></h3>
+    <h3 style="margin:0">Ranked — closest first <span style="font-weight:600;color:#9C4B47;font-size:12px">(your word is excluded; rank 1 = its best match)</span></h3>
     <p class="help" style="margin:2px 0 6px">Facilities rank closest to facilities (hospital → medical center → clinic); the practitioners (physician, doctor) come next — related, but a different kind of thing.</p>
     <ul id="list" class="list"></ul>
   </div>
 </main>
-<script src="../assets/pipeline.js?v=15"></script>
+<script src="../assets/pipeline.js?v=16"></script>
 <script src="../assets/common.js?v=12"></script>
 <script>
 const WORDS=["hospital","medical center","medical care center","clinic","doctor","physician","insurance","policy","apple","pear","fruit","car","vehicle"];
@@ -134,7 +134,7 @@ function draw(){
   const cx=W/2+panX, cy=H/2+panY;
   ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.clearRect(0,0,W,H);
-  ctx.strokeStyle="#E8E0D8"; ctx.lineWidth=1;
+  ctx.strokeStyle="#F0DBB0"; ctx.lineWidth=1;
   const step=60*k;
   for(let x=0;x<=W;x+=step){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
   for(let y=0;y<=H;y+=step){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
@@ -155,7 +155,7 @@ function draw(){
     ctx.setLineDash([]);
     if(i<3){
       const mx=tQ[0]+(tp[0]-tQ[0])*0.45, my=tQ[1]+(tp[1]-tQ[1])*0.45;
-      ctx.fillStyle="#3B2A20"; ctx.font="700 11px Lora, Georgia, serif";
+      ctx.fillStyle="#6F1D1B"; ctx.font="700 11px Lora, Georgia, serif";
       ctx.fillText(r.score.toFixed(2), mx+3, my-5);
     }
   }
@@ -168,16 +168,16 @@ function draw(){
     const isTop3 = rank>=0 && rank<3;
     if(isTopK){
       ctx.beginPath(); ctx.arc(p[0], p[1], 16, 0, Math.PI*2);
-      ctx.fillStyle = isTop3 ? "rgba(59,42,32,.15)" : "rgba(59,42,32,.10)";
+      ctx.fillStyle = isTop3 ? "rgba(111,29,27,.15)" : "rgba(111,29,27,.10)";
       ctx.fill();
     }
     ctx.beginPath();
     ctx.arc(p[0], p[1], isQuery?10: isTopK?8:6, 0, Math.PI*2);
-    if(isQuery){ ctx.fillStyle="#FDFBF7"; ctx.fill(); ctx.strokeStyle="#3B2A20"; ctx.lineWidth=2.5; ctx.stroke(); }
-    else if(isTopK){ ctx.fillStyle = isTop3 ? "#3B2A20" : "#5F4A3A"; ctx.fill(); }
-    else { ctx.fillStyle="#C9BCAE"; ctx.fill(); }
+    if(isQuery){ ctx.fillStyle="#FDFBF7"; ctx.fill(); ctx.strokeStyle="#6F1D1B"; ctx.lineWidth=2.5; ctx.stroke(); }
+    else if(isTopK){ ctx.fillStyle = isTop3 ? "#6F1D1B" : "#94403C"; ctx.fill(); }
+    else { ctx.fillStyle="#D9A7A2"; ctx.fill(); }
     ctx.font = isQuery ? "700 15px Lora" : isTopK ? "600 13.5px Lora" : "600 12px Lora";
-    ctx.fillStyle= isQuery||isTopK ? "#3B2A20" : "#5F4A3A";
+    ctx.fillStyle= isQuery||isTopK ? "#6F1D1B" : "#94403C";
     const labelW = ctx.measureText(w).width;
     let lx = p[0]+12, ly = p[1]+4;
     if(p[0] + labelW + 14 > W){ lx = p[0] - labelW - 12; }
@@ -186,7 +186,7 @@ function draw(){
     if(ly > H-12) ly = p[1]-8;
     ctx.fillText(w, lx, ly);
     if(isTop3){                                       // rank sublabel only for top-3 (less clutter)
-      ctx.fillStyle= isTop3 ? "#3B2A20" : "#3B2A20";
+      ctx.fillStyle= isTop3 ? "#6F1D1B" : "#6F1D1B";
       ctx.font="700 11px Lora";
       ctx.fillText(score.toFixed(2), lx, ly+14);
     }
@@ -194,13 +194,13 @@ function draw(){
   const topKList = lastRanked.slice(0,k_sel);
   list.innerHTML = topKList.map((r,i)=>{
     const pct = Math.round(r.score*100);
-    const col = i<3 ? "#3B2A20" : "#5F4A3A";
-    const bg = i<3 ? "#F5EFE6" : "#FDFBF7";
-    return `<li style="background:${bg};border-color:${col}55"><span><strong style="color:${col}">${i+1}. ${r.text}</strong> <span style="color:#8A7566">— ${r.score.toFixed(2)} cosine</span></span><span class="score" style="color:${col}">${pct}%</span></li>`;
+    const col = i<3 ? "#6F1D1B" : "#94403C";
+    const bg = i<3 ? "#FFE6A7" : "#FDFBF7";
+    return `<li style="background:${bg};border-color:${col}55"><span><strong style="color:${col}">${i+1}. ${r.text}</strong> <span style="color:#9C4B47">— ${r.score.toFixed(2)} cosine</span></span><span class="score" style="color:${col}">${pct}%</span></li>`;
   }).join("");
   if(lastRanked.length>k_sel){
     const next = lastRanked.slice(k_sel, k_sel+2);
-    list.innerHTML += `<li style="background:#F5EFE6;border-style:dashed"><span style="color:#8A7566;font-size:12px">Next outside Top ${k_sel}: ${next.map(n=>`${n.text} (${n.score.toFixed(2)})`).join(", ")}</span><span style="color:#8A7566;font-size:11px">cut off</span></li>`;
+    list.innerHTML += `<li style="background:#FFE6A7;border-style:dashed"><span style="color:#9C4B47;font-size:12px">Next outside Top ${k_sel}: ${next.map(n=>`${n.text} (${n.score.toFixed(2)})`).join(", ")}</span><span style="color:#9C4B47;font-size:11px">cut off</span></li>`;
   }
 }
 renderChips();
