@@ -1,19 +1,19 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
-<title>Ingest — RAG Explainer</title><link rel="stylesheet" href="../assets/style.css?v=2">
-<style>.pdfpage{border:1px solid #E3E3E0;border-radius:10px;padding:10px 12px;margin:6px 0;background:#fff;font-size:13px;color:#333333}.pdfpage b{color:#111111}</style>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Epilogue:wght@600;700;800&display=swap">
+<title>Ingest — RAG Explainer</title><link rel="stylesheet" href="../assets/style.css?v=3">
+<style>.pdfpage{border:1px solid #E8E0D8;border-radius:10px;padding:10px 12px;margin:6px 0;background:#FDFBF7;font-size:13px;color:#4A372B}.pdfpage b{color:#3B2A20}</style>
 </head>
 <body>
 <header class="topbar"><div class="topbar-inner"><div class="brand"><div class="brand-mark">RE</div><div>RAG Explainer <small>Ingest — Reading the PDF</small></div></div><nav class="nav"><a href="../index.html">Home</a><a href="../index.html#visualise">Visualise</a><a href="../resources.html">Resources</a></nav></div></header>
 <main class="wrap">
   <div id="pipeline" style="margin-bottom:12px"></div>
   <div class="kicker">Ingest • Reading the source files</div>
-  <h1 style="color:#111111;margin:8px 0 6px">Step zero — the system reads your PDF</h1>
-  <p style="color:#6F6F6F;margin:0">Before anything smart happens, the pipeline extracts every word from the 50-page policy. Garbage in → garbage out, so this step decides answer quality.</p>
-  <div class="card" style="margin-top:12px;background:#F7F7F5">
-    <h3 style="margin:0;color:#111111">How it works</h3>
-    <ol style="font-size:13px;color:#6F6F6F;padding-left:18px;margin:8px 0 0;line-height:1.55">
+  <h1 style="color:#3B2A20;margin:8px 0 6px">Step zero — the system reads your PDF</h1>
+  <p style="color:#8A7566;margin:0">Before anything smart happens, the pipeline extracts every word from the 50-page policy. Garbage in → garbage out, so this step decides answer quality.</p>
+  <div class="card" style="margin-top:12px;background:#F5EFE6">
+    <h3 style="margin:0;color:#3B2A20">How it works</h3>
+    <ol style="font-size:13px;color:#8A7566;padding-left:18px;margin:8px 0 0;line-height:1.55">
       <li>PDF pages go in — scanned or digital.</li>
       <li>Text and tables are extracted (OCR model only if scanned).</li>
       <li>Every slice's Meaning Fingerprint gets stored, ready for Search.</li>
@@ -21,29 +21,29 @@
   </div>
 
   <div class="card" style="margin-top:12px">
-    <h3 style="margin:0;color:#111111">What gets extracted — tap a page</h3>
+    <h3 style="margin:0;color:#3B2A20">What gets extracted — tap a page</h3>
     <div id="pages">
       <div class="pdfpage" onclick="pick(this,'Definitions — ‘Medical Center’ includes hospital and clinic facilities.','Clean digital text → extracted word-for-word.')"><b>Page 1</b> — Definitions (digital text)</div>
       <div class="pdfpage" onclick="pick(this,'Schedule table: City General · St. Jude’s · Westside','Tables are read row-by-row, not as a picture.')"><b>Page 8</b> — Provider table</div>
       <div class="pdfpage" onclick="pick(this,'[scanned signature page]','Scanned image → needs OCR. Blurry scan → OCR errors → wrong answers later.')"><b>Page 22</b> — Scanned signature (needs OCR)</div>
     </div>
-    <div id="explain" style="margin-top:10px;padding:10px;background:#F7F7F5;border:1px solid #E3E3E0;border-radius:10px;font-size:13px;color:#111111">Tap a page above to see how it is read.</div>
+    <div id="explain" style="margin-top:10px;padding:10px;background:#F5EFE6;border:1px solid #E8E0D8;border-radius:10px;font-size:13px;color:#3B2A20">Tap a page above to see how it is read.</div>
   </div>
 
   <div class="grid grid-2" style="margin-top:12px">
-    <div class="card"><h3>What it does</h3><ul style="font-size:13px;color:#6F6F6F;padding-left:18px;margin:6px 0"><li>Reads text, tables and images (OCR)</li><li>Keeps data inside your system — private</li><li>Acts as the single source of truth</li></ul></div>
-    <div class="card"><h3>What it does NOT do</h3><ul style="font-size:13px;color:#6F6F6F;padding-left:18px;margin:6px 0"><li>No slicing yet (that’s Chunking)</li><li>No meaning yet (that’s Embeddings)</li><li>Does not “look” at the PDF like you do — it extracts</li></ul></div>
+    <div class="card"><h3>What it does</h3><ul style="font-size:13px;color:#8A7566;padding-left:18px;margin:6px 0"><li>Reads text, tables and images (OCR)</li><li>Keeps data inside your system — private</li><li>Acts as the single source of truth</li></ul></div>
+    <div class="card"><h3>What it does NOT do</h3><ul style="font-size:13px;color:#8A7566;padding-left:18px;margin:6px 0"><li>No slicing yet (that’s Chunking)</li><li>No meaning yet (that’s Embeddings)</li><li>Does not “look” at the PDF like you do — it extracts</li></ul></div>
   </div>
 
-  <div class="card" style="margin-top:12px;background:#F7F7F5"><h3>Next: Chunking</h3>
-  <p style="font-size:13px;color:#6F6F6F;margin:6px 0">Extracted text is still 50 pages. Next the pipeline <a href="02_chunk_lab.html" style="font-weight:700">cuts it into slices →</a></p></div>
+  <div class="card" style="margin-top:12px;background:#F5EFE6"><h3>Next: Chunking</h3>
+  <p style="font-size:13px;color:#8A7566;margin:6px 0">Extracted text is still 50 pages. Next the pipeline <a href="02_chunk_lab.html" style="font-weight:700">cuts it into slices →</a></p></div>
 </main>
-<script src="../assets/pipeline.js?v=14"></script>
+<script src="../assets/pipeline.js?v=15"></script>
 <script>
 function pick(el, what, note){
-  document.querySelectorAll('.pdfpage').forEach(p=>p.style.borderColor='#E3E3E0');
-  el.style.borderColor='#111111';
-  document.getElementById('explain').innerHTML='<strong>'+what+'</strong><br><span style="color:#6F6F6F">'+note+'</span>';
+  document.querySelectorAll('.pdfpage').forEach(p=>p.style.borderColor='#E8E0D8');
+  el.style.borderColor='#3B2A20';
+  document.getElementById('explain').innerHTML='<strong>'+what+'</strong><br><span style="color:#8A7566">'+note+'</span>';
 }
 renderPipeline('ingest');
 </script>

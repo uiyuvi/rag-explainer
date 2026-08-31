@@ -1,43 +1,43 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Epilogue:wght@600;700;800&display=swap">
 <title>Baguette Slicer Lab — RAG Explainer</title>
-<link rel="stylesheet" href="../assets/style.css?v=2">
+<link rel="stylesheet" href="../assets/style.css?v=3">
 <style>
-.chunk{padding:10px 12px;border-radius:10px;margin:6px 0;font-size:13px;line-height:1.5;border:1px solid #E3E3E0;cursor:pointer;transition:.15s}
-.chunk:hover{transform:translateY(-1px);box-shadow:0 2px 10px rgba(0,0,0,.06)}
-.chunk.best{border-color:#111111;background:#F7F7F5;box-shadow:0 4px 14px rgba(0,0,0,.10)}
-.baguette{border-radius:14px;overflow:hidden;display:flex;align-items:stretch;border:1px solid #E3E3E0;background:#F7F7F5;min-height:52px}
-.slice{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 2px;border-right:1px solid #fff}
-.slice .sn{font-size:11px;font-weight:800;color:#111111;line-height:1}
-.slice .sr{font-size:9px;font-weight:700;color:#6F6F6F;line-height:1;white-space:nowrap}
+.chunk{padding:10px 12px;border-radius:10px;margin:6px 0;font-size:13px;line-height:1.5;border:1px solid #E8E0D8;cursor:pointer;transition:.15s}
+.chunk:hover{transform:translateY(-1px);box-shadow:0 2px 10px rgba(59,42,32,.07)}
+.chunk.best{border-color:#3B2A20;background:#F5EFE6;box-shadow:0 4px 14px rgba(59,42,32,.12)}
+.baguette{border-radius:14px;overflow:hidden;display:flex;align-items:stretch;border:1px solid #E8E0D8;background:#F5EFE6;min-height:52px}
+.slice{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 2px;border-right:1px solid #FDFBF7}
+.slice .sn{font-size:11px;font-weight:800;color:#3B2A20;line-height:1}
+.slice .sr{font-size:9px;font-weight:700;color:#8A7566;line-height:1;white-space:nowrap}
 .baguette.dense .sr{display:none}
-.bnd{width:26px;flex:0 0 26px;display:grid;place-items:center;font-size:9px;font-weight:800;color:#111111;background:rgba(0,0,0,.08)}
+.bnd{width:26px;flex:0 0 26px;display:grid;place-items:center;font-size:9px;font-weight:800;color:#3B2A20;background:rgba(59,42,32,.10)}
 .bag-summary{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.bag-summary span{background:#fff;border:1px solid #E3E3E0;border-radius:999px;padding:4px 9px;font-size:11px;font-weight:700;color:#111111}
-.bag-summary span.hl{border-color:#111111;color:#111111;background:#F7F7F5}
+.bag-summary span{background:#FDFBF7;border:1px solid #E8E0D8;border-radius:999px;padding:4px 9px;font-size:11px;font-weight:700;color:#3B2A20}
+.bag-summary span.hl{border-color:#3B2A20;color:#3B2A20;background:#F5EFE6}
 .preset{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
 @media(max-width:640px){.preset{grid-template-columns:1fr}}
-.preset button{padding:9px 10px;border-radius:12px;border:1px solid #E3E3E0;background:#fff;font-size:13px;font-weight:800;color:#111111;cursor:pointer;text-align:left;line-height:1.25}
-.preset button small{display:block;font-size:11px;font-weight:600;color:#6F6F6F;margin-top:2px}
-.preset button.active{background:#111111;color:#fff;border-color:#111111}
-.preset button.active small{color:#D4D4D4}
-.range-card{padding:12px;border:1px solid #E3E3E0;border-radius:12px;background:#F7F7F5}
+.preset button{padding:9px 10px;border-radius:12px;border:1px solid #E8E0D8;background:#FDFBF7;font-size:13px;font-weight:800;color:#3B2A20;cursor:pointer;text-align:left;line-height:1.25}
+.preset button small{display:block;font-size:11px;font-weight:600;color:#8A7566;margin-top:2px}
+.preset button.active{background:#3B2A20;color:#FDFBF7;border-color:#3B2A20}
+.preset button.active small{color:#E5DCD3}
+.range-card{padding:12px;border:1px solid #E8E0D8;border-radius:12px;background:#F5EFE6}
 .range-row{margin:8px 0}
-.range-row label{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;color:#111111}
+.range-row label{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;color:#3B2A20}
 .range-row input{flex:1}
-.range-row .val{min-width:70px;text-align:right;font-weight:800;color:#111111}
-.help{font-size:12px;color:#6F6F6F;margin:2px 0 8px 0}
-.status{margin-top:10px;padding:10px 12px;border-radius:10px;background:#111111;color:#fff;font-size:12px;font-family:ui-monospace,Menlo,monospace}
-.status .verdict{display:block;margin-top:6px;font-family:Inter,sans-serif;font-weight:700}
-.status .verdict.good{color:#E3E3E0}
-.status .verdict.warn{color:#E3E3E0}
-.scorebar{height:6px;background:#E3E3E0;border-radius:999px;margin-top:6px;overflow:hidden}
-.scorefill{height:100%;background:#111111;border-radius:999px}
-.scorefill.bestfill{background:#111111}
-.slicerange{font-size:11px;color:#6F6F6F;font-weight:600}
-.sh{background:rgba(0,0,0,.08);border-radius:3px;padding:0 2px}
+.range-row .val{min-width:70px;text-align:right;font-weight:800;color:#3B2A20}
+.help{font-size:12px;color:#8A7566;margin:2px 0 8px 0}
+.status{margin-top:10px;padding:10px 12px;border-radius:10px;background:#3B2A20;color:#FDFBF7;font-size:12px;font-family:ui-monospace,Menlo,monospace}
+.status .verdict{display:block;margin-top:6px;font-family:Epilogue,sans-serif;font-weight:700}
+.status .verdict.good{color:#E8E0D8}
+.status .verdict.warn{color:#E8E0D8}
+.scorebar{height:6px;background:#E8E0D8;border-radius:999px;margin-top:6px;overflow:hidden}
+.scorefill{height:100%;background:#3B2A20;border-radius:999px}
+.scorefill.bestfill{background:#3B2A20}
+.slicerange{font-size:11px;color:#8A7566;font-weight:600}
+.sh{background:rgba(59,42,32,.10);border-radius:3px;padding:0 2px}
 </style>
 </head>
 <body>
@@ -45,25 +45,25 @@
 <main class="wrap">
   <div id="pipeline" style="margin-bottom:12px"></div>
   <div class="kicker">Chunking — Baguette Slicer</div>
-  <h1 style="color:#111111;margin:8px 0 6px">Cut the baguette — find the garlic slice</h1>
-  <p style="color:#6F6F6F;margin:0">A 50-page policy is too long for AI. We cut it into slices (chunks). Drag the sliders — every number on this page updates instantly.</p>
-  <div class="card" style="margin-top:12px;background:#F7F7F5">
-    <h3 style="margin:0;color:#111111">How it works</h3>
-    <ol style="font-size:13px;color:#6F6F6F;padding-left:18px;margin:8px 0 0;line-height:1.55">
+  <h1 style="color:#3B2A20;margin:8px 0 6px">Cut the baguette — find the garlic slice</h1>
+  <p style="color:#8A7566;margin:0">A 50-page policy is too long for AI. We cut it into slices (chunks). Drag the sliders — every number on this page updates instantly.</p>
+  <div class="card" style="margin-top:12px;background:#F5EFE6">
+    <h3 style="margin:0;color:#3B2A20">How it works</h3>
+    <ol style="font-size:13px;color:#8A7566;padding-left:18px;margin:8px 0 0;line-height:1.55">
       <li>Slice the long text into chunks (drag the sliders below).</li>
       <li>Overlap keeps an answer that sits at a cut from being lost.</li>
       <li>Smaller slices = precise but fragmented; bigger = complete but diluted.</li>
     </ol>
   </div>
 
-  <div class="card" style="margin-top:12px;background:#F7F7F5;border-color:#E3E3E0">
-    <div style="font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:#111111">Your question (fixed for this demo)</div>
-    <div style="font-size:15px;font-weight:700;color:#111111;margin-top:4px">“Which hospitals are covered in this policy?”</div>
-    <div style="font-size:12px;color:#6F6F6F;margin-top:4px">We rank every slice by <strong>cosine similarity</strong> — simply a 0–100% similarity score between meanings — to this question. Highest score = slice that would be sent to the AI.</div>
+  <div class="card" style="margin-top:12px;background:#F5EFE6;border-color:#E8E0D8">
+    <div style="font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:#3B2A20">Your question (fixed for this demo)</div>
+    <div style="font-size:15px;font-weight:700;color:#3B2A20;margin-top:4px">“Which hospitals are covered in this policy?”</div>
+    <div style="font-size:12px;color:#8A7566;margin-top:4px">We rank every slice by <strong>cosine similarity</strong> — simply a 0–100% similarity score between meanings — to this question. Highest score = slice that would be sent to the AI.</div>
   </div>
 
   <div class="card">
-    <h3 style="margin:0;color:#111111">Slice the document</h3>
+    <h3 style="margin:0;color:#3B2A20">Slice the document</h3>
     <p class="help">Drag the sliders below. The baguette shows <strong>each slice’s character range</strong> and the <strong>↩shared overlap</strong> at every cut.</p>
 
     <div class="baguette" id="baguette"></div>
@@ -86,32 +86,32 @@
 
   <details class="card">
     <summary>Source text — 50-page excerpt (tap to edit)</summary>
-    <textarea id="txt" style="width:100%;height:110px;margin-top:10px;padding:10px;border:1px solid #E3E3E0;border-radius:10px;font-size:13px">HEALTH INSURANCE POLICY — Schedule of Network Providers (excerpt). Section 4.2.1 List of Network Service Liability and Covered Institutions: The policy covers City General Hospital Alliance, St. Jude’s Medical Center, and Westside Health Center under the Preferred Provider Tier. Section 4.2.2 Emergency Care: Out-of-network emergency care is reimbursed only if pre-authorized within 48 hours. Section 5 Legal Disclaimer: This policy does not guarantee availability of Physicians on weekends. For other benefits, see Appendix B. The Preferred Provider Tier includes comprehensive care at listed centers. Any service outside the network is subject to co-pay of 30% unless classified as emergency under Section 4.2.2.</textarea>
+    <textarea id="txt" style="width:100%;height:110px;margin-top:10px;padding:10px;border:1px solid #E8E0D8;border-radius:10px;font-size:13px">HEALTH INSURANCE POLICY — Schedule of Network Providers (excerpt). Section 4.2.1 List of Network Service Liability and Covered Institutions: The policy covers City General Hospital Alliance, St. Jude’s Medical Center, and Westside Health Center under the Preferred Provider Tier. Section 4.2.2 Emergency Care: Out-of-network emergency care is reimbursed only if pre-authorized within 48 hours. Section 5 Legal Disclaimer: This policy does not guarantee availability of Physicians on weekends. For other benefits, see Appendix B. The Preferred Provider Tier includes comprehensive care at listed centers. Any service outside the network is subject to co-pay of 30% unless classified as emergency under Section 4.2.2.</textarea>
     <p class="help">You can edit this — try pasting a clause and see how slicing changes.</p>
   </details>
 
   <div class="grid grid-2" style="margin-top:12px">
     <div class="card">
-      <h3 style="margin:0;color:#111111">Your slices — tap any</h3>
+      <h3 style="margin:0;color:#3B2A20">Your slices — tap any</h3>
       <p class="help">Blue = <strong>best for your question</strong> — at the Search step this is what the AI receives. Gray = others. Score = cosine similarity.</p>
       <p class="help"><span class="sh" style="padding:0 4px">Highlighted text</span> = shared with the neighbouring slice — it is read twice.</p>
       <div id="chunks"></div>
-      <div style="font-size:11px;color:#6F6F6F;margin-top:8px"><span id="count">0 chunks</span> • <span id="time">~0 ms</span></div>
+      <div style="font-size:11px;color:#8A7566;margin-top:8px"><span id="count">0 chunks</span> • <span id="time">~0 ms</span></div>
     </div>
     <div class="card" style="position:sticky;top:72px;align-self:start">
-      <h3 style="margin:0;color:#111111">What Search will retrieve</h3>
+      <h3 style="margin:0;color:#3B2A20">What Search will retrieve</h3>
       <p class="help" style="margin:2px 0 6px">Nothing is sent to the AI yet — this is a <strong>preview</strong>. At the Search step, the highest-scoring slice (like the one below) is what gets sent.</p>
-      <div id="best" style="margin-top:8px;padding:12px;background:#F7F7F5;border:1px solid #E3E3E0;border-radius:10px;color:#111111">Move sliders to see the best slice.</div>
-      <div id="bestExplain" style="font-size:12px;color:#6F6F6F;margin-top:8px"></div>
-      <div style="margin-top:10px;padding:10px;background:#F7F7F5;border:1px solid #E3E3E0;border-radius:10px">
-        <div style="font-size:12px;font-weight:700;color:#111111">Why this one is highlighted</div>
+      <div id="best" style="margin-top:8px;padding:12px;background:#F5EFE6;border:1px solid #E8E0D8;border-radius:10px;color:#3B2A20">Move sliders to see the best slice.</div>
+      <div id="bestExplain" style="font-size:12px;color:#8A7566;margin-top:8px"></div>
+      <div style="margin-top:10px;padding:10px;background:#F5EFE6;border:1px solid #E8E0D8;border-radius:10px">
+        <div style="font-size:12px;font-weight:700;color:#3B2A20">Why this one is highlighted</div>
         <p class="help" style="margin:4px 0 0">We compute <code>cosine(slice, question)</code> for every slice — highest wins. Move <strong>Chunk size</strong> and watch the winner change; move <strong>Overlap</strong> to see a cut sentence survive in the next slice.</p>
       </div>
       <details class="details"><summary>For builders</summary><p class="help">Real pipeline: 500 chars + 50 overlap, 768-D embeddings. Overlap prevents boundary loss; step = size − overlap.</p></details>
     </div>
   </div>
 </main>
-<script src="../assets/pipeline.js?v=14"></script>
+<script src="../assets/pipeline.js?v=15"></script>
 <script src="../assets/common.js?v=12"></script>
 <script>
 const txt=document.getElementById('txt'), size=document.getElementById('size'), over=document.getElementById('over'), sizeV=document.getElementById('sizeV'), overV=document.getElementById('overV'), chunksDiv=document.getElementById('chunks'), best=document.getElementById('best'), bestExplain=document.getElementById('bestExplain'), count=document.getElementById('count'), timeEl=document.getElementById('time'), baguette=document.getElementById('baguette'), bagSummary=document.getElementById('bagSummary'), statusLive=document.getElementById('statusLive');
@@ -139,7 +139,7 @@ function renderBaguette(pieces, overlap, size){
     const p=pieces[i];
     const d=document.createElement('div');
     d.className="slice";
-    d.style.background=["#FFFFFF","#F7F7F5","#F7F7F5","#F7F7F5","#F7F7F5","#F7F7F5"][i%6];
+    d.style.background=["#FDFBF7","#F5EFE6","#F5EFE6","#F5EFE6","#F5EFE6","#F5EFE6"][i%6];
     const last = i===vis-1 && n>vis;
     d.innerHTML=`<span class="sn">${last?("+"+(n-vis+1)):("S"+(i+1))}</span>`+
                 `<span class="sr">${p.start}–${p.end}</span>`;
@@ -215,24 +215,24 @@ function render(){
     const sc=scored.find(x=>x.idx===i).score;
     const isBest=p.text===bestScore.p.text;
     const pct=Math.round(sc*100);
-    const badge=isBest?'<span style="background:#111111;color:#fff;font-size:11px;font-weight:800;padding:3px 7px;border-radius:999px;margin-left:6px">Best — Search would pick this</span>'
-      :`<span style="font-size:11px;color:#6F6F6F;float:right">${sc.toFixed(2)} • ${pct}%</span>`;
+    const badge=isBest?'<span style="background:#3B2A20;color:#FDFBF7;font-size:11px;font-weight:800;padding:3px 7px;border-radius:999px;margin-left:6px">Best — Search would pick this</span>'
+      :`<span style="font-size:11px;color:#8A7566;float:right">${sc.toFixed(2)} • ${pct}%</span>`;
     const hit="";
     const share=(i>0&&o>0)?`<span class="slicerange">↩ shares ${o} with slice #${i}</span>`:"";
-    return `<div class="chunk ${isBest?'best':''}" data-idx="${i}"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:11px;font-weight:700;color:#6F6F6F">S${i+1} • chars ${p.start}–${p.end} • ${p.text.length} chars ${share}</span>${badge}</div><div style="margin-top:4px">${hit}${slicePreviewHTML(p,o,i,pieces.length)}</div><div class="scorebar"><div class="scorefill ${isBest?'bestfill':''}" style="width:${Math.max(6,pct)}%"></div></div></div>`;
+    return `<div class="chunk ${isBest?'best':''}" data-idx="${i}"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:11px;font-weight:700;color:#8A7566">S${i+1} • chars ${p.start}–${p.end} • ${p.text.length} chars ${share}</span>${badge}</div><div style="margin-top:4px">${hit}${slicePreviewHTML(p,o,i,pieces.length)}</div><div class="scorebar"><div class="scorefill ${isBest?'bestfill':''}" style="width:${Math.max(6,pct)}%"></div></div></div>`;
   }).join("");
 
   chunksDiv.querySelectorAll('.chunk').forEach(el=>{
     el.addEventListener('click', ()=>{
       const idx=parseInt(el.dataset.idx,10);
       const item=scored.find(x=>x.idx===idx);
-      best.innerHTML=`<div style="font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#111111">Selected slice S${idx+1} (chars ${item.p.start}–${item.p.end}) — score ${item.score.toFixed(2)}</div><div style="margin-top:6px;font-size:14px;line-height:1.5">${item.p.text.slice(0,320).replace(/</g,"&lt;")}</div>`;
+      best.innerHTML=`<div style="font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#3B2A20">Selected slice S${idx+1} (chars ${item.p.start}–${item.p.end}) — score ${item.score.toFixed(2)}</div><div style="margin-top:6px;font-size:14px;line-height:1.5">${item.p.text.slice(0,320).replace(/</g,"&lt;")}</div>`;
       bestExplain.textContent=item.p.text===bestScore.p.text?"This is the highest match — the AI would see this slice.":`Score ${item.score.toFixed(2)} — lower than best (${bestScore.score.toFixed(2)}), so it would be ranked lower and likely not sent.`;
       if(window.innerWidth<700) best.scrollIntoView({behavior:'smooth', block:'center'});
     });
   });
 
-  best.innerHTML=`<div style="font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#111111">Best for “${query}” — score ${bestScore.score.toFixed(2)}</div><div style="margin-top:6px;font-size:14px;line-height:1.5;font-weight:600">${bestScore.p.text.slice(0,320).replace(/</g,"&lt;")}</div>`;
+  best.innerHTML=`<div style="font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#3B2A20">Best for “${query}” — score ${bestScore.score.toFixed(2)}</div><div style="margin-top:6px;font-size:14px;line-height:1.5;font-weight:600">${bestScore.p.text.slice(0,320).replace(/</g,"&lt;")}</div>`;
 
   // live status: numbers + verdict/lesson
   const step=Math.max(1,s-o);

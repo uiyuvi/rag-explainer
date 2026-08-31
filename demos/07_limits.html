@@ -1,49 +1,49 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Epilogue:wght@600;700;800&display=swap">
 <title>07 Limits — RAG Explainer</title>
-<link rel="stylesheet" href="../assets/style.css?v=2">
+<link rel="stylesheet" href="../assets/style.css?v=3">
 </head>
 <body>
 <header class="topbar"><div class="topbar-inner"><div class="brand"><div class="brand-mark">RE</div><div>RAG Explainer <small>Limits Explorer</small></div></div><nav class="nav"><a href="../index.html">Home</a><a href="../index.html#visualise">Visualise Concepts</a><a href="../resources.html">Resources</a></nav></div></header>
 <main class="wrap">
   <div id="pipeline" style="margin-bottom:12px"></div>
   <div class="kicker">Limits Explorer</div>
-  <h1 style="color:#111111">Limits Explorer</h1>
-  <p style="color:#6F6F6F">Three knobs that break RAG. Move them → see the answer degrade → learn the mitigation.</p>
+  <h1 style="color:#3B2A20">Limits Explorer</h1>
+  <p style="color:#8A7566">Three knobs that break RAG. Move them → see the answer degrade → learn the mitigation.</p>
 
   <div class="grid grid-3">
     <div class="card">
       <h3>1. Blurry PDF (OCR)</h3>
-      <p style="font-size:13px;color:#6F6F6F">Simulate OCR errors: “Medical Center” → “MediCal C3nter”</p>
+      <p style="font-size:13px;color:#8A7566">Simulate OCR errors: “Medical Center” → “MediCal C3nter”</p>
       <label style="font-size:13px"><input type="checkbox" id="blur"> Enable blur corruption</label>
-      <p id="blurOut" style="font-size:12px;color:#111111;margin-top:8px"></p>
+      <p id="blurOut" style="font-size:12px;color:#3B2A20;margin-top:8px"></p>
     </div>
     <div class="card">
       <h3>2. Chunk Size</h3>
       <div class="range-row"><input type="range" id="cs" min="80" max="900" value="500"><span id="csV">500</span></div>
-      <p style="font-size:12px;color:#6F6F6F">Too small → “St. Jude’s” cut. Too big → legal fluff dilutes.</p>
+      <p style="font-size:12px;color:#8A7566">Too small → “St. Jude’s” cut. Too big → legal fluff dilutes.</p>
     </div>
     <div class="card">
       <h3>3. Top-K</h3>
       <div class="range-row"><input type="range" id="tk" min="1" max="6" value="2"><span id="tkV">2</span></div>
-      <p style="font-size:12px;color:#6F6F6F">Too low → misses Westside. Too high → token overflow.</p>
+      <p style="font-size:12px;color:#8A7566">Too low → misses Westside. Too high → token overflow.</p>
     </div>
   </div>
 
   <div class="card" style="margin-top:12px">
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><input id="q" value="Which hospitals are covered?" style="flex:1;padding:10px;border:1px solid #E3E3E0;border-radius:10px"><button class="btn btn-primary" id="test">Test Answer</button></div>
-    <div id="res" style="margin-top:12px;padding:12px;border-radius:10px;border:1px solid #E3E3E0;background:#F7F7F5">Press Test…</div>
-    <div id="mit" style="margin-top:8px;font-size:13px;color:#111111"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><input id="q" value="Which hospitals are covered?" style="flex:1;padding:10px;border:1px solid #E8E0D8;border-radius:10px"><button class="btn btn-primary" id="test">Test Answer</button></div>
+    <div id="res" style="margin-top:12px;padding:12px;border-radius:10px;border:1px solid #E8E0D8;background:#F5EFE6">Press Test…</div>
+    <div id="mit" style="margin-top:8px;font-size:13px;color:#3B2A20"></div>
   </div>
 
   <div class="grid grid-2" style="margin-top:12px">
-    <div class="card"><h3>Mitigations</h3><ul style="font-size:13px;color:#6F6F6F;margin:0;padding-left:18px"><li>Blur → OCR + human review</li><li>Small chunks → 50 overlap, 450-550 size</li><li>Top-K → 3-4 + “No answer” fallback</li><li>Update → re-chunk + re-embed only that file (Basic cheapest)</li></ul></div>
-    <div class="card"><h3>For Builders — cost</h3><p style="font-size:13px;color:#6F6F6F">Embedding 50 pages ≈ cents. Re-embedding on update = same. GraphRAG rebuild = heavier. Agentic = higher token loops.</p></div>
+    <div class="card"><h3>Mitigations</h3><ul style="font-size:13px;color:#8A7566;margin:0;padding-left:18px"><li>Blur → OCR + human review</li><li>Small chunks → 50 overlap, 450-550 size</li><li>Top-K → 3-4 + “No answer” fallback</li><li>Update → re-chunk + re-embed only that file (Basic cheapest)</li></ul></div>
+    <div class="card"><h3>For Builders — cost</h3><p style="font-size:13px;color:#8A7566">Embedding 50 pages ≈ cents. Re-embedding on update = same. GraphRAG rebuild = heavier. Agentic = higher token loops.</p></div>
   </div>
 </main>
-<script src="../assets/pipeline.js?v=14"></script>
+<script src="../assets/pipeline.js?v=15"></script>
 <script src="../assets/common.js?v=12"></script>
 <script>
 const q=document.getElementById('q'), res=document.getElementById('res'), mit=document.getElementById('mit'), blur=document.getElementById('blur'), cs=document.getElementById('cs'), csV=document.getElementById('csV'), tk=document.getElementById('tk'), tkV=document.getElementById('tkV'), blurOut=document.getElementById('blurOut');
@@ -70,15 +70,15 @@ function test(){
   const top=ranked.slice(0,k);
   const best=top[0]?.raw||0;
   if(best<0.4){
-    res.style.background="#F7F7F5"; res.style.borderColor="#E3E3E0"; res.style.color="#111111";
-    res.innerHTML = `<strong>✘ Hallucination risk</strong> — best score ${best.toFixed(2)}.<br>“No relevant chunk. Model would guess.”<br><span style="color:#6F6F6F;font-size:12px">Mitigate: fix blur / increase chunk / raise Top-K.</span>`;
+    res.style.background="#F5EFE6"; res.style.borderColor="#E8E0D8"; res.style.color="#3B2A20";
+    res.innerHTML = `<strong>✘ Hallucination risk</strong> — best score ${best.toFixed(2)}.<br>“No relevant chunk. Model would guess.”<br><span style="color:#8A7566;font-size:12px">Mitigate: fix blur / increase chunk / raise Top-K.</span>`;
     mit.textContent=msg+" Fix: disable blur, size ~500, Top-K 3-4.";
   } else if(k<3 && ranked[2].raw>0.6){
-    res.style.background="#F7F7F5"; res.style.borderColor="#E3E3E0"; res.style.color="#111111";
+    res.style.background="#F5EFE6"; res.style.borderColor="#E8E0D8"; res.style.color="#3B2A20";
     res.innerHTML = `<strong>Partial answer</strong> — Top-${k} misses Westside (rank 3, ${ranked[2].raw.toFixed(2)}).<br>“City General, St. Jude’s…” — Westside omitted.`;
     mit.textContent=msg+" Raise Top-K to 3-4 to include third hospital.";
   } else {
-    res.style.background="#F7F7F5"; res.style.borderColor="#E3E3E0"; res.style.color="#111111";
+    res.style.background="#F5EFE6"; res.style.borderColor="#E8E0D8"; res.style.color="#3B2A20";
     res.innerHTML = `<strong>✓ Grounded answer</strong> — Top-${k} includes ${top.map(t=>t.text.split("—")[0]).join(", ")} (scores ${top.map(t=>t.raw.toFixed(2)).join(", ")}).<br>“Covered at City General, St. Jude’s Medical Center, and Westside Health (p.12, p.8).”`;
     mit.textContent=msg||"Good settings: no blur, 450-550 chunk, Top-K 3-4.";
   }

@@ -1,39 +1,39 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Epilogue:wght@600;700;800&display=swap">
 <title>06 Full Pipeline — RAG Explainer</title>
-<link rel="stylesheet" href="../assets/style.css?v=2">
-<style>.log{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#111111;color:#D4D4D4;padding:12px;border-radius:10px;white-space:pre-wrap;min-height:180px}.step{opacity:.5}.step.active{opacity:1;background:#F7F7F5;border-color:#111111}</style>
+<link rel="stylesheet" href="../assets/style.css?v=3">
+<style>.log{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#3B2A20;color:#E5DCD3;padding:12px;border-radius:10px;white-space:pre-wrap;min-height:180px}.step{opacity:.5}.step.active{opacity:1;background:#F5EFE6;border-color:#3B2A20}</style>
 </head>
 <body>
 <header class="topbar"><div class="topbar-inner"><div class="brand"><div class="brand-mark">RE</div><div>RAG Explainer <small>Answer — Full Pipeline</small></div></div><nav class="nav"><a href="../index.html">Home</a><a href="../index.html#visualise">Visualise Concepts</a><a href="../resources.html">Resources</a></nav></div></header>
 <main class="wrap">
   <div id="pipeline" style="margin-bottom:12px"></div>
   <div class="kicker">Answer — Full Pipeline</div>
-  <h1 style="color:#111111">Full pipeline simulator — 5-page mock PDF</h1>
-  <p style="color:#6F6F6F">One click → logs all 8 steps, exactly as in the pipeline bar above. Watch the model badges: <strong>OCR</strong> at Ingest, <strong>embedding model</strong> at Embeddings and Query, <strong>LLM</strong> at Answer — the rest is plain code, no model. The LLM appears only in the last step: same input, same output everywhere else. Vector DB runs twice — fingerprints are <strong>filed</strong> after Embeddings, then <strong>searched</strong> during Search.</p>
+  <h1 style="color:#3B2A20">Full pipeline simulator — 5-page mock PDF</h1>
+  <p style="color:#8A7566">One click → logs all 8 steps, exactly as in the pipeline bar above. Watch the model badges: <strong>OCR</strong> at Ingest, <strong>embedding model</strong> at Embeddings and Query, <strong>LLM</strong> at Answer — the rest is plain code, no model. The LLM appears only in the last step: same input, same output everywhere else. Vector DB runs twice — fingerprints are <strong>filed</strong> after Embeddings, then <strong>searched</strong> during Search.</p>
 
-  <style>.mflag{font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;background:#F7F7F5;color:#111111;white-space:nowrap}.mflag.nomodel{background:#F7F7F5;color:#6F6F6F}.mflag.llm{background:#111111;color:#FFFFFF}</style>
+  <style>.mflag{font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;background:#F5EFE6;color:#3B2A20;white-space:nowrap}.mflag.nomodel{background:#F5EFE6;color:#8A7566}.mflag.llm{background:#3B2A20;color:#FDFBF7}</style>
 
   <div class="demo-bar"><input id="q" value="Which hospitals are covered?"><button class="btn btn-primary" id="run">▶ Run Pipeline</button><button class="btn btn-secondary" id="reset">Reset</button></div>
 
   <div class="grid grid-2">
     <div>
       <div class="grid" style="gap:8px">
-        <div class="card step" id="s1"><strong>Ingest</strong> <span style="color:#6F6F6F">— extract text/tables</span> <span class="mflag">OCR model if scanned</span></div>
-        <div class="card step" id="s2"><strong>Chunking</strong> <span style="color:#6F6F6F">— 500 + 50 overlap</span> <span class="mflag nomodel">no model — plain code</span></div>
-        <div class="card step" id="s3"><strong>Embeddings</strong> <span style="color:#6F6F6F">— 8-D mock vectors</span> <span class="mflag">embedding model</span></div>
-        <div class="card step" id="s4"><strong>Vector DB</strong> <span style="color:#6F6F6F">— file + group by meaning</span> <span class="mflag nomodel">no model — storage</span></div>
-        <div class="card step" id="s5"><strong>Query</strong> <span style="color:#6F6F6F">— question → fingerprint</span> <span class="mflag">embedding model — same as slices</span></div>
-        <div class="card step" id="s6"><strong>Search</strong> <span style="color:#6F6F6F">— inside the Vector DB, cosine Top-K=3</span> <span class="mflag nomodel">no model — cosine math</span></div>
-        <div class="card step" id="s7"><strong>Context</strong> <span style="color:#6F6F6F">— Top-K into the token window</span> <span class="mflag nomodel">no model — assembly</span></div>
-        <div class="card step" id="s8"><strong>Answer</strong> <span style="color:#6F6F6F">— grounded, with citations</span> <span class="mflag llm">LLM</span></div>
+        <div class="card step" id="s1"><strong>Ingest</strong> <span style="color:#8A7566">— extract text/tables</span> <span class="mflag">OCR model if scanned</span></div>
+        <div class="card step" id="s2"><strong>Chunking</strong> <span style="color:#8A7566">— 500 + 50 overlap</span> <span class="mflag nomodel">no model — plain code</span></div>
+        <div class="card step" id="s3"><strong>Embeddings</strong> <span style="color:#8A7566">— 8-D mock vectors</span> <span class="mflag">embedding model</span></div>
+        <div class="card step" id="s4"><strong>Vector DB</strong> <span style="color:#8A7566">— file + group by meaning</span> <span class="mflag nomodel">no model — storage</span></div>
+        <div class="card step" id="s5"><strong>Query</strong> <span style="color:#8A7566">— question → fingerprint</span> <span class="mflag">embedding model — same as slices</span></div>
+        <div class="card step" id="s6"><strong>Search</strong> <span style="color:#8A7566">— inside the Vector DB, cosine Top-K=3</span> <span class="mflag nomodel">no model — cosine math</span></div>
+        <div class="card step" id="s7"><strong>Context</strong> <span style="color:#8A7566">— Top-K into the token window</span> <span class="mflag nomodel">no model — assembly</span></div>
+        <div class="card step" id="s8"><strong>Answer</strong> <span style="color:#8A7566">— grounded, with citations</span> <span class="mflag llm">LLM</span></div>
       </div>
       <div class="card" id="answer" style="margin-top:12px;display:none"></div>
-      <div class="card" id="nextsteps" style="margin-top:12px;display:none;background:#F7F7F5">
-        <h3 style="margin:0;color:#111111">Where to go next</h3>
-        <p style="font-size:13px;color:#6F6F6F;margin:6px 0">Trust matters: see <a href="07_limits.html" style="font-weight:700">how this can fail — and how to fix it →</a><br>
+      <div class="card" id="nextsteps" style="margin-top:12px;display:none;background:#F5EFE6">
+        <h3 style="margin:0;color:#3B2A20">Where to go next</h3>
+        <p style="font-size:13px;color:#8A7566;margin:6px 0">Trust matters: see <a href="07_limits.html" style="font-weight:700">how this can fail — and how to fix it →</a><br>
         Curious about the real tools? <a href="../resources.html" style="font-weight:700">Explore further →</a><br>
         Replays: <a href="00_ingest.html" style="font-weight:700">Ingest</a> · <a href="02_chunk_lab.html" style="font-weight:700">Chunking</a> · <a href="03_vector_map.html" style="font-weight:700">Embeddings</a> · <a href="04b_vectordb.html" style="font-weight:700">Vector DB</a> · <a href="04a_query.html" style="font-weight:700">Query</a> · <a href="04_similarity_rank.html" style="font-weight:700">Search</a> · <a href="05_context_window.html" style="font-weight:700">Context</a></p>
       </div>
@@ -41,7 +41,7 @@
     <div class="card"><h3>Console</h3><div id="log" class="log">Press Run…</div></div>
   </div>
 </main>
-<script src="../assets/pipeline.js?v=14"></script>
+<script src="../assets/pipeline.js?v=15"></script>
 <script src="../assets/common.js?v=12"></script>
 <script>
 const PAGES=[
@@ -69,8 +69,8 @@ async function run(){
   renderPipeline('answer'); document.getElementById('s8').classList.add('active'); add("→ Answer: LLM writes, with citations · model: LLM"); await delay(600);
   answer.style.display="block"; document.getElementById('nextsteps').style.display="block";
   const has = top.some(t=> t.text.toLowerCase().includes("city general")||t.text.toLowerCase().includes("st. jude"));
-  if(has){ answer.innerHTML='<strong style="color:#111111">✓ Answer (grounded):</strong> “According to your policy (p.12, p.8), you are covered at <strong>City General, St. Jude’s Medical Center, and Westside Health</strong>.”<br><span style="color:#6F6F6F;font-size:12px">Citations: p.12, p.8 — verify in PDF. Query “'+query+'” matched 3 chunks (0.93, 0.91, 0.84).</span>'; add("✓ Answer ready with citations."); }
-  else { answer.innerHTML='<strong style="color:#111111">No answer found in provided chunks.</strong> <span style="color:#6F6F6F">Provide more pages or adjust chunking.</span>'; add("✘ No relevant chunk in Top-K."); }
+  if(has){ answer.innerHTML='<strong style="color:#3B2A20">✓ Answer (grounded):</strong> “According to your policy (p.12, p.8), you are covered at <strong>City General, St. Jude’s Medical Center, and Westside Health</strong>.”<br><span style="color:#8A7566;font-size:12px">Citations: p.12, p.8 — verify in PDF. Query “'+query+'” matched 3 chunks (0.93, 0.91, 0.84).</span>'; add("✓ Answer ready with citations."); }
+  else { answer.innerHTML='<strong style="color:#3B2A20">No answer found in provided chunks.</strong> <span style="color:#8A7566">Provide more pages or adjust chunking.</span>'; add("✘ No relevant chunk in Top-K."); }
 }
 document.getElementById('run').addEventListener('click', run);
 document.getElementById('reset').addEventListener('click', ()=>{

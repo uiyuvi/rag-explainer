@@ -1,21 +1,21 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Epilogue:wght@600;700;800&display=swap">
 <title>04 Similarity Rank — RAG Explainer</title>
-<link rel="stylesheet" href="../assets/style.css?v=2">
-<style>.bar{height:10px;background:#E3E3E0;border-radius:999px;overflow:hidden;margin-top:6px}.fill{height:100%;background:#111111;transition:width .3s}</style>
+<link rel="stylesheet" href="../assets/style.css?v=3">
+<style>.bar{height:10px;background:#E8E0D8;border-radius:999px;overflow:hidden;margin-top:6px}.fill{height:100%;background:#3B2A20;transition:width .3s}</style>
 </head>
 <body>
 <header class="topbar"><div class="topbar-inner"><div class="brand"><div class="brand-mark">RE</div><div>RAG Explainer <small>Search — Similarity Rank</small></div></div><nav class="nav"><a href="../index.html">Home</a><a href="../index.html#visualise">Visualise Concepts</a><a href="../resources.html">Resources</a></nav></div></header>
 <main class="wrap">
   <div id="pipeline" style="margin-bottom:12px"></div>
   <div class="kicker">Search — Similarity Rank</div>
-  <h1 style="color:#111111">Rank every chunk by meaning</h1>
-  <p style="color:#6F6F6F">Your question is already a fingerprint (previous step). Now compare it against 8 mock chunks from the insurance PDF — see which bubble up.</p>
-  <div class="card" style="margin-top:12px;background:#F7F7F5">
-    <h3 style="margin:0;color:#111111">How it works</h3>
-    <ol style="font-size:13px;color:#6F6F6F;padding-left:18px;margin:8px 0 0;line-height:1.55">
+  <h1 style="color:#3B2A20">Rank every chunk by meaning</h1>
+  <p style="color:#8A7566">Your question is already a fingerprint (previous step). Now compare it against 8 mock chunks from the insurance PDF — see which bubble up.</p>
+  <div class="card" style="margin-top:12px;background:#F5EFE6">
+    <h3 style="margin:0;color:#3B2A20">How it works</h3>
+    <ol style="font-size:13px;color:#8A7566;padding-left:18px;margin:8px 0 0;line-height:1.55">
       <li>Cosine compares the question fingerprint with every chunk’s.</li>
       <li>Scores run 0.00 (unrelated) to 1.00 (same meaning).</li>
       <li>Sort all scores, keep only the Top-K, drop the rest.</li>
@@ -31,7 +31,7 @@
   <p class="note" style="margin-top:12px">Top-K chunks are the only ones sent to the LLM. Others are ignored — like discarding 40 pages of legal fluff. Wondering why keywords aren’t enough? <a href="01_keyword_vs_vector.html" style="font-weight:700">Try Keyword vs Vector →</a></p>
   <details class="card details"><summary>For Builders — cosine</summary><p class="flow-note">cosine = dot(a,b) for normalized vectors. Here Top-K=4. Real DBs use ANN for 10k+ vectors.</p></details>
 </main>
-<script src="../assets/pipeline.js?v=14"></script>
+<script src="../assets/pipeline.js?v=15"></script>
 <script src="../assets/common.js?v=12"></script>
 <script>
 const chunks=[
@@ -54,7 +54,7 @@ function render(){
   list.innerHTML=ranked.map((r,i)=>{
     const isTop = top.some(x=>x.text===r.text);
     const w=Math.max(4, Math.round((r.score)*100));
-    return `<div class="card" style="${isTop?'border-color:#111111;background:#F7F7F5':''}"><div style="display:flex;justify-content:space-between;gap:8px"><strong style="color:${isTop?'#111111':'#111111'}">#${i+1} ${isTop?'Top-K':''}</strong><span class="score">${r.score.toFixed(2)}</span></div><div style="font-size:13px;color:#333333;margin-top:6px">${r.text}</div><div class="bar"><div class="fill" style="width:${w}%;${isTop?'background:#111111':''}"></div></div></div>`;
+    return `<div class="card" style="${isTop?'border-color:#3B2A20;background:#F5EFE6':''}"><div style="display:flex;justify-content:space-between;gap:8px"><strong style="color:${isTop?'#3B2A20':'#3B2A20'}">#${i+1} ${isTop?'Top-K':''}</strong><span class="score">${r.score.toFixed(2)}</span></div><div style="font-size:13px;color:#4A372B;margin-top:6px">${r.text}</div><div class="bar"><div class="fill" style="width:${w}%;${isTop?'background:#3B2A20':''}"></div></div></div>`;
   }).join("");
 }
 document.getElementById('go').addEventListener('click', render); thr.addEventListener('input', render); kSel.addEventListener('change', render); q.addEventListener('keydown', e=>{if(e.key==='Enter') render();}); render();
