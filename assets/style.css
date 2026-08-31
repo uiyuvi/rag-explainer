@@ -1,14 +1,14 @@
 /* RAG Explainer — Warm Paper (Smashing-style, brown ink, mobile first) */
 :root{
   --bg:#FDFBF7;
-  --surface:#FFE6A7;
+  --surface:#F6E3B4;
   --ink:#6F1D1B;
   --body:#6F1D1B;
   --muted:#9C4B47;
-  --border:#F0DBB0;
+  --border:#E8D2A0;
   --border-strong:#6F1D1B;
   --console-bg:#2B0F0E;
-  --console-fg:#FFE6A7;
+  --console-fg:#F6E3B4;
   --radius:10px;
   --shadow:0 1px 2px rgba(111,29,27,.08);
   --shadow-hover:0 2px 6px rgba(111,29,27,.14);

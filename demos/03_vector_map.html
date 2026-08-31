@@ -4,26 +4,26 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap">
 <title>Closest-Match Map — RAG Explainer</title>
-<link rel="stylesheet" href="../assets/style.css?v=5">
+<link rel="stylesheet" href="../assets/style.css?v=6">
 <style>
 .map-wrap{position:relative;touch-action:none;overflow:hidden}
 .legend{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
-.legend span{font-size:12px;font-weight:700;padding:6px 10px;border-radius:999px;background:#FDFBF7;border:1px solid #F0DBB0;color:#6F1D1B}
+.legend span{font-size:12px;font-weight:700;padding:6px 10px;border-radius:999px;background:#FDFBF7;border:1px solid #E8D2A0;color:#6F1D1B}
 @media(max-width:640px){.legend span{font-size:13px;padding:7px 12px}}
 .dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:4px;vertical-align:middle}
 .chips{display:flex;gap:8px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;margin:10px 0;-webkit-overflow-scrolling:touch}
 .chips::-webkit-scrollbar{display:none}
-.chip{padding:10px 14px;border-radius:999px;background:#FFE6A7;border:1px solid #F0DBB0;font-size:14px;font-weight:700;color:#6F1D1B;cursor:pointer;transition:.15s;white-space:nowrap;flex-shrink:0}
+.chip{padding:10px 14px;border-radius:999px;background:#F6E3B4;border:1px solid #E8D2A0;font-size:14px;font-weight:700;color:#6F1D1B;cursor:pointer;transition:.15s;white-space:nowrap;flex-shrink:0}
 @media(max-width:640px){.chip{padding:11px 16px;font-size:15px}}
 .chip.active{background:#6F1D1B;color:#FDFBF7;border-color:#6F1D1B}
 .chip:active{transform:scale(.97)}
 .kbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}
-.kbar .kBtn{padding:10px 16px;border-radius:999px;border:1px solid #F0DBB0;background:#FFE6A7;font-size:14px;font-weight:700;cursor:pointer}
+.kbar .kBtn{padding:10px 16px;border-radius:999px;border:1px solid #E8D2A0;background:#F6E3B4;font-size:14px;font-weight:700;cursor:pointer}
 @media(max-width:640px){.kbar .kBtn{padding:11px 18px;font-size:15px}}
 .kbar .kBtn.active{background:#6F1D1B;color:#FDFBF7;border-color:#6F1D1B}
-.canvas-wrap{background:#FDFBF7;border:1px solid #F0DBB0;border-radius:14px;padding:8px;box-shadow:0 4px 24px rgba(111,29,27,.07)}
+.canvas-wrap{background:#FDFBF7;border:1px solid #E8D2A0;border-radius:14px;padding:8px;box-shadow:0 4px 24px rgba(111,29,27,.07)}
 .canvas-wrap canvas{width:100%;height:auto;display:block;border-radius:10px;touch-action:none}
-.score-hint{margin-top:8px;font-size:13px;font-weight:700;color:#6F1D1B;background:#FFE6A7;border:1px solid #F0DBB0;border-radius:10px;padding:8px 10px}
+.score-hint{margin-top:8px;font-size:13px;font-weight:700;color:#6F1D1B;background:#F6E3B4;border:1px solid #E8D2A0;border-radius:10px;padding:8px 10px}
 .results{max-height:46vh;overflow:auto}
 @media(max-width:640px){.results{max-height:40vh}.canvas-wrap{padding:6px}}
 </style>
@@ -79,7 +79,7 @@
     <ul id="list" class="list"></ul>
   </div>
 </main>
-<script src="../assets/pipeline.js?v=16"></script>
+<script src="../assets/pipeline.js?v=17"></script>
 <script src="../assets/common.js?v=12"></script>
 <script>
 const WORDS=["hospital","medical center","medical care center","clinic","doctor","physician","insurance","policy","apple","pear","fruit","car","vehicle"];
@@ -134,7 +134,7 @@ function draw(){
   const cx=W/2+panX, cy=H/2+panY;
   ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.clearRect(0,0,W,H);
-  ctx.strokeStyle="#F0DBB0"; ctx.lineWidth=1;
+  ctx.strokeStyle="#E8D2A0"; ctx.lineWidth=1;
   const step=60*k;
   for(let x=0;x<=W;x+=step){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
   for(let y=0;y<=H;y+=step){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
@@ -195,12 +195,12 @@ function draw(){
   list.innerHTML = topKList.map((r,i)=>{
     const pct = Math.round(r.score*100);
     const col = i<3 ? "#6F1D1B" : "#94403C";
-    const bg = i<3 ? "#FFE6A7" : "#FDFBF7";
+    const bg = i<3 ? "#F6E3B4" : "#FDFBF7";
     return `<li style="background:${bg};border-color:${col}55"><span><strong style="color:${col}">${i+1}. ${r.text}</strong> <span style="color:#9C4B47">— ${r.score.toFixed(2)} cosine</span></span><span class="score" style="color:${col}">${pct}%</span></li>`;
   }).join("");
   if(lastRanked.length>k_sel){
     const next = lastRanked.slice(k_sel, k_sel+2);
-    list.innerHTML += `<li style="background:#FFE6A7;border-style:dashed"><span style="color:#9C4B47;font-size:12px">Next outside Top ${k_sel}: ${next.map(n=>`${n.text} (${n.score.toFixed(2)})`).join(", ")}</span><span style="color:#9C4B47;font-size:11px">cut off</span></li>`;
+    list.innerHTML += `<li style="background:#F6E3B4;border-style:dashed"><span style="color:#9C4B47;font-size:12px">Next outside Top ${k_sel}: ${next.map(n=>`${n.text} (${n.score.toFixed(2)})`).join(", ")}</span><span style="color:#9C4B47;font-size:11px">cut off</span></li>`;
   }
 }
 renderChips();

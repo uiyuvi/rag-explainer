@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap">
 <title>05 Lawyer’s Desk — RAG Explainer</title>
-<link rel="stylesheet" href="../assets/style.css?v=5">
-<style>.window{border:2px dashed #6F1D1B;border-radius:14px;padding:12px;min-height:180px;background:#FFE6A7}.chunk-pill{display:inline-block;padding:6px 10px;background:#FDFBF7;border:1px solid #F0DBB0;border-radius:999px;font-size:12px;margin:4px;cursor:grab}.window.full{border-color:#6F1D1B;background:#FFE6A7}</style>
+<link rel="stylesheet" href="../assets/style.css?v=6">
+<style>.window{border:2px dashed #6F1D1B;border-radius:14px;padding:12px;min-height:180px;background:#F6E3B4}.chunk-pill{display:inline-block;padding:6px 10px;background:#FDFBF7;border:1px solid #E8D2A0;border-radius:999px;font-size:12px;margin:4px;cursor:grab}.window.full{border-color:#6F1D1B;background:#F6E3B4}</style>
 </head>
 <body>
 <header class="topbar"><div class="topbar-inner"><div class="brand"><div class="brand-mark">RE</div><div>RAG Explainer <small>Context — Lawyer’s Desk</small></div></div><nav class="nav"><a href="../index.html">Home</a><a href="../index.html#visualise">Visualise Concepts</a><a href="../resources.html">Resources</a></nav></div></header>
@@ -24,24 +24,24 @@
       <h3>LLM Token Window <span id="count" style="float:right;color:#6F1D1B;font-weight:700">0 / 4096</span></h3>
       <div id="window" class="window"></div>
       <div id="status" style="margin-top:8px;font-size:13px;color:#9C4B47">Tap a chunk to add it (or drag it in). When the window has context, the LLM answers.</div>
-      <div id="answer" style="margin-top:10px;padding:10px;background:#FDFBF7;border:1px solid #F0DBB0;border-radius:10px;display:none"></div>
+      <div id="answer" style="margin-top:10px;padding:10px;background:#FDFBF7;border:1px solid #E8D2A0;border-radius:10px;display:none"></div>
     </div>
   </div>
   <p class="note">Why not all 50 pages? Token limit + cheaper + less hallucination. Context is precious.</p>
 
-  <div class="card" style="margin-top:12px;background:#FFE6A7;border-color:#F0DBB0">
+  <div class="card" style="margin-top:12px;background:#F6E3B4;border-color:#E8D2A0">
     <h3 style="margin:0;color:#6F1D1B">Search vs Context — what’s the difference?</h3>
     <p style="font-size:13px;color:#6F1D1B;margin:6px 0"><strong>Search</strong> (previous step) decides <strong>WHICH</strong> slices win — it ranks every slice and picks the Top-K.</p>
     <p style="font-size:13px;color:#6F1D1B;margin:6px 0"><strong>Context</strong> (this step) decides <strong>HOW</strong> they’re handed over — the winners are assembled inside the LLM’s reading window, trimmed to fit the token limit.</p>
     <p style="font-size:13px;font-weight:700;color:#6F1D1B;margin:6px 0 0">One line: Search picks the pages; Context puts them on the lawyer’s desk.</p>
   </div>
 
-  <div class="card" style="margin-top:12px;background:#FFE6A7">
+  <div class="card" style="margin-top:12px;background:#F6E3B4">
     <h3 style="margin:0;color:#6F1D1B">Next: Answer — the only step where an LLM works</h3>
     <p style="font-size:13px;color:#9C4B47;margin:6px 0">Everything before it (Ingest → Chunking → Embeddings → Vector DB → Query → Search → Context) is deterministic machinery: no LLM, no guessing — same input, same output. <a href="06_e2e_rag.html" style="font-weight:700">Run the full pipeline →</a></p>
   </div>
 </main>
-<script src="../assets/pipeline.js?v=16"></script>
+<script src="../assets/pipeline.js?v=17"></script>
 <script src="../assets/common.js?v=12"></script>
 <script>
 const chunks=[
@@ -66,7 +66,7 @@ function renderWindow(){
   win.classList.toggle('full', total>4096);
   win.innerHTML=used.map(id=>{
     const c=chunks.find(x=>x.id===id);
-    return `<span class="chunk-pill" style="background:#FFE6A7;border-color:#6F1D1B" data-id="${c.id}">${c.text} ✕</span>`;
+    return `<span class="chunk-pill" style="background:#F6E3B4;border-color:#6F1D1B" data-id="${c.id}">${c.text} ✕</span>`;
   }).join("")||'<span style="color:#9C4B47;font-size:12px">Empty — drag here or click Auto-fill.</span>';
   win.querySelectorAll('.chunk-pill').forEach(el=> el.addEventListener('click', ()=>{ used=used.filter(x=>x!==+el.dataset.id); renderAll(); }));
   if(total>4096){ status.textContent="Window overflow — remove a chunk. LLM would truncate."; answer.style.display="none"; }

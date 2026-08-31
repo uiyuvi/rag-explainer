@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap">
 <title>06 Full Pipeline — RAG Explainer</title>
-<link rel="stylesheet" href="../assets/style.css?v=5">
-<style>.log{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#6F1D1B;color:#FFE6A7;padding:12px;border-radius:10px;white-space:pre-wrap;min-height:180px}.step{opacity:.5}.step.active{opacity:1;background:#FFE6A7;border-color:#6F1D1B}</style>
+<link rel="stylesheet" href="../assets/style.css?v=6">
+<style>.log{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#6F1D1B;color:#F6E3B4;padding:12px;border-radius:10px;white-space:pre-wrap;min-height:180px}.step{opacity:.5}.step.active{opacity:1;background:#F6E3B4;border-color:#6F1D1B}</style>
 </head>
 <body>
 <header class="topbar"><div class="topbar-inner"><div class="brand"><div class="brand-mark">RE</div><div>RAG Explainer <small>Answer — Full Pipeline</small></div></div><nav class="nav"><a href="../index.html">Home</a><a href="../index.html#visualise">Visualise Concepts</a><a href="../resources.html">Resources</a></nav></div></header>
@@ -14,7 +14,7 @@
   <h1 style="color:#6F1D1B">Full pipeline simulator — 5-page mock PDF</h1>
   <p style="color:#9C4B47">One click → logs all 8 steps, exactly as in the pipeline bar above. Watch the model badges: <strong>OCR</strong> at Ingest, <strong>embedding model</strong> at Embeddings and Query, <strong>LLM</strong> at Answer — the rest is plain code, no model. The LLM appears only in the last step: same input, same output everywhere else. Vector DB runs twice — fingerprints are <strong>filed</strong> after Embeddings, then <strong>searched</strong> during Search.</p>
 
-  <style>.mflag{font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;background:#FFE6A7;color:#6F1D1B;white-space:nowrap}.mflag.nomodel{background:#FFE6A7;color:#9C4B47}.mflag.llm{background:#6F1D1B;color:#FDFBF7}</style>
+  <style>.mflag{font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;background:#F6E3B4;color:#6F1D1B;white-space:nowrap}.mflag.nomodel{background:#F6E3B4;color:#9C4B47}.mflag.llm{background:#6F1D1B;color:#FDFBF7}</style>
 
   <div class="demo-bar"><input id="q" value="Which hospitals are covered?"><button class="btn btn-primary" id="run">▶ Run Pipeline</button><button class="btn btn-secondary" id="reset">Reset</button></div>
 
@@ -31,7 +31,7 @@
         <div class="card step" id="s8"><strong>Answer</strong> <span style="color:#9C4B47">— grounded, with citations</span> <span class="mflag llm">LLM</span></div>
       </div>
       <div class="card" id="answer" style="margin-top:12px;display:none"></div>
-      <div class="card" id="nextsteps" style="margin-top:12px;display:none;background:#FFE6A7">
+      <div class="card" id="nextsteps" style="margin-top:12px;display:none;background:#F6E3B4">
         <h3 style="margin:0;color:#6F1D1B">Where to go next</h3>
         <p style="font-size:13px;color:#9C4B47;margin:6px 0">Trust matters: see <a href="07_limits.html" style="font-weight:700">how this can fail — and how to fix it →</a><br>
         Curious about the real tools? <a href="../resources.html" style="font-weight:700">Explore further →</a><br>
@@ -41,7 +41,7 @@
     <div class="card"><h3>Console</h3><div id="log" class="log">Press Run…</div></div>
   </div>
 </main>
-<script src="../assets/pipeline.js?v=16"></script>
+<script src="../assets/pipeline.js?v=17"></script>
 <script src="../assets/common.js?v=12"></script>
 <script>
 const PAGES=[

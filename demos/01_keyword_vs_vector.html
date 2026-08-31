@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap">
 <title>01 Keyword vs Vector — RAG Explainer</title>
-<link rel="stylesheet" href="../assets/style.css?v=5">
-<style>.toggle{width:64px;height:34px;background:#F0DBB0;border-radius:999px;position:relative;cursor:pointer;display:inline-block}.knob{position:absolute;top:3px;left:3px;width:28px;height:28px;background:#FDFBF7;border-radius:50%;box-shadow:0 2px 8px rgba(111,29,27,.20);transition:.2s}.toggle.on{background:#6F1D1B}.toggle.on .knob{left:33px}</style>
+<link rel="stylesheet" href="../assets/style.css?v=6">
+<style>.toggle{width:64px;height:34px;background:#E8D2A0;border-radius:999px;position:relative;cursor:pointer;display:inline-block}.knob{position:absolute;top:3px;left:3px;width:28px;height:28px;background:#FDFBF7;border-radius:50%;box-shadow:0 2px 8px rgba(111,29,27,.20);transition:.2s}.toggle.on{background:#6F1D1B}.toggle.on .knob{left:33px}</style>
 </head>
 <body>
 <header class="topbar"><div class="topbar-inner"><div class="brand"><div class="brand-mark">RE</div><div>RAG Explainer <small>Keyword vs Vector</small></div></div><nav class="nav"><a href="../index.html">Home</a><a href="../index.html#visualise">Visualise Concepts</a><a href="../resources.html">Resources</a></nav></div></header>
@@ -13,7 +13,7 @@
   <div class="kicker">Keyword vs Vector</div>
   <h1 style="color:#6F1D1B">Keyword misses, meaning finds</h1>
   <p style="color:#9C4B47">Policy sentence: <em>“Covered providers: City General and St. Jude’s <strong>Medical Center</strong>.”</em> You search for <strong>“Hospitals”</strong>.</p>
-  <div class="card" style="margin-top:12px;background:#FFE6A7">
+  <div class="card" style="margin-top:12px;background:#F6E3B4">
     <h3 style="margin:0;color:#6F1D1B">How it works</h3>
     <ol style="font-size:13px;color:#9C4B47;padding-left:18px;margin:8px 0 0;line-height:1.55">
       <li>Keyword match: same letters only — “Hospitals” never hits “Medical Center”.</li>
@@ -28,14 +28,14 @@
   </div>
 
   <div class="grid grid-2" style="margin-top:12px">
-    <div class="card"><h3>Your Query</h3><input id="q" value="Hospitals" style="width:100%;padding:12px;border:1px solid #F0DBB0;border-radius:10px;font-size:16px"><div id="finger" style="margin-top:10px;font-size:12px;color:#9C4B47">Fingerprint: —</div></div>
-    <div class="card"><h3>Result</h3><div id="res" style="padding:12px;border-radius:10px;background:#FFE6A7;border:1px solid #F0DBB0;color:#6F1D1B">✘ 0 hits — “Medical Center” not equal to “Hospitals”</div><div id="score" style="margin-top:8px;font-size:13px;color:#9C4B47"></div></div>
+    <div class="card"><h3>Your Query</h3><input id="q" value="Hospitals" style="width:100%;padding:12px;border:1px solid #E8D2A0;border-radius:10px;font-size:16px"><div id="finger" style="margin-top:10px;font-size:12px;color:#9C4B47">Fingerprint: —</div></div>
+    <div class="card"><h3>Result</h3><div id="res" style="padding:12px;border-radius:10px;background:#F6E3B4;border:1px solid #E8D2A0;color:#6F1D1B">✘ 0 hits — “Medical Center” not equal to “Hospitals”</div><div id="score" style="margin-top:8px;font-size:13px;color:#9C4B47"></div></div>
   </div>
 
-  <div class="card" style="margin-top:12px;background:#FFE6A7"><strong>Receptionist analogy:</strong> “Is there a doctor?” → “No, only Physicians.” Literal vs semantic. Vector search bridges it.</div>
+  <div class="card" style="margin-top:12px;background:#F6E3B4"><strong>Receptionist analogy:</strong> “Is there a doctor?” → “No, only Physicians.” Literal vs semantic. Vector search bridges it.</div>
   <details class="card details"><summary>For Builders</summary><p class="flow-note">Keyword = string equality. Vector = cosine(query,“Medical Center”)=0.99. Encoder maps synonyms near each other.</p></details>
 </main>
-<script src="../assets/pipeline.js?v=16"></script>
+<script src="../assets/pipeline.js?v=17"></script>
 <script src="../assets/common.js?v=12"></script>
 <script>
 const q=document.getElementById('q'), res=document.getElementById('res'), finger=document.getElementById('finger'), score=document.getElementById('score'), tog=document.getElementById('tog'), label=document.getElementById('modeLabel');
@@ -50,12 +50,12 @@ function update(){
     const has = query.toLowerCase()==="hospitals" ? false : query.toLowerCase().includes("medical");
     // actual policy contains Medical Center
     const hit = query.toLowerCase() === "medical center" || query.toLowerCase()==="medical";
-    if(hit){ res.textContent="✓ 1 hit — exact match"; res.style.background="#FFE6A7"; res.style.color="#6F1D1B"; res.style.borderColor="#F0DBB0"; score.textContent="Keyword only finds same letters."; }
-    else { res.textContent='✘ 0 hits — “Medical Center” not equal to “'+query+'”'; res.style.background="#FFE6A7"; res.style.color="#6F1D1B"; res.style.borderColor="#F0DBB0"; score.textContent="Missed semantic match."; }
+    if(hit){ res.textContent="✓ 1 hit — exact match"; res.style.background="#F6E3B4"; res.style.color="#6F1D1B"; res.style.borderColor="#E8D2A0"; score.textContent="Keyword only finds same letters."; }
+    else { res.textContent='✘ 0 hits — “Medical Center” not equal to “'+query+'”'; res.style.background="#F6E3B4"; res.style.color="#6F1D1B"; res.style.borderColor="#E8D2A0"; score.textContent="Missed semantic match."; }
   } else {
     const s=cosine(mockEmbed(query), mockEmbed("Medical Center"));
     res.textContent='✓ Found: “St. Jude’s Medical Center” — closest meaning';
-    res.style.background="#FFE6A7"; res.style.color="#6F1D1B"; res.style.borderColor="#F0DBB0";
+    res.style.background="#F6E3B4"; res.style.color="#6F1D1B"; res.style.borderColor="#E8D2A0";
     score.textContent="Cosine similarity: "+s.toFixed(2)+" ("+Math.round(s*100)+"%) — meaning fingerprint close.";
     if(s>0.85) res.textContent+=' (score '+s.toFixed(2)+')';
   }
