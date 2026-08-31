@@ -70,7 +70,7 @@
       <span><i class="dot" style="background:#D9A7A2"></i>Others</span>
       <span>Metric: cosine similarity</span>
     </div>
-    <div class="range-row"><label>Zoom <input type="range" id="zoom" min="60" max="140" value="100"></label><label>Spread <input type="range" id="spread" min="60" max="140" value="90"></label><span id="hint" class="flow-note">Tap “physician” → watch red cluster • Tap “car” → see fruit far</span></div>
+    <div class="range-row"><label>Zoom <input type="range" id="zoom" min="60" max="200" value="100"></label><label>Spread <input type="range" id="spread" min="60" max="200" value="100"></label><span id="hint" class="flow-note">Tap “physician” → watch cluster • Tap “car” → see fruit far</span></div>
   </div>
 
   <div class="card" id="rankCard">
@@ -92,7 +92,7 @@ const POS={
 const canvas=document.getElementById('map'), ctx=canvas.getContext('2d');
 const list=document.getElementById('list'), chipsDiv=document.getElementById('chips'), selInfo=document.getElementById('selInfo'), legendK=document.getElementById('legendK');
 let selectedQuery="hospital", selectedK=5;
-let zoom=100, spread=90;
+let zoom=100, spread=100;
 let panX=0, panY=0;
 document.getElementById('zoom').addEventListener('input', e=>{zoom=+e.target.value; draw();});
 document.getElementById('spread').addEventListener('input', e=>{spread=+e.target.value; draw();});
@@ -140,12 +140,12 @@ function draw(){
   for(let y=0;y<=H;y+=step){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
   const qKey = query.toLowerCase();
   const qPos = POS[qKey] || [230, 135];
-  function tr(p){ return [(p[0]-450)*s + cx, (p[1]-260)*s + cy]; }
+  function tr(p){ return [(p[0]-230)*s + cx, (p[1]-135)*s + cy]; }
   const tQ = tr(qPos);
   for(let i=0;i<Math.min(k_sel, lastRanked.length);i++){
     const r=lastRanked[i];
     if(r.text.toLowerCase()===qKey) continue;
-    const p=POS[r.text] || [500, 300];
+    const p=POS[r.text] || [290, 180];
     const tp=tr(p);
     const alpha = 0.35 - (i*0.02);
     ctx.strokeStyle=`rgba(0,0,0,${Math.max(0.12, alpha)})`;
@@ -160,7 +160,7 @@ function draw(){
     }
   }
   for(const w of WORDS){
-    const p=tr(POS[w]||[400,300]);
+    const p=tr(POS[w]||[260,160]);
     const rank = lastRanked.findIndex(r=>r.text===w);
     const score = rank>=0? lastRanked[rank].score : 0;
     const isQuery = w.toLowerCase()===qKey;
@@ -253,10 +253,10 @@ canvas.addEventListener('touchend', e=>{ if(e.touches.length===0){ lastTouchDist
 let lastTap=0;
 canvas.addEventListener('touchend', e=>{
   const now=Date.now();
-  if(now-lastTap<300 && e.touches.length===0){ panX=0; panY=0; zoom=100; spread=90; document.getElementById('zoom').value=zoom; document.getElementById('spread').value=spread; draw(); }
+  if(now-lastTap<300 && e.touches.length===0){ panX=0; panY=0; zoom=100; spread=100; document.getElementById('zoom').value=zoom; document.getElementById('spread').value=spread; draw(); }
   lastTap=now;
 });
-if(window.innerWidth<640){ zoom=95; spread=95; document.getElementById('zoom').value=zoom; document.getElementById('spread').value=spread; draw(); }
+draw();
 </script>
 <script>renderPipeline('embeddings');</script>
 </body>
