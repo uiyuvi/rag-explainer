@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Epilogue:wght@600;700;800&display=swap">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap">
 <title>Closest-Match Map — RAG Explainer</title>
-<link rel="stylesheet" href="../assets/style.css?v=3">
+<link rel="stylesheet" href="../assets/style.css?v=4">
 <style>
 .map-wrap{position:relative;touch-action:none;overflow:hidden}
 .legend{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
@@ -155,7 +155,7 @@ function draw(){
     ctx.setLineDash([]);
     if(i<3){
       const mx=tQ[0]+(tp[0]-tQ[0])*0.45, my=tQ[1]+(tp[1]-tQ[1])*0.45;
-      ctx.fillStyle="#3B2A20"; ctx.font="700 11px Epilogue, sans-serif";
+      ctx.fillStyle="#3B2A20"; ctx.font="700 11px Lora, Georgia, serif";
       ctx.fillText(r.score.toFixed(2), mx+3, my-5);
     }
   }
@@ -176,7 +176,7 @@ function draw(){
     if(isQuery){ ctx.fillStyle="#FDFBF7"; ctx.fill(); ctx.strokeStyle="#3B2A20"; ctx.lineWidth=2.5; ctx.stroke(); }
     else if(isTopK){ ctx.fillStyle = isTop3 ? "#3B2A20" : "#5F4A3A"; ctx.fill(); }
     else { ctx.fillStyle="#C9BCAE"; ctx.fill(); }
-    ctx.font = isQuery ? "700 15px Epilogue" : isTopK ? "600 13.5px Epilogue" : "600 12px Epilogue";
+    ctx.font = isQuery ? "700 15px Lora" : isTopK ? "600 13.5px Lora" : "600 12px Lora";
     ctx.fillStyle= isQuery||isTopK ? "#3B2A20" : "#5F4A3A";
     const labelW = ctx.measureText(w).width;
     let lx = p[0]+12, ly = p[1]+4;
@@ -187,7 +187,7 @@ function draw(){
     ctx.fillText(w, lx, ly);
     if(isTop3){                                       // rank sublabel only for top-3 (less clutter)
       ctx.fillStyle= isTop3 ? "#3B2A20" : "#3B2A20";
-      ctx.font="700 11px Epilogue";
+      ctx.font="700 11px Lora";
       ctx.fillText(score.toFixed(2), lx, ly+14);
     }
   }
