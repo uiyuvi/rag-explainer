@@ -6,17 +6,8 @@
 <title>Resources — RAG Explainer</title>
 <link rel="stylesheet" href="assets/style.css?v=7">
 <style>
-/* --- Swiss ledger ticker --- */
-.ticker{background:#000;color:#fff;font-family:var(--font-mono);font-size:11px;padding:6px 16px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;letter-spacing:.08em;text-transform:uppercase}
-.ticker .dot{width:8px;height:8px;background:var(--swiss-blue);display:inline-block;margin-right:8px;vertical-align:middle}
-.ticker a{color:#fff}
 /* --- Header block --- */
-.res-header{display:grid;grid-template-columns:2fr 1fr;border:2px solid var(--swiss-rule);background:var(--swiss-surface);box-shadow:var(--shadow-hard);margin-top:16px}
-.res-header-main{padding:24px;border-right:2px solid var(--swiss-rule)}
-.res-header-side{padding:20px;background:var(--swiss-subtle);display:flex;flex-direction:column;justify-content:space-between;gap:16px}
-.side-meta h3{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--swiss-ink-muted);margin:0 0 4px}
-.side-meta p{font-family:var(--font-mono);font-size:13px;font-weight:700;margin:0;color:var(--swiss-ink)}
-@media(max-width:840px){.res-header{grid-template-columns:1fr}.res-header-main{border-right:none;border-bottom:2px solid var(--swiss-rule)}}
+.res-header{border:2px solid var(--swiss-rule);background:var(--swiss-surface);box-shadow:var(--shadow-hard);margin-top:16px;padding:24px}
 /* --- Deck card (QR + slides) --- */
 .deck{border:2px solid var(--swiss-rule);background:var(--swiss-surface);box-shadow:var(--shadow-hard);margin:24px 0}
 .deck-head{background:#000;color:#fff;padding:8px 16px;font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
@@ -63,7 +54,6 @@
 </style>
 </head>
 <body>
-<div class="ticker"><span><span class="dot"></span>RAG EXPLAINER // FIELD GUIDE BIBLIOGRAPHY</span><span>[REF] // ANNOTATED SOURCES & TOOLS</span></div>
 <header class="topbar">
   <div class="topbar-inner">
     <div class="brand"><div class="brand-mark">RE</div><div>RAG Explainer <small>Resources</small></div></div>
@@ -77,11 +67,6 @@
       <span class="kicker">[REF] // PRIMARY SOURCES & TOOLS</span>
       <h1 style="margin-top:12px">Curated Reference Matrix</h1>
       <p class="lead">You have seen the pipeline — from page extraction to cosine ranking and cited answers. This is the next step: an annotated bibliography to explore RAG at your own pace, grounded in the primary research and tools behind what the demos just showed.</p>
-    </div>
-    <div class="res-header-side">
-      <div class="side-meta"><h3>Target Artifact</h3><p>5-page mock insurance policy</p></div>
-      <div class="side-meta"><h3>Verification Standard</h3><p>Deterministic first / LLM last</p></div>
-      <div class="side-meta"><h3>Format</h3><p>Static site — no login, no install</p></div>
     </div>
   </div>
 
