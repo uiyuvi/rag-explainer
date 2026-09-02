@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
 <title>RAG Explainer — Build Your Personal Document Assistant </title>
 <meta name="description" content="How AI answers from private PDFs — Vector Search explained step-by-step. 7 mobile demos, no setup.">
-<link rel="stylesheet" href="assets/style.css?v=6">
+<link rel="stylesheet" href="assets/style.css?v=7">
 </head>
 <body>
 <header class="topbar">
@@ -31,8 +31,8 @@
       <a class="btn btn-primary" href="#visualise">▶ Visualise Concepts</a>
       <a class="btn btn-secondary" href="slides/rag_explainer.pptx">Download Slides</a>
     </div>
-    <div style="margin-top:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px;color:#9C4B47">
-      <span>Share: <strong style="color:#6F1D1B">uiyuvi.github.io/rag-explainer</strong></span>
+    <div style="margin-top:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px;color:#737373">
+      <span>Share: <strong style="color:#000000">uiyuvi.github.io/rag-explainer</strong></span>
       <button class="btn btn-ghost" style="padding:6px 12px;font-size:12px" onclick="navigator.clipboard&&navigator.clipboard.writeText('https://uiyuvi.github.io/rag-explainer/').then(()=>alert('Link copied'))">Copy link</button>
       <span style="font-size:12px">All QR codes are on the <a href="resources.html" style="font-weight:700">Resources</a> page for the final slide.</span>
     </div>
@@ -59,9 +59,9 @@
   <section class="section">
     <div class="section-head"><h2>Beyond Basic RAG — When to Level Up</h2><p>Each level trades cost for capability • all need re-processing on update</p></div>
     <div class="grid grid-3">
-      <div class="card" style="border-top:3px solid #6F1D1B"><h3>Basic RAG</h3><p>Split → embed → Top-K → answer.<br><strong>On update:</strong> re-chunk + re-embed only that file. Cheapest, fastest.</p></div>
-      <div class="card" style="border-top:3px solid #9C4B47"><h3>GraphRAG</h3><p>Builds entity graph (Hospital ↔ covers ↔ City).<br><strong>On update:</strong> rebuild graph. Great for “how are X and Y connected?” but heavy.</p></div>
-      <div class="card" style="border-top:3px solid #6F1D1B"><h3>Agentic RAG</h3><p>Agent loops: search → check → search again.<br><strong>On update:</strong> no storage, but slower + higher token cost. For multi-hop questions.</p></div>
+      <div class="card" style="border-top:3px solid #000000"><h3>Basic RAG</h3><p>Split → embed → Top-K → answer.<br><strong>On update:</strong> re-chunk + re-embed only that file. Cheapest, fastest.</p></div>
+      <div class="card" style="border-top:3px solid #737373"><h3>GraphRAG</h3><p>Builds entity graph (Hospital ↔ covers ↔ City).<br><strong>On update:</strong> rebuild graph. Great for “how are X and Y connected?” but heavy.</p></div>
+      <div class="card" style="border-top:3px solid #000000"><h3>Agentic RAG</h3><p>Agent loops: search → check → search again.<br><strong>On update:</strong> no storage, but slower + higher token cost. For multi-hop questions.</p></div>
     </div>
     <p class="note">All 3 require re-processing on change — Basic cheapest per file. See <a href="resources.html">resources.html</a> for one link per card.</p>
   </section>
@@ -69,9 +69,9 @@
   <section class="section">
     <div class="card" style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
       <div>
-        <h3 style="margin:0;color:#6F1D1B">Go Further — After the Session</h3>
-        <p style="margin:6px 0;color:#9C4B47;font-size:14px">Open <a href="resources.html">resources.html</a> — curated links, each matched to the concept it explains: TensorFlow Projector (real enwiki vectors), Embedding Atlas, Sentence-Transformers, Vector DB intro, RAG/GraphRAG/Agentic guides. QR code is on that page for the final slide.</p>
-        <p style="margin:0;font-weight:700;color:#6F1D1B">uiyuvi.github.io/rag-explainer/resources.html</p>
+        <h3 style="margin:0;color:#000000">Go Further — After the Session</h3>
+        <p style="margin:6px 0;color:#737373;font-size:14px">Open <a href="resources.html">resources.html</a> — curated links, each matched to the concept it explains: TensorFlow Projector (real enwiki vectors), Embedding Atlas, Sentence-Transformers, Vector DB intro, RAG/GraphRAG/Agentic guides. QR code is on that page for the final slide.</p>
+        <p style="margin:0;font-weight:700;color:#000000">uiyuvi.github.io/rag-explainer/resources.html</p>
       </div>
     </div>
   </section>
@@ -80,7 +80,7 @@
 <footer class="footer">
   RAG Explainer • Private data stays private • <a href="resources.html">Resources</a> • <a href="slides/rag_explainer.pptx">Slides</a>
 </footer>
-<script src="assets/pipeline.js?v=17"></script>
+<script src="assets/pipeline.js?v=18"></script>
 <script>renderPipelineOverview('pipeline');</script>
 </body>
 </html>
