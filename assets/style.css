@@ -60,15 +60,14 @@ a:hover{color:var(--swiss-ink)}
   font-family:var(--font-mono);
 }
 .brand small{display:block;font-weight:600;color:var(--swiss-ink-muted);font-size:10px;letter-spacing:.08em;text-transform:uppercase;margin-top:-2px;font-family:var(--font-mono)}
-.nav{display:flex;gap:0;flex-wrap:wrap}
+.nav{display:flex;gap:8px;flex-wrap:wrap}
 .nav a{
   padding:8px 12px;border-radius:0!important;font-size:12px;font-weight:700;
   font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.04em;
   background:var(--swiss-surface);color:var(--swiss-ink);
-  border:1px solid var(--swiss-rule);border-left-width:0;
+  border:1px solid var(--swiss-rule);
   text-decoration:none;
 }
-.nav a:first-child{border-left-width:1px}
 .nav a.primary{background:var(--swiss-ink);color:#fff}
 .nav a.primary:hover{background:var(--swiss-blue);border-color:var(--swiss-blue);color:#fff}
 @media(max-width:640px){.nav{width:100%}.topbar-inner{flex-wrap:wrap}}
@@ -134,9 +133,8 @@ h1 span{color:var(--swiss-blue)}
 .section-head h2{margin:0;font-size:20px}
 .section-head p{margin:0;color:var(--swiss-ink-muted);font-size:13px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.06em}
 /* Pipeline — sharp index tabs */
-.pipeline{display:flex;gap:0;align-items:center;flex-wrap:wrap;font-size:12px;font-weight:700;color:var(--swiss-ink)}
-.pipe-step{padding:7px 11px;background:var(--swiss-surface);border:1px solid var(--swiss-rule);border-left-width:0;border-radius:0!important;text-decoration:none;color:var(--swiss-ink);transition:.1s;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.03em}
-.pipe-step:first-child{border-left-width:1px}
+.pipeline{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:12px;font-weight:700;color:var(--swiss-ink)}
+.pipe-step{padding:7px 11px;background:var(--swiss-surface);border:1px solid var(--swiss-rule);border-radius:0!important;text-decoration:none;color:var(--swiss-ink);transition:.1s;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.03em}
 .pipe-step:hover{color:var(--swiss-blue);border-color:var(--swiss-blue);position:relative;z-index:1}
 .pipe-step.active{background:var(--swiss-ink);color:#fff;border-color:var(--swiss-rule)}
 .pipe-arrow{color:var(--swiss-ink-muted);font-weight:700}
