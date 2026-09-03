@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<title>Interactive RAG Flow — RAG Explainer</title>
+<link rel="stylesheet" href="../assets/style.css?v=8">
+<style>
+.workbench{display:flex;flex-direction:column;gap:16px;margin-top:14px}
+/* control panel */
+.control-panel{border:2px solid var(--swiss-rule);background:var(--swiss-surface);box-shadow:var(--shadow-hard);padding:18px}
+.panel-title-row{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;border-bottom:2px solid var(--swiss-rule);padding-bottom:10px;margin-bottom:14px}
+.panel-title{font-family:var(--font-display);font-size:clamp(19px,3.5vw,24px);font-weight:700;letter-spacing:-.02em;margin:0;text-transform:uppercase}
+.panel-pill{font-family:var(--font-mono);font-size:11px;font-weight:700;background:var(--swiss-ink);color:#fff;padding:3px 8px;text-transform:uppercase}
+.switchboard{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px}
+.mode-group{display:flex;align-items:center;gap:12px;background:var(--swiss-subtle);border:2px solid var(--swiss-rule);padding:6px 12px;flex-wrap:wrap}
+.switch-label{font-family:var(--font-mono);font-size:11px;font-weight:700;text-transform:uppercase}
+.rag-switch{display:flex;align-items:center;cursor:pointer;user-select:none}
+.rag-track{width:140px;height:34px;background:#fff;border:2px solid var(--swiss-rule);position:relative;display:flex;align-items:center;box-shadow:2px 2px 0px #000}
+.rag-thumb{width:50%;height:100%;background:var(--swiss-ink);color:#fff;font-family:var(--font-mono);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;text-transform:uppercase;transition:transform .2s cubic-bezier(.2,.8,.2,1),background .2s}
+.rag-track.active .rag-thumb{transform:translateX(100%);background:var(--swiss-blue)}
+#modeDesc{font-family:var(--font-mono);font-size:12px;color:var(--swiss-ink-secondary)}
+.action-group{display:flex;gap:10px;flex-wrap:wrap}
+/* flow viewport */
+.flow-card{border:2px solid var(--swiss-rule);background:var(--swiss-surface);box-shadow:var(--shadow-hard)}
+.flow-status{background:#000;color:#fff;padding:8px 14px;font-family:var(--font-mono);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
+.canvas-box{position:relative;width:100%;height:480px;background:#fafaf8;background-image:linear-gradient(to right,#ecece8 1px,transparent 1px),linear-gradient(to bottom,#ecece8 1px,transparent 1px);background-size:20px 20px;overflow:hidden}
+@media(min-width:768px){.canvas-box{height:420px;background-size:24px 24px}}
+.canvas-box canvas{width:100%;height:100%;display:block}
+/* inspector */
+.inspector{border:2px solid var(--swiss-rule);background:var(--swiss-surface);box-shadow:var(--shadow-hard);display:grid;grid-template-columns:1fr}
+@media(min-width:820px){.inspector{grid-template-columns:1fr 340px}}
+.log-pane{padding:14px 18px;border-bottom:2px solid var(--swiss-rule);display:flex;flex-direction:column;gap:8px}
+@media(min-width:820px){.log-pane{border-bottom:none;border-right:2px solid var(--swiss-rule)}}
+.inspector-title{font-family:var(--font-mono);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--swiss-ink-muted);display:flex;justify-content:space-between}
+.terminal{font-family:var(--font-mono);font-size:12px;background:#000;color:#fff;padding:10px;height:140px;overflow-y:auto;line-height:1.5;white-space:pre-wrap}
+.log-step{color:#EBF0FF}.log-rag{color:#9db8f5}.log-err{color:#ff8790}.log-ok{color:#EBF0FF}
+.payload-pane{padding:14px 18px;background:#fafafa;display:flex;flex-direction:column;gap:8px}
+.payload-box{font-family:var(--font-mono);font-size:12px;background:#fff;border:1px solid var(--swiss-rule);padding:10px;display:flex;flex-direction:column;gap:6px;line-height:1.45}
+.payload-badge{font-size:10px;font-weight:700;text-transform:uppercase;padding:2px 6px;display:inline-block;align-self:flex-start;background:#D4D4D4;color:#000}
+.payload-meta{font-size:11px;color:var(--swiss-ink-muted);border-top:1px dashed #D4D4D4;padding-top:6px}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner">
+  <div class="brand"><div class="brand-mark">RE</div><div>RAG Explainer <small>Interactive RAG Flow</small></div></div>
+  <nav class="nav"><a href="../index.html">Home</a><a href="../index.html#visualise">Visualise Concepts</a><a href="../resources.html">Resources</a></nav>
+</div></header>
+<main class="wrap">
+  <div id="pipeline" style="margin-bottom:12px"></div>
+  <div class="kicker">[FLOW] // SAME QUESTION, TWO PATHS</div>
+  <h1 style="margin-top:12px">Interactive RAG Flow</h1>
+  <p class="lead">AI alone vs AI with your documents — watch the difference. The same question travels two routes: straight to the model (guessing, red) or through the policy first (grounded, blue). Toggle the switch, send the question, follow the data packet.</p>
+
+  <div class="workbench">
+    <div class="control-panel">
+      <div class="panel-title-row">
+        <h2 class="panel-title">Visual Pipeline Flow</h2>
+        <div class="panel-pill" id="traceCounter">DEMO RUN: #00</div>
+      </div>
+      <div class="switchboard">
+        <div class="mode-group">
+          <span class="switch-label">Pipeline Mode:</span>
+          <div class="rag-switch" id="ragSwitch">
+            <div class="rag-track" id="ragTrack"><div class="rag-thumb" id="ragThumb">WITHOUT RAG</div></div>
+          </div>
+          <span id="modeDesc">Policy Knowledge: <strong style="color:var(--swiss-red)">UNAVAILABLE</strong></span>
+        </div>
+        <div class="action-group">
+          <button class="btn btn-primary" id="send">▶ Send Question</button>
+          <button class="btn" id="resetBtn">↺ Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-card">
+      <div class="flow-status">
+        <span>FLOW: INSURANCE POLICY Q&amp;A (5-PAGE MOCK)</span>
+        <span id="modeTag">[MODE: AI ALONE // UNTRAINED ON YOUR FILES]</span>
+      </div>
+      <div class="canvas-box" id="canvasBox"><canvas id="flowCanvas"></canvas></div>
+    </div>
+
+    <div class="inspector">
+      <div class="log-pane">
+        <div class="inspector-title"><span>Pipeline Activity Log</span><span style="color:var(--swiss-blue)">REAL-TIME</span></div>
+        <div class="terminal" id="logOutput">[SYSTEM READY]
+Pipeline initialized. Question: "Which hospitals are covered?"
+Document: "Mock insurance policy (pages 8 + 12)"
+Tap "Send Question" to see data move through the system.</div>
+      </div>
+      <div class="payload-pane">
+        <div class="inspector-title"><span>[MOVING DATA PACKET]</span></div>
+        <div class="payload-box">
+          <span class="payload-badge" id="payloadBadge">IDLE</span>
+          <div id="payloadSummary">Waiting to send question...</div>
+          <div class="payload-meta" id="payloadMeta">Document Grounding: NONE</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+<script src="../assets/pipeline.js?v=18"></script>
+<script src="../assets/common.js?v=12"></script>
+<script>
+let isRAG=false, runCount=0, packets=[];
+const canvas=document.getElementById('flowCanvas'), ctx=canvas.getContext('2d'), canvasBox=document.getElementById('canvasBox');
+function resizeCanvas(){
+  const rect=canvasBox.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
+  canvas.width=rect.width*dpr; canvas.height=rect.height*dpr;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+window.addEventListener('resize', resizeCanvas);
+function getLayout(){
+  const w=canvasBox.clientWidth, h=canvasBox.clientHeight, mobile=w<768;
+  if(mobile){
+    const leftX=w*0.34, rightX=w*0.76;
+    return {mobile:mobile,nodeW:126,nodeH:46,
+      question:{x:leftX,y:h*0.12,label:"01. YOUR QUESTION",sub:"User Prompt"},
+      policy:{x:rightX,y:h*0.40,label:"02. POLICY DOC",sub:"Mock policy (p.8, p.12)"},
+      llm:{x:leftX,y:h*0.65,label:"03. AI MODEL (LLM)",sub:"Text Generator"},
+      answer:{x:leftX,y:h*0.88,label:"04. FINAL ANSWER",sub:"Audited Output"}};
+  }
+  return {mobile:mobile,nodeW:132,nodeH:52,
+    question:{x:w*0.14,y:h*0.35,label:"01. YOUR QUESTION",sub:"User Prompt"},
+    policy:{x:w*0.42,y:h*0.78,label:"02. POLICY DOC",sub:"Mock policy (p.8, p.12)"},
+    llm:{x:w*0.66,y:h*0.35,label:"03. AI MODEL (LLM)",sub:"Text Generator"},
+    answer:{x:w*0.89,y:h*0.35,label:"04. FINAL ANSWER",sub:"Audited Output"}};
+}
+function toggleRAG(){
+  isRAG=!isRAG;
+  const track=document.getElementById('ragTrack'), thumb=document.getElementById('ragThumb');
+  const modeDesc=document.getElementById('modeDesc'), modeTag=document.getElementById('modeTag');
+  if(isRAG){
+    track.classList.add('active'); thumb.innerText="WITH RAG";
+    modeDesc.innerHTML='Policy Knowledge: <strong style="color:var(--swiss-blue)">CONNECTED</strong>';
+    modeTag.innerText="[MODE: WITH RAG // CONNECTED TO MOCK POLICY]";
+    modeTag.style.color="#9db8f5";
+    logCLI("[PIPELINE UPDATE] Policy connected! Data will now retrieve pages 8 and 12 before answering.","rag");
+  } else {
+    track.classList.remove('active'); thumb.innerText="WITHOUT RAG";
+    modeDesc.innerHTML='Policy Knowledge: <strong style="color:var(--swiss-red)">UNAVAILABLE</strong>';
+    modeTag.innerText="[MODE: AI ALONE // UNTRAINED ON YOUR FILES]";
+    modeTag.style.color="#ffffff";
+    logCLI("[PIPELINE UPDATE] Policy disconnected. AI must rely on generic memory.","err");
+  }
+}
+document.getElementById('ragSwitch').addEventListener('click', toggleRAG);
+class FlowPacket{
+  constructor(path,label,badgeColor,onComplete){
+    this.path=path; this.currentLeg=0; this.progress=0;
+    this.speed=canvasBox.clientWidth<768?0.026:0.022;
+    this.label=label; this.badgeColor=badgeColor; this.onComplete=onComplete;
+  }
+  update(){
+    this.progress+=this.speed;
+    if(this.progress>=1){
+      this.progress=0; this.currentLeg++;
+      if(this.currentLeg>=this.path.length-1){ if(this.onComplete)this.onComplete(); return false; }
+    }
+    return true;
+  }
+  getPosition(){
+    const p1=this.path[this.currentLeg], p2=this.path[this.currentLeg+1];
+    return {x:p1.x+(p2.x-p1.x)*this.progress, y:p1.y+(p2.y-p1.y)*this.progress};
+  }
+}
+function sendQuestion(){
+  runCount++;
+  document.getElementById('traceCounter').innerText="DEMO RUN: #"+String(runCount).padStart(2,'0');
+  const L=getLayout();
+  if(!isRAG){
+    logCLI("\n[STEP 1] Question dispatched: 'Which hospitals are covered?'","step");
+    updateInspector("QUESTION DATA","Sending: 'Which hospitals are covered?'","#000000","Policy Document Bypassed");
+    packets.push(new FlowPacket([L.question,L.llm],'QUESTION',"#000000",()=>{
+      logCLI("[STEP 2] AI Model received question with ZERO policy files attached.","err");
+      logCLI("[WARNING] Model is guessing from generic internet training...","err");
+      updateInspector("AI GUESSING","No policy found. Model is guessing terms.","#d90429","Hallucination Risk: HIGH");
+      setTimeout(()=>{
+        packets.push(new FlowPacket([L.llm,L.answer],'UNCITED ANSWER',"#d90429",()=>{
+          logCLI("[RESULT] Unverified guess: 'You are probably covered at major private hospitals...'","err");
+          updateInspector("UNCITED GUESS","Output: 'Probably major private hospitals' (No page citation)","#d90429","FAIL: NOT FROM YOUR POLICY");
+        }));
+      },250);
+    }));
+  } else {
+    logCLI("\n[STEP 1] Question dispatched: 'Which hospitals are covered?'","step");
+    logCLI("[SEARCH] Routing question to the mock policy to find the exact pages...","rag");
+    updateInspector("QUESTION DATA","Routing to Policy Document (pages 8 + 12)","#002FA7","Searching Vector Index");
+    packets.push(new FlowPacket([L.question,L.policy],'QUESTION',"#002FA7",()=>{
+      logCLI("[STEP 2] MATCH FOUND! Retrieved the network-provider pages.","ok");
+      logCLI("[POLICY EXTRACT] 'St. Jude's Medical Center and Westside Health Center are network providers.'","ok");
+      updateInspector("RETRIEVED PAGES","Found pages 8 + 12 (network providers)","#002FA7","Pages 8, 12 • Similarity: 0.99");
+      setTimeout(()=>{
+        packets.push(new FlowPacket([L.policy,L.llm],'QUESTION + PAGES 8+12',"#002FA7",()=>{
+          logCLI("[STEP 3] AI Model received BOTH question AND the exact policy pages.","step");
+          logCLI("[INFERENCE] AI constrained to policy facts. Writing cited answer...","step");
+          updateInspector("AUGMENTED PROMPT","Question + pages 8+12 delivered to AI Model","#002FA7","Prompt Tokens: 214");
+          setTimeout(()=>{
+            packets.push(new FlowPacket([L.llm,L.answer],'CITED ANSWER',"#002FA7",()=>{
+              logCLI("[RESULT] Verified answer: 'Covered at City General, St. Jude's, and Westside [p.8, p.12]'","ok");
+              updateInspector("100% GROUNDED","Verdict: City General, St. Jude's, Westside [p.8, p.12]","#002FA7","AUDITED WITH PAGE CITATIONS");
+            }));
+          },250);
+        }));
+      },250);
+    }));
+  }
+}
+document.getElementById('send').addEventListener('click', sendQuestion);
+document.getElementById('resetBtn').addEventListener('click', resetTrace);
+function render(){
+  const w=canvasBox.clientWidth, h=canvasBox.clientHeight, L=getLayout();
+  ctx.clearRect(0,0,w,h);
+  ctx.lineWidth=2;
+  if(!isRAG){ ctx.strokeStyle='#000000'; ctx.setLineDash([]); }
+  else { ctx.strokeStyle='#D4D4D4'; ctx.setLineDash([4,4]); }
+  ctx.beginPath(); ctx.moveTo(L.question.x,L.question.y); ctx.lineTo(L.llm.x,L.llm.y); ctx.stroke(); ctx.setLineDash([]);
+  ctx.strokeStyle='#000000';
+  ctx.beginPath(); ctx.moveTo(L.llm.x,L.llm.y); ctx.lineTo(L.answer.x,L.answer.y); ctx.stroke();
+  if(isRAG){ ctx.strokeStyle='#002FA7'; ctx.lineWidth=2.5; ctx.setLineDash([]); }
+  else { ctx.strokeStyle='#D4D4D4'; ctx.lineWidth=1.5; ctx.setLineDash([4,4]); }
+  ctx.beginPath(); ctx.moveTo(L.question.x,L.question.y); ctx.lineTo(L.policy.x,L.policy.y); ctx.lineTo(L.llm.x,L.llm.y); ctx.stroke(); ctx.setLineDash([]);
+  const midX=(L.question.x+L.policy.x)/2, midY=(L.question.y+L.policy.y)/2;
+  const badgeW=L.mobile?86:100, badgeH=22;
+  ctx.fillStyle='#ffffff'; ctx.strokeStyle=isRAG?'#002FA7':'#737373'; ctx.lineWidth=2;
+  ctx.fillRect(midX-badgeW/2,midY-badgeH/2,badgeW,badgeH); ctx.strokeRect(midX-badgeW/2,midY-badgeH/2,badgeW,badgeH);
+  ctx.font='9px "JetBrains Mono", monospace'; ctx.fillStyle=isRAG?'#002FA7':'#737373'; ctx.textAlign='center';
+  ctx.fillText(isRAG?"● CONNECTED":"○ DISCONNECTED",midX,midY+3.5);
+  const nodeList=[
+    {key:'question',node:L.question,active:true},
+    {key:'policy',node:L.policy,active:isRAG},
+    {key:'llm',node:L.llm,active:true},
+    {key:'answer',node:L.answer,active:true}];
+  nodeList.forEach(({key,node,active})=>{
+    const nW=L.nodeW, nH=L.nodeH;
+    ctx.fillStyle=active?'#ffffff':'#f0f0f0';
+    ctx.strokeStyle=active?'#000000':'#D4D4D4'; ctx.lineWidth=2;
+    ctx.fillRect(node.x-nW/2,node.y-nH/2,nW,nH); ctx.strokeRect(node.x-nW/2,node.y-nH/2,nW,nH);
+    let barColor='#000000';
+    if(key==='policy') barColor=isRAG?'#002FA7':'#D4D4D4';
+    if(key==='answer') barColor=isRAG?'#002FA7':'#d90429';
+    ctx.fillStyle=barColor; ctx.fillRect(node.x-nW/2,node.y-nH/2,nW,5);
+    ctx.font=(L.mobile?'9.5px':'10.5px')+' "JetBrains Mono", monospace';
+    ctx.fillStyle=active?'#000000':'#737373'; ctx.textAlign='center';
+    ctx.fillText(node.label,node.x,node.y+(L.mobile?3:4));
+    ctx.font=(L.mobile?'7.5px':'8.5px')+' Inter, sans-serif';
+    ctx.fillStyle=active?'#404040':'#A3A3A3';
+    ctx.fillText(node.sub,node.x,node.y+(L.mobile?14:16));
+  });
+  for(let i=packets.length-1;i>=0;i--){
+    const p=packets[i];
+    if(!p.update()){ packets.splice(i,1); continue; }
+    const pos=p.getPosition(), pW=L.mobile?80:92, pH=22;
+    ctx.fillStyle='#ffffff'; ctx.strokeStyle=p.badgeColor; ctx.lineWidth=2;
+    ctx.fillRect(pos.x-pW/2,pos.y-pH/2,pW,pH); ctx.strokeRect(pos.x-pW/2,pos.y-pH/2,pW,pH);
+    ctx.fillStyle=p.badgeColor; ctx.fillRect(pos.x-pW/2,pos.y-pH/2,4,pH);
+    ctx.font='8px "JetBrains Mono", monospace'; ctx.fillStyle='#000000'; ctx.textAlign='center';
+    ctx.fillText(p.label,pos.x+2,pos.y+3);
+  }
+  requestAnimationFrame(render);
+}
+function logCLI(text,type){
+  const log=document.getElementById('logOutput');
+  const time=new Date().toISOString().substring(11,19);
+  const cls=type==="step"?"log-step":type==="rag"?"log-rag":type==="err"?"log-err":"log-ok";
+  log.innerHTML+="\n<span class=\""+cls+"\">["+time+"] "+text+"</span>";
+  log.scrollTop=log.scrollHeight;
+}
+function updateInspector(badgeText,summary,badgeBg,meta){
+  const badge=document.getElementById('payloadBadge');
+  badge.innerText=badgeText; badge.style.background=badgeBg; badge.style.color="#ffffff";
+  document.getElementById('payloadSummary').innerText=summary;
+  document.getElementById('payloadMeta').innerText=meta;
+}
+function resetTrace(){
+  document.getElementById('logOutput').innerHTML="[SYSTEM RESET]\nPipeline reset. Choose mode and tap 'Send Question'.";
+  updateInspector("IDLE","Waiting to send question...","#D4D4D4","Document Grounding: NONE");
+}
+window.addEventListener('DOMContentLoaded',()=>{ resizeCanvas(); requestAnimationFrame(render); });
+</script>
+<script>renderPipelineOverview('pipeline');</script>
+</body>
+</html>
