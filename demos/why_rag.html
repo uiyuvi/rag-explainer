@@ -21,6 +21,7 @@
 .rag-track.active .rag-thumb{transform:translateX(100%);background:var(--swiss-blue)}
 #modeDesc{font-family:var(--font-mono);font-size:12px;color:var(--swiss-ink-secondary)}
 .action-group{display:flex;gap:10px;flex-wrap:wrap}
+.btn:disabled{opacity:.45;cursor:default;transform:none;box-shadow:3px 3px 0px #000}
 /* flow viewport */
 .flow-card{border:2px solid var(--swiss-rule);background:var(--swiss-surface);box-shadow:var(--shadow-hard)}
 .flow-status{background:#000;color:#fff;padding:8px 14px;font-family:var(--font-mono);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
@@ -104,6 +105,7 @@ Tap "Send Question" to see data move through the system.</div>
 <script src="../assets/common.js?v=12"></script>
 <script>
 let isRAG=false, runCount=0, packets=[];
+let doneLegs=new Set(), litNodes=new Set(), curLeg=null, runMode=null, userVerdict=null, runSeq=0;
 const canvas=document.getElementById('flowCanvas'), ctx=canvas.getContext('2d'), canvasBox=document.getElementById('canvasBox');
 function resizeCanvas(){
   const rect=canvasBox.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
@@ -113,19 +115,45 @@ function resizeCanvas(){
 window.addEventListener('resize', resizeCanvas);
 function getLayout(){
   const w=canvasBox.clientWidth, h=canvasBox.clientHeight, mobile=w<768;
+  let L;
   if(mobile){
-    const leftX=w*0.34, rightX=w*0.76;
-    return {mobile:mobile,nodeW:126,nodeH:46,
-      question:{x:leftX,y:h*0.12,label:"01. YOUR QUESTION",sub:"User Prompt"},
-      policy:{x:rightX,y:h*0.40,label:"02. POLICY DOC",sub:"Mock policy (p.8, p.12)"},
-      llm:{x:leftX,y:h*0.65,label:"03. AI MODEL (LLM)",sub:"Text Generator"},
-      answer:{x:leftX,y:h*0.88,label:"04. FINAL ANSWER",sub:"Audited Output"}};
+    L={mobile:mobile,nodeW:108,nodeH:44,
+      user:{x:w*0.50,y:h*0.08,label:"01 USER",sub:"Asks a question"},
+      app:{x:w*0.50,y:h*0.27,label:"02 APP",sub:"Orchestrator"},
+      data:{x:w*0.72,y:h*0.47,label:"03 DATA SOURCES",sub:"Mock policy · p.8, p.12"},
+      llm:{x:w*0.30,y:h*0.66,label:"04 AI MODEL (LLM)",sub:"Text Generator"}};
+  } else {
+    L={mobile:mobile,nodeW:136,nodeH:50,
+      user:{x:w*0.10,y:h*0.34,label:"01 USER",sub:"Asks a question"},
+      app:{x:w*0.40,y:h*0.34,label:"02 APP",sub:"Orchestrator"},
+      llm:{x:w*0.72,y:h*0.34,label:"04 AI MODEL (LLM)",sub:"Text Generator"},
+      data:{x:w*0.40,y:h*0.76,label:"03 DATA SOURCES",sub:"Mock policy · p.8, p.12"}};
   }
-  return {mobile:mobile,nodeW:132,nodeH:52,
-    question:{x:w*0.14,y:h*0.35,label:"01. YOUR QUESTION",sub:"User Prompt"},
-    policy:{x:w*0.42,y:h*0.78,label:"02. POLICY DOC",sub:"Mock policy (p.8, p.12)"},
-    llm:{x:w*0.66,y:h*0.35,label:"03. AI MODEL (LLM)",sub:"Text Generator"},
-    answer:{x:w*0.89,y:h*0.35,label:"04. FINAL ANSWER",sub:"Audited Output"}};
+  const o=mobile?{h:7,v:6}:{h:10,v:8};
+  L.legs={
+    1:{a:L.user,b:L.app,off:o.h,num:'1',cap:'QUERY'},
+    6:{a:L.app,b:L.user,off:o.h,num:'6',cap:'ANSWER'},
+    2:{a:L.app,b:L.data,off:-o.v,num:'2',cap:'RETRIEVAL QUERY'},
+    3:{a:L.data,b:L.app,off:-o.v,num:'3',cap:'RETRIEVED CHUNKS'},
+    4:{a:L.app,b:L.llm,off:-o.h,num:'4',cap:'QUERY + CHUNKS'},
+    5:{a:L.llm,b:L.app,off:-o.h,num:'5',cap:'ANSWER'}};
+  return L;
+}
+/* offset segment endpoints + helpers */
+function offSeg(a,b,off){
+  const dx=b.x-a.x, dy=b.y-a.y, len=Math.hypot(dx,dy)||1;
+  const nx=-dy/len*off, ny=dx/len*off;
+  return [a.x+nx,a.y+ny,b.x+nx,b.y+ny];
+}
+function segMid(x1,y1,x2,y2){ return [(x1+x2)/2,(y1+y2)/2]; }
+function arrowHead(x2,y2,ang,color,lw){
+  ctx.strokeStyle=color; ctx.lineWidth=lw; ctx.setLineDash([]);
+  ctx.beginPath();
+  ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-9*Math.cos(ang-0.42),y2-9*Math.sin(ang-0.42));
+  ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-9*Math.cos(ang+0.42),y2-9*Math.sin(ang+0.42));
+  ctx.stroke();
 }
 function toggleRAG(){
   isRAG=!isRAG;
@@ -147,99 +175,175 @@ function toggleRAG(){
 }
 document.getElementById('ragSwitch').addEventListener('click', toggleRAG);
 class FlowPacket{
-  constructor(path,label,badgeColor,onComplete){
-    this.path=path; this.currentLeg=0; this.progress=0;
-    this.speed=canvasBox.clientWidth<768?0.026:0.022;
-    this.label=label; this.badgeColor=badgeColor; this.onComplete=onComplete;
+  constructor(legId,label,badgeColor,onComplete){
+    this.leg=legId; this.label=label; this.badgeColor=badgeColor; this.onComplete=onComplete;
+    this.progress=0;
+    const a=curLayout.legs[legId].a, b=curLayout.legs[legId].b;
+    this.dist=Math.hypot(b.x-a.x,b.y-a.y)||1;
+    const pxs=curLayout.mobile?5:6;
+    this.speed=pxs/this.dist;
   }
   update(){
     this.progress+=this.speed;
-    if(this.progress>=1){
-      this.progress=0; this.currentLeg++;
-      if(this.currentLeg>=this.path.length-1){ if(this.onComplete)this.onComplete(); return false; }
-    }
+    if(this.progress>=1){ if(this.onComplete)this.onComplete(); return false; }
     return true;
   }
   getPosition(){
-    const p1=this.path[this.currentLeg], p2=this.path[this.currentLeg+1];
-    return {x:p1.x+(p2.x-p1.x)*this.progress, y:p1.y+(p2.y-p1.y)*this.progress};
+    const [x1,y1,x2,y2]=curSeg(this.leg);
+    return {x:x1+(x2-x1)*this.progress, y:y1+(y2-y1)*this.progress};
   }
+}
+let curLayout=null;
+function curSeg(id){
+  const leg=curLayout.legs[id];
+  return offSeg(leg.a,leg.b,leg.off);
+}
+function lit(id){ doneLegs.add(id); curLeg=null;
+  const arrivals={1:'app',2:'data',3:'app',4:'llm',5:'app',6:'user'};
+  if(arrivals[id]) litNodes.add(arrivals[id]);
 }
 function sendQuestion(){
   runCount++;
   document.getElementById('traceCounter').innerText="DEMO RUN: #"+String(runCount).padStart(2,'0');
-  const L=getLayout();
-  if(!isRAG){
-    logCLI("\n[STEP 1] Question dispatched: 'Which hospitals are covered?'","step");
+  curLayout=getLayout();
+  const L=curLayout, M=L.mobile;
+  doneLegs=new Set(); litNodes=new Set(['user']); curLeg=null; userVerdict=null; packets=[];
+  runMode=isRAG;
+  const sendBtn=document.getElementById('send'); sendBtn.disabled=true;
+  const finish=()=>{ sendBtn.disabled=false; };
+  const mySeq=++runSeq;
+  function fire(id,label,color,then){
+    curLeg=id;
+    packets.push(new FlowPacket(id,label,color,()=>{ if(runSeq!==mySeq)return; lit(id); if(then)then(); }));
+  }
+  if(!runMode){
+    logCLI("\n[1/6] Question dispatched: 'Which hospitals are covered?'","step");
     updateInspector("QUESTION DATA","Sending: 'Which hospitals are covered?'","#000000","Policy Document Bypassed");
-    packets.push(new FlowPacket([L.question,L.llm],'QUESTION',"#000000",()=>{
-      logCLI("[STEP 2] AI Model received question with ZERO policy files attached.","err");
-      logCLI("[WARNING] Model is guessing from generic internet training...","err");
-      updateInspector("AI GUESSING","No policy found. Model is guessing terms.","#d90429","Hallucination Risk: HIGH");
+    fire(1,'QUESTION',"#000000",()=>{
+      logCLI("[1/6] APP received the question. No policy store is connected.","step");
+      updateInspector("QUESTION AT APP","Held by the APP — retrieval legs skipped","#000000","Legs 2-3 bypassed");
       setTimeout(()=>{
-        packets.push(new FlowPacket([L.llm,L.answer],'UNCITED ANSWER',"#d90429",()=>{
-          logCLI("[RESULT] Unverified guess: 'You are probably covered at major private hospitals...'","err");
-          updateInspector("UNCITED GUESS","Output: 'Probably major private hospitals' (No page citation)","#d90429","FAIL: NOT FROM YOUR POLICY");
-        }));
-      },250);
-    }));
-  } else {
-    logCLI("\n[STEP 1] Question dispatched: 'Which hospitals are covered?'","step");
-    logCLI("[SEARCH] Routing question to the mock policy to find the exact pages...","rag");
-    updateInspector("QUESTION DATA","Routing to Policy Document (pages 8 + 12)","#002FA7","Searching Vector Index");
-    packets.push(new FlowPacket([L.question,L.policy],'QUESTION',"#002FA7",()=>{
-      logCLI("[STEP 2] MATCH FOUND! Retrieved the network-provider pages.","ok");
-      logCLI("[POLICY EXTRACT] 'St. Jude's Medical Center and Westside Health Center are network providers.'","ok");
-      updateInspector("RETRIEVED PAGES","Found pages 8 + 12 (network providers)","#002FA7","Pages 8, 12 • Similarity: 0.99");
-      setTimeout(()=>{
-        packets.push(new FlowPacket([L.policy,L.llm],'QUESTION + PAGES 8+12',"#002FA7",()=>{
-          logCLI("[STEP 3] AI Model received BOTH question AND the exact policy pages.","step");
-          logCLI("[INFERENCE] AI constrained to policy facts. Writing cited answer...","step");
-          updateInspector("AUGMENTED PROMPT","Question + pages 8+12 delivered to AI Model","#002FA7","Prompt Tokens: 214");
+        fire(4,'QUERY',"#000000",()=>{
+          logCLI("[4/6] APP sends the QUESTION alone — nothing attached to ground it.","step");
+          logCLI("[4/6] Model received the question with ZERO policy files.","err");
+          logCLI("[WARNING] Model is guessing from generic internet training...","err");
+          updateInspector("AI GUESSING","No policy found. Model is guessing terms.","#d90429","Hallucination Risk: HIGH");
           setTimeout(()=>{
-            packets.push(new FlowPacket([L.llm,L.answer],'CITED ANSWER',"#002FA7",()=>{
-              logCLI("[RESULT] Verified answer: 'Covered at City General, St. Jude's, and Westside [p.8, p.12]'","ok");
-              updateInspector("100% GROUNDED","Verdict: City General, St. Jude's, Westside [p.8, p.12]","#002FA7","AUDITED WITH PAGE CITATIONS");
-            }));
+            fire(5,M?'UNCITED':'UNCITED ANSWER',"#d90429",()=>{
+              logCLI("[5/6] Model returns an uncited answer to the APP.","err");
+              setTimeout(()=>{
+                fire(6,M?'GUESS - NO CITE':'GUESS - NO CITATION',"#d90429",()=>{
+                  logCLI("[6/6] APP delivers the guess to you.","err");
+                  logCLI("[RESULT] Unverified guess: 'You are probably covered at major private hospitals...'","err");
+                  updateInspector("UNCITED GUESS","Output: 'Probably major private hospitals' (No page citation)","#d90429","FAIL: NOT FROM YOUR POLICY");
+                  userVerdict='#d90429'; finish();
+                });
+              },250);
+            });
           },250);
-        }));
+        });
       },250);
-    }));
+    });
+  } else {
+    logCLI("\n[1/6] Question dispatched: 'Which hospitals are covered?'","step");
+    logCLI("[1/6] Routing through the policy store to find the exact pages...","rag");
+    updateInspector("QUESTION DATA","Sending: 'Which hospitals are covered?'","#000000","At the APP - retrieval next");
+    fire(1,'QUESTION',"#000000",()=>{
+      logCLI("[1/6] APP received the question. Sending a retrieval query...","step");
+      setTimeout(()=>{
+        fire(2,M?'RET QUERY':'RETRIEVAL QUERY',"#002FA7",()=>{
+          logCLI("[2/6] MATCH FOUND! Pages 8 + 12 (Similarity: 0.99).","ok");
+          updateInspector("RETRIEVED PAGES","Found pages 8 + 12 (network providers)","#002FA7","Pages 8, 12 / Similarity: 0.99");
+          setTimeout(()=>{
+            fire(3,M?'CHUNKS - 0.99':'RETRIEVED CHUNKS - 0.99',"#002FA7",()=>{
+              logCLI("[3/6] Policy pages returned to the APP.","ok");
+              setTimeout(()=>{
+                fire(4,M?'Q + PAGES 8+12':'QUERY + PAGES 8+12',"#002FA7",()=>{
+                  logCLI("[4/6] APP sends QUESTION + chunks to the model.","step");
+                  logCLI("[4/6] Model reads the exact policy pages. Writing cited answer...","step");
+                  updateInspector("AUGMENTED PROMPT","Question + pages 8+12 delivered to AI Model","#002FA7","Prompt Tokens: 214");
+                  setTimeout(()=>{
+                    fire(5,M?'CITED':'CITED ANSWER',"#002FA7",()=>{
+                      logCLI("[5/6] Cited answer returned to the APP.","ok");
+                      setTimeout(()=>{
+                        fire(6,M?'ANSWER + CITE':'ANSWER + CITATIONS',"#002FA7",()=>{
+                          logCLI("[6/6] APP delivers the answer to you.","ok");
+                          logCLI("[RESULT] Verified: 'Covered at City General, St. Jude's, and Westside [p.8, p.12]'","ok");
+                          updateInspector("100% GROUNDED","Verdict: City General, St. Jude's, Westside [p.8, p.12]","#002FA7","AUDITED WITH PAGE CITATIONS");
+                          userVerdict='#002FA7'; finish();
+                        });
+                      },250);
+                    });
+                  },250);
+                });
+              },250);
+            });
+          },250);
+        });
+      },250);
+    });
   }
 }
 document.getElementById('send').addEventListener('click', sendQuestion);
 document.getElementById('resetBtn').addEventListener('click', resetTrace);
+function legDraw(L,id){
+  const done=doneLegs.has(id), cur=(curLeg===id);
+  if(!isRAG&&(id===2||id===3)) return {color:'#D4D4D4',width:1.5,dash:[4,4]};
+  if(done||cur){
+    let c='#000000';
+    if(runMode){ c=(id===1)?'#000000':'#002FA7'; }
+    else { c=(id===1||id===4)?'#000000':'#d90429'; }
+    return {color:c,width:cur?3:2.5,dash:[]};
+  }
+  return {color:'#000000',width:2,dash:[]};
+}
+function drawLeg(L,id){
+  const leg=L.legs[id], st=legDraw(L,id);
+  const [x1,y1,x2,y2]=offSeg(leg.a,leg.b,leg.off);
+  ctx.strokeStyle=st.color; ctx.lineWidth=st.width; ctx.setLineDash(st.dash);
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); ctx.setLineDash([]);
+  arrowHead(x2,y2,Math.atan2(y2-y1,x2-x1),st.color,st.width);
+  let mx=(x1+x2)/2, my=(y1+y2)/2;
+  mx=Math.max(11,Math.min(L.w-11,mx)); my=Math.max(11,Math.min(L.h-11,my));
+  const filled=doneLegs.has(id)||curLeg===id, r=L.mobile?7:9;
+  ctx.beginPath(); ctx.arc(mx,my,r,0,Math.PI*2);
+  ctx.fillStyle=filled?st.color:'#ffffff'; ctx.fill();
+  ctx.strokeStyle=st.color; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.font='700 '+(L.mobile?8:9)+'px "JetBrains Mono", monospace';
+  ctx.fillStyle=filled?'#ffffff':st.color; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(leg.num,mx,my+0.5); ctx.textBaseline='alphabetic';
+  if(!L.mobile&&leg.cap){
+    ctx.font='8px "JetBrains Mono", monospace'; ctx.fillStyle=st.color;
+    const tw=ctx.measureText(leg.cap).width;
+    if(mx+16+tw>L.w-6){ ctx.textAlign='right'; ctx.fillText(leg.cap,mx-15,my+3); }
+    else { ctx.textAlign='left'; ctx.fillText(leg.cap,mx+15,my+3); }
+  }
+}
 function render(){
-  const w=canvasBox.clientWidth, h=canvasBox.clientHeight, L=getLayout();
+  const w=canvasBox.clientWidth, h=canvasBox.clientHeight;
+  curLayout=getLayout();
+  const L=curLayout; L.w=w; L.h=h;
   ctx.clearRect(0,0,w,h);
-  ctx.lineWidth=2;
-  if(!isRAG){ ctx.strokeStyle='#000000'; ctx.setLineDash([]); }
-  else { ctx.strokeStyle='#D4D4D4'; ctx.setLineDash([4,4]); }
-  ctx.beginPath(); ctx.moveTo(L.question.x,L.question.y); ctx.lineTo(L.llm.x,L.llm.y); ctx.stroke(); ctx.setLineDash([]);
-  ctx.strokeStyle='#000000';
-  ctx.beginPath(); ctx.moveTo(L.llm.x,L.llm.y); ctx.lineTo(L.answer.x,L.answer.y); ctx.stroke();
-  if(isRAG){ ctx.strokeStyle='#002FA7'; ctx.lineWidth=2.5; ctx.setLineDash([]); }
-  else { ctx.strokeStyle='#D4D4D4'; ctx.lineWidth=1.5; ctx.setLineDash([4,4]); }
-  ctx.beginPath(); ctx.moveTo(L.question.x,L.question.y); ctx.lineTo(L.policy.x,L.policy.y); ctx.lineTo(L.llm.x,L.llm.y); ctx.stroke(); ctx.setLineDash([]);
-  const midX=(L.question.x+L.policy.x)/2, midY=(L.question.y+L.policy.y)/2;
+  [1,6,2,3,4,5].forEach(id=>drawLeg(L,id));
+  const l2=L.legs[2], [zx1,zy1,zx2,zy2]=offSeg(l2.a,l2.b,l2.off);
+  const midX=(zx1+zx2)/2, midY=(zy1+zy2)/2;
   const badgeW=L.mobile?86:100, badgeH=22;
   ctx.fillStyle='#ffffff'; ctx.strokeStyle=isRAG?'#002FA7':'#737373'; ctx.lineWidth=2;
   ctx.fillRect(midX-badgeW/2,midY-badgeH/2,badgeW,badgeH); ctx.strokeRect(midX-badgeW/2,midY-badgeH/2,badgeW,badgeH);
   ctx.font='9px "JetBrains Mono", monospace'; ctx.fillStyle=isRAG?'#002FA7':'#737373'; ctx.textAlign='center';
-  ctx.fillText(isRAG?"● CONNECTED":"○ DISCONNECTED",midX,midY+3.5);
+  ctx.fillText(isRAG?"\u25CF CONNECTED":"\u25CB DISCONNECTED",midX,midY+3.5);
+  const activeMap={user:true,app:true,llm:true,data:isRAG};
   const nodeList=[
-    {key:'question',node:L.question,active:true},
-    {key:'policy',node:L.policy,active:isRAG},
-    {key:'llm',node:L.llm,active:true},
-    {key:'answer',node:L.answer,active:true}];
-  nodeList.forEach(({key,node,active})=>{
-    const nW=L.nodeW, nH=L.nodeH;
+    {key:'user',node:L.user},{key:'app',node:L.app},{key:'data',node:L.data},{key:'llm',node:L.llm}];
+  nodeList.forEach(({key,node})=>{
+    const active=activeMap[key], nW=L.nodeW, nH=L.nodeH;
     ctx.fillStyle=active?'#ffffff':'#f0f0f0';
     ctx.strokeStyle=active?'#000000':'#D4D4D4'; ctx.lineWidth=2;
     ctx.fillRect(node.x-nW/2,node.y-nH/2,nW,nH); ctx.strokeRect(node.x-nW/2,node.y-nH/2,nW,nH);
     let barColor='#000000';
-    if(key==='policy') barColor=isRAG?'#002FA7':'#D4D4D4';
-    if(key==='answer') barColor=isRAG?'#002FA7':'#d90429';
+    if(key==='user') barColor=userVerdict||'#000000';
+    if(key==='app') barColor=(litNodes.has('app')&&runMode)?'#002FA7':'#000000';
+    if(key==='data') barColor=litNodes.has('data')?'#002FA7':'#D4D4D4';
     ctx.fillStyle=barColor; ctx.fillRect(node.x-nW/2,node.y-nH/2,nW,5);
     ctx.font=(L.mobile?'9.5px':'10.5px')+' "JetBrains Mono", monospace';
     ctx.fillStyle=active?'#000000':'#737373'; ctx.textAlign='center';
@@ -251,7 +355,7 @@ function render(){
   for(let i=packets.length-1;i>=0;i--){
     const p=packets[i];
     if(!p.update()){ packets.splice(i,1); continue; }
-    const pos=p.getPosition(), pW=L.mobile?80:92, pH=22;
+    const pos=p.getPosition(), pW=L.mobile?104:124, pH=22;
     ctx.fillStyle='#ffffff'; ctx.strokeStyle=p.badgeColor; ctx.lineWidth=2;
     ctx.fillRect(pos.x-pW/2,pos.y-pH/2,pW,pH); ctx.strokeRect(pos.x-pW/2,pos.y-pH/2,pW,pH);
     ctx.fillStyle=p.badgeColor; ctx.fillRect(pos.x-pW/2,pos.y-pH/2,4,pH);
@@ -274,6 +378,8 @@ function updateInspector(badgeText,summary,badgeBg,meta){
   document.getElementById('payloadMeta').innerText=meta;
 }
 function resetTrace(){
+  runSeq++; packets=[]; doneLegs=new Set(); litNodes=new Set(); curLeg=null; runMode=null; userVerdict=null;
+  document.getElementById('send').disabled=false;
   document.getElementById('logOutput').innerHTML="[SYSTEM RESET]\nPipeline reset. Choose mode and tap 'Send Question'.";
   updateInspector("IDLE","Waiting to send question...","#D4D4D4","Document Grounding: NONE");
 }
