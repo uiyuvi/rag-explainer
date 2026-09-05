@@ -79,7 +79,7 @@
       </div>
       <div class="deck-info">
         <h2>Workshop Deck & Phone Demos</h2>
-        <p>Presenting or sharing this material? Put this page on your final slide: attendees scan the code and run every demo on their own phone. The deck below mirrors the walkthrough — take it, reuse it, explore afterwards.</p>
+          <p>Presenting or sharing this material? Put this page on your final slide: attendees scan the code and run every demo on their own phone. The deck below covers the eight-stage walkthrough — take it, reuse it, explore afterwards.</p>
       </div>
       <div class="deck-actions">
         <a href="slides/rag_explainer.pptx" class="btn btn-primary">Download .PPTX</a>
@@ -148,7 +148,7 @@
       <div class="res-body">
         <h2 class="res-title"><a href="https://arxiv.org/abs/1603.09320" target="_blank" rel="noopener">Efficient and Robust Approximate Nearest Neighbor Search Using HNSW Graphs</a></h2>
         <div class="res-author">Yu. A. Malkov & D. A. Yashunin • IEEE TPAMI 2018</div>
-        <p class="res-abs">The algorithmic engine inside Chroma, Qdrant, Milvus, Weaviate, and pgvector. Multi-layer navigable graphs reduce vector lookup from exhaustive linear scan O(N) to logarithmic O(log N).</p>
+        <p class="res-abs">The algorithmic engine inside Chroma, Qdrant, Milvus, Weaviate, and pgvector. In short: shortcuts that skip most of the library — only a few shelves get checked, so lookup drops from scanning everything O(N) to O(log N).</p>
         <div class="takeaway"><strong>Why it matters</strong>Pairs with the Vector DB demo: without an ANN index, searching 100,000 clauses means scoring every fingerprint; with HNSW, retrieval takes milliseconds.</div>
       </div>
       <div class="res-actions">
@@ -162,7 +162,7 @@
       <div class="res-body">
         <h2 class="res-title"><a href="https://arxiv.org/abs/2005.11401" target="_blank" rel="noopener">Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks</a></h2>
         <div class="res-author">Patrick Lewis et al. • NeurIPS 2020 (Meta AI)</div>
-        <p class="res-abs">The paper that coined “RAG”. Couples parametric memory (the sequence generator) with non-parametric memory (DPR dense vector retrieval) so answers can cite external knowledge.</p>
+        <p class="res-abs">The paper that coined “RAG”. Instead of stuffing knowledge into model weights, it keeps knowledge in a searchable index the model reads at answer time — so answers can cite external sources.</p>
         <div class="takeaway"><strong>First principles anchor</strong>Establishes why model weights must not be treated as a static encyclopedia — knowledge lives in the index, the model reads it at answer time.</div>
       </div>
       <div class="res-actions">
